@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<massive-search-mapping xmlns="http://massiveart.com/schema/dic/massive-search-mapping">
+    <mapping class="Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation">
+        <index value="Abbreviation"/>
+        <id property="id"/>
+        <name expr="object.getName()"/>
+        <summary expr="object.getExplanation()"/>
+        <text expr="object.getDescription()"/>
+        <locale property="locale"/>
+        <fields>
+            <field name="name" expr="object.getName()" type="string"/>
+            <field name="summary" expr="object.getExplanation()" type="string"/>
+            <field name="text" expr="object.getDescription()" type="string"/>
+        </fields>
+    </mapping>
+</massive-search-mapping>

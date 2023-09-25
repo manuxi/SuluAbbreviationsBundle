@@ -1,0 +1,43 @@
+sulu_abbreviations:
+    id: "Id"
+    name: "Name"
+    explanation: "Explanation"
+    description: "Description"
+    publish: "publish"
+    unpublish: "unpublish"
+    published: "published"
+    published_date: "Publish Date"
+    published_at: "Published at"
+
+    header:
+        content: "Content"
+        additional: "Further Information"
+        mandatory: "Mandatory Fields"
+        optional: "Optional Fields"
+    abbreviation_selection_label: "{count} {count, plural, =1 {news} other {news}} selected"
+    select_abbreviation: "Select abbreviation"
+    select_abbreviationlist: "Select abbreviation"
+    no_abbreviation_selected: "No abbreviation selected"
+    enable_news: "Enable abbreviation"
+    publish_news: "Publish Abbreviation"
+    webspace_settings: "Webspace settings"
+    customize_webspace_settings: "Customize webspace settings"
+    main_webspace: "Main webspace"
+    additional_webspace: "Additional webspaces"
+    shadow_news: "Shadow news"
+    enable_shadow_news: "Enable shadow news"
+    search_name: "Abbreviation"
+    empty_abbreviationlist: "No Abbreviation chosen"
+    abbreviation: "Abbreviation"
+
+sulu_activity:
+    resource:
+        abbreviation: "Abbreviation"
+    description:
+        abbreviation:
+            created: "{userFullName} created the news \"{resourceTitle}\"."
+            modified: "{userFullName} modified the news \"{resourceTitle}\"."
+            removed: "{userFullName} deleted the news \"{resourceTitle}\"."
+            restored: "{userFullName} restored the news \"{resourceTitle}\"."
+            published: "{userFullName} published the news \"{resourceTitle}\"."
+            unpublished: "{userFullName} unpublished the news \"{resourceTitle}\"."

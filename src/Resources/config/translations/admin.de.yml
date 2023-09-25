@@ -1,0 +1,42 @@
+sulu_abbreviations:
+    id: "Id"
+    name: "Name"
+    explanation: "Erklärung"
+    description: "Anmerkungen"
+    publish: "veröffentlichen"
+    unpublish: "Veröffentlichen beenden"
+    published: "veröffentlicht"
+    published_date: "Veröffentlichungsdatum"
+    published_at: "Veröffentlicht am"
+
+    header:
+        content: "Inhalt"
+        additional: "Weitere Informationen"
+        mandatory: "Verpflichtende Felder"
+        optional: "Optionale Felder"
+    abbreviation_selection_label: "{count} {count, plural, =1 {Abbreviation} other {Abbreviation}} ausgewählt"
+    select_abbreviation: "Abkürzung auswählen"
+    select_abbreviationlist: "Abkürzung auswählen"
+    no_abbreviation_selected: "Keine Abkürzung ausgewählt"
+    publish_news: "Abkürzung veröffentlichen"
+    webspace_settings: "Webspace Einstellungen"
+    customize_webspace_settings: "Webspace Einstellungen anpassen"
+    main_webspace: "Haupt Webspace"
+    additional_webspace: "Zusätzliche Webspaces"
+    shadow_news: "Shadow Abkürzung"
+    enable_shadow_news: "Shadow Abkürzung aktivieren"
+    search_name: "Abkürzung"
+    empty_newslist: "Keine Abkürzung ausgewählt"
+    abbreviation: "Abkürzung"
+
+sulu_activity:
+    resource:
+        abbreviation: "Abkürzung"
+    description:
+        abbreviation:
+            created: "{userFullName} hat die Abkürzung \"{resourceTitle}\" erstellt."
+            modified: "{userFullName} hat die Abkürzung \"{resourceTitle}\" geändert."
+            removed: "{userFullName} hat die Abkürzung \"{resourceTitle}\" gelöscht."
+            restored: "{userFullName} hat die Abkürzung \"{resourceTitle}\" wieder hergestellt."
+            published: "{userFullName} hat die Abkürzung \"{resourceTitle}\" veröffentlicht."
+            unpublished: "{userFullName} hat die Veröffentlichung der Abkürzung \"{resourceTitle}\" beendet."
