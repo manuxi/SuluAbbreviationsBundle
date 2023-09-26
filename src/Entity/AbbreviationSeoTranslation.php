@@ -29,7 +29,7 @@ class AbbreviationSeoTranslation implements SeoTranslationInterface
         $this->setLocale($locale);
     }
 
-    public function getAbbreviationSeo(): AbbreviationSeo
+    public function getSeo(): AbbreviationSeo
     {
         return $this->abbreviationSeo;
     }

@@ -169,8 +169,8 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
         $entity = $this->abbreviationModel->update($id, $request);
         $this->updateRoutesForEntity($entity);
 
-        $this->abbreviationSeoModel->updateEventSeo($entity->getEventSeo(), $request);
-        $this->abbreviationExcerptModel->updateEventExcerpt($entity->getEventExcerpt(), $request);
+        $this->abbreviationSeoModel->updateAbbreviationSeo($entity->getSeo(), $request);
+        $this->abbreviationExcerptModel->updateAbbreviationExcerpt($entity->setExcerpt(), $request);
 
         return $this->handleView($this->view($entity));
     }

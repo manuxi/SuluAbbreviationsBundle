@@ -44,18 +44,18 @@ class Abbreviation implements AuditableTranslatableInterface
     private ?int $id = null;
 
     /**
-     * @ORM\OneToOne(targetEntity="Manuxi\SuluAbbreviationBundle\Entity\AbbreviationSeo", mappedBy="event", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity="Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationSeo", mappedBy="abbreviation", cascade={"persist", "remove"})
      *
      * @Serializer\Exclude
      */
-    private ?AbbreviationSeo $eventSeo = null;
+    private ?AbbreviationSeo $abbreviationSeo = null;
 
     /**
-     * @ORM\OneToOne(targetEntity="Manuxi\SuluAbbreviationBundle\Entity\AbbreviationExcerpt", mappedBy="event", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity="Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationExcerpt", mappedBy="abbreviation", cascade={"persist", "remove"})
      *
      * @Serializer\Exclude
      */
-    private ?AbbreviationExcerpt $eventExcerpt = null;
+    private ?AbbreviationExcerpt $abbreviationExcerpt = null;
 
     /**
      * @ORM\OneToMany(targetEntity=AbbreviationTranslation::class, mappedBy="abbreviation", cascade={"ALL"}, indexBy="locale", fetch="EXTRA_LAZY")
@@ -220,35 +220,35 @@ class Abbreviation implements AuditableTranslatableInterface
         return $this;
     }
 
-    public function getAbbreviationSeo(): AbbreviationSeo
+    public function getSeo(): AbbreviationSeo
     {
-        if (!$this->eventSeo instanceof AbbreviationSeo) {
-            $this->eventSeo = new AbbreviationSeo();
-            $this->eventSeo->setAbbreviation($this);
+        if (!$this->abbreviationSeo instanceof AbbreviationSeo) {
+            $this->abbreviationSeo = new AbbreviationSeo();
+            $this->abbreviationSeo->setAbbreviation($this);
         }
 
-        return $this->eventSeo;
+        return $this->abbreviationSeo;
     }
 
-    public function setAbbreviationSeo(?AbbreviationSeo $eventSeo): self
+    public function setSeo(?AbbreviationSeo $abbreviationSeo): self
     {
-        $this->eventSeo = $eventSeo;
+        $this->abbreviationSeo = $abbreviationSeo;
         return $this;
     }
 
-    public function getAbbreviationExcerpt(): AbbreviationExcerpt
+    public function setExcerpt(): AbbreviationExcerpt
     {
-        if (!$this->eventExcerpt instanceof AbbreviationExcerpt) {
-            $this->eventExcerpt = new AbbreviationExcerpt();
-            $this->eventExcerpt->setAbbreviation($this);
+        if (!$this->abbreviationExcerpt instanceof AbbreviationExcerpt) {
+            $this->abbreviationExcerpt = new AbbreviationExcerpt();
+            $this->abbreviationExcerpt->setAbbreviation($this);
         }
 
-        return $this->eventExcerpt;
+        return $this->abbreviationExcerpt;
     }
 
-    public function setAbbreviationExcerpt(?AbbreviationExcerpt $eventExcerpt): self
+    public function setAbbreviationExcerpt(?AbbreviationExcerpt $abbreviationExcerpt): self
     {
-        $this->eventExcerpt = $eventExcerpt;
+        $this->abbreviationExcerpt = $abbreviationExcerpt;
         return $this;
     }
 
@@ -279,10 +279,10 @@ class Abbreviation implements AuditableTranslatableInterface
 
     private function propagateLocale(string $locale): self
     {
-        $eventSeo = $this->getAbbreviationSeo();
-        $eventSeo->setLocale($locale);
-        $eventExcerpt = $this->getAbbreviationExcerpt();
-        $eventExcerpt->setLocale($locale);
+        $abbreviationSeo = $this->getSeo();
+        $abbreviationSeo->setLocale($locale);
+        $abbreviationExcerpt = $this->setExcerpt();
+        $abbreviationExcerpt->setLocale($locale);
         $this->initExt();
         return $this;
     }
@@ -290,10 +290,10 @@ class Abbreviation implements AuditableTranslatableInterface
     private function initExt(): self
     {
         if (!$this->hasExt('seo')) {
-            $this->addExt('seo', $this->getAbbreviationSeo());
+            $this->addExt('seo', $this->getSeo());
         }
         if (!$this->hasExt('excerpt')) {
-            $this->addExt('excerpt', $this->getAbbreviationExcerpt());
+            $this->addExt('excerpt', $this->setExcerpt());
         }
 
         return $this;
