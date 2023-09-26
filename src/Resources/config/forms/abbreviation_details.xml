@@ -72,6 +72,16 @@
                     </params>
                 </property>
 
+                <property name="category" type="single_category_selection" colspan="6">
+                    <meta>
+                        <title>sulu_abbreviations.category</title>
+                    </meta>
+                    <params>
+                        <param name="request_parameters" type="collection">
+                            <param name="rootKey" value="abbreviations"/>
+                        </param>
+                    </params>
+                </property>
             </properties>
         </section>
     </properties>

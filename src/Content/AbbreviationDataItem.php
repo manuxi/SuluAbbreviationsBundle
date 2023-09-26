@@ -32,6 +32,22 @@ class AbbreviationDataItem implements ItemInterface
     /**
      * @Serializer\VirtualProperty
      */
+    public function getTitle(): string
+    {
+        return (string) $this->entity->getName();
+    }
+
+    /**
+     * @Serializer\VirtualProperty
+     */
+    public function getImage(): ?string
+    {
+        return null;
+    }
+
+    /**
+     * @Serializer\VirtualProperty
+     */
     public function getName(): string
     {
         return (string) $this->entity->getName();

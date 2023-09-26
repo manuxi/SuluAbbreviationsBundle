@@ -44,6 +44,20 @@ class Abbreviation implements AuditableTranslatableInterface
     private ?int $id = null;
 
     /**
+     * @ORM\OneToOne(targetEntity="Manuxi\SuluAbbreviationBundle\Entity\AbbreviationSeo", mappedBy="event", cascade={"persist", "remove"})
+     *
+     * @Serializer\Exclude
+     */
+    private ?AbbreviationSeo $eventSeo = null;
+
+    /**
+     * @ORM\OneToOne(targetEntity="Manuxi\SuluAbbreviationBundle\Entity\AbbreviationExcerpt", mappedBy="event", cascade={"persist", "remove"})
+     *
+     * @Serializer\Exclude
+     */
+    private ?AbbreviationExcerpt $eventExcerpt = null;
+
+    /**
      * @ORM\OneToMany(targetEntity=AbbreviationTranslation::class, mappedBy="abbreviation", cascade={"ALL"}, indexBy="locale", fetch="EXTRA_LAZY")
      * @Serializer\Exclude
      */
@@ -56,6 +70,7 @@ class Abbreviation implements AuditableTranslatableInterface
     public function __construct()
     {
         $this->translations = new ArrayCollection();
+        $this->initExt();
     }
 
     public function getId(): ?int
@@ -143,6 +158,7 @@ class Abbreviation implements AuditableTranslatableInterface
     public function setLocale(string $locale): self
     {
         $this->locale = $locale;
+        $this->propagateLocale($locale);
         return $this;
     }
 
@@ -204,4 +220,82 @@ class Abbreviation implements AuditableTranslatableInterface
         return $this;
     }
 
+    public function getAbbreviationSeo(): AbbreviationSeo
+    {
+        if (!$this->eventSeo instanceof AbbreviationSeo) {
+            $this->eventSeo = new AbbreviationSeo();
+            $this->eventSeo->setAbbreviation($this);
+        }
+
+        return $this->eventSeo;
+    }
+
+    public function setAbbreviationSeo(?AbbreviationSeo $eventSeo): self
+    {
+        $this->eventSeo = $eventSeo;
+        return $this;
+    }
+
+    public function getAbbreviationExcerpt(): AbbreviationExcerpt
+    {
+        if (!$this->eventExcerpt instanceof AbbreviationExcerpt) {
+            $this->eventExcerpt = new AbbreviationExcerpt();
+            $this->eventExcerpt->setAbbreviation($this);
+        }
+
+        return $this->eventExcerpt;
+    }
+
+    public function setAbbreviationExcerpt(?AbbreviationExcerpt $eventExcerpt): self
+    {
+        $this->eventExcerpt = $eventExcerpt;
+        return $this;
+    }
+
+    /**
+     * @Serializer\VirtualProperty(name="ext")
+     */
+    public function getExt(): array
+    {
+        return $this->ext;
+    }
+
+    public function setExt(array $ext): self
+    {
+        $this->ext = $ext;
+        return $this;
+    }
+
+    public function addExt(string $key, $value): self
+    {
+        $this->ext[$key] = $value;
+        return $this;
+    }
+
+    public function hasExt(string $key): bool
+    {
+        return \array_key_exists($key, $this->ext);
+    }
+
+    private function propagateLocale(string $locale): self
+    {
+        $eventSeo = $this->getAbbreviationSeo();
+        $eventSeo->setLocale($locale);
+        $eventExcerpt = $this->getAbbreviationExcerpt();
+        $eventExcerpt->setLocale($locale);
+        $this->initExt();
+        return $this;
+    }
+
+    private function initExt(): self
+    {
+        if (!$this->hasExt('seo')) {
+            $this->addExt('seo', $this->getAbbreviationSeo());
+        }
+        if (!$this->hasExt('excerpt')) {
+            $this->addExt('excerpt', $this->getAbbreviationExcerpt());
+        }
+
+        return $this;
+    }
 }

@@ -4,13 +4,13 @@
         <index value="abbreviation"/>
         <id property="id"/>
         <name expr="object.getName()"/>
-        <summary expr="object.getExplanation()"/>
-        <text expr="object.getDescription()"/>
+        <explanation expr="object.getExplanation()"/>
+        <description expr="object.getDescription()"/>
         <locale property="locale"/>
         <fields>
             <field name="name" expr="object.getName()" type="string"/>
-            <field name="summary" expr="object.getExplanation()" type="string"/>
-            <field name="text" expr="object.getDescription()" type="string"/>
+            <field name="explanation" expr="object.getExplanation()" type="string"/>
+            <field name="description" expr="object.getDescription()" type="string"/>
         </fields>
     </mapping>
 </massive-search-mapping>

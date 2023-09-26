@@ -80,7 +80,7 @@ class DoctrineListRepresentationFactory
         }
 
         $list = $this->addGhostLocaleToListElements($list, $parameters['locale'] ?? null);
-        //$list = $this->addImagesToListElements($list, $parameters['locale'] ?? null);
+        $list = $this->addImagesToListElements($list, $parameters['locale'] ?? null);
 
         return new PaginatedRepresentation(
             $list,

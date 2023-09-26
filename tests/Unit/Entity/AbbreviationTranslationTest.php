@@ -77,4 +77,12 @@ class AbbreviationTranslationTest extends SuluTestCase
         $this->assertNull($this->translation->getPublishedAt());
     }
 
+    public function testRoutePath(): void
+    {
+        $testRoutePath = 'abbreviations/abbreviation-100';
+        $this->assertEmpty($this->translation->getRoutePath());
+        $this->assertSame($this->translation, $this->translation->setRoutePath($testRoutePath));
+        $this->assertSame($testRoutePath, $this->translation->getRoutePath());
+    }
+
 }

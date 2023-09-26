@@ -27,6 +27,9 @@ class AbbreviationsAdmin extends Admin
     public const EDIT_FORM_DETAILS_VIEW = 'sulu_abbreviations.abbreviations.edit_form.details';
     public const SECURITY_CONTEXT = 'sulu.modules.abbreviation';
 
+    //seo,excerpt, etc
+    public const EDIT_FORM_VIEW_SEO = 'sulu_event.event.edit_form.seo';
+    public const EDIT_FORM_VIEW_EXCERPT = 'sulu_event.event.edit_form.excerpt';
     public const EDIT_FORM_VIEW_SETTINGS = 'sulu_abbreviations.edit_form.settings';
 
     private ViewBuilderFactoryInterface $viewBuilderFactory;
@@ -166,6 +169,38 @@ class AbbreviationsAdmin extends Admin
             }
 
             $formToolbarActionsWithoutType[] = new ToolbarAction('sulu_admin.save');
+
+            $viewCollection->add(
+                $this->viewBuilderFactory
+                    ->createPreviewFormViewBuilder(static::EDIT_FORM_VIEW_SEO, '/seo')
+//                    ->disablePreviewWebspaceChooser()
+                    ->setResourceKey(Abbreviation::RESOURCE_KEY)
+                    ->setFormKey('page_seo')
+                    ->setTabTitle('sulu_page.seo')
+//                    ->setTabCondition('nodeType == 1 && shadowOn == false')
+                    ->addToolbarActions($formToolbarActionsWithoutType)
+//                    ->addRouterAttributesToFormRequest($routerAttributesToFormRequest)
+                    ->setPreviewCondition($previewCondition)
+                    ->setTitleVisible(true)
+                    ->setTabOrder(2048)
+                    ->setParent(static::EDIT_FORM_VIEW)
+            );
+            $viewCollection->add(
+                $this->viewBuilderFactory
+                    ->createPreviewFormViewBuilder(static::EDIT_FORM_VIEW_EXCERPT, '/excerpt')
+//                    ->disablePreviewWebspaceChooser()
+                    ->setResourceKey(Abbreviation::RESOURCE_KEY)
+                    ->setFormKey('page_excerpt')
+                    ->setTabTitle('sulu_page.excerpt')
+//                    ->setTabCondition('(nodeType == 1 || nodeType == 4) && shadowOn == false')
+                    ->addToolbarActions($formToolbarActionsWithoutType)
+//                    ->addRouterAttributesToFormRequest($routerAttributesToFormRequest)
+//                    ->addRouterAttributesToFormMetadata($routerAttributesToFormMetadata)
+                    ->setPreviewCondition($previewCondition)
+                    ->setTitleVisible(true)
+                    ->setTabOrder(3072)
+                    ->setParent(static::EDIT_FORM_VIEW)
+            );
 
             $viewCollection->add(
                 $this->viewBuilderFactory

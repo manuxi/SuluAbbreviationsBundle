@@ -7,6 +7,8 @@
 
         <service id="Manuxi\SuluAbbreviationsBundle\Controller\Admin\AbbreviationsController" public="true">
             <argument type="service" id="sulu_abbreviations.model.abbreviation"/>
+            <argument type="service" id="sulu_abbreviation.model.abbreviation_seo"/>
+            <argument type="service" id="sulu_abbreviation.model.abbreviation_excerpt"/>
             <argument type="service" id="sulu_route.manager.route_manager"/>
             <argument type="service" id="sulu.repository.route"/>
             <argument type="service" id="sulu_abbreviations.doctrine_list_representation_factory"/>

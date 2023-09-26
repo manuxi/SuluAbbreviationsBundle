@@ -6,6 +6,7 @@ namespace Manuxi\SuluAbbreviationsBundle\Controller\Admin;
 
 use Manuxi\SuluAbbreviationsBundle\Common\DoctrineListRepresentationFactory;
 use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
+use Manuxi\SuluAbbreviationsBundle\Entity\Models\AbbreviationExcerptModel;
 use Manuxi\SuluAbbreviationsBundle\Entity\Models\AbbreviationModel;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
@@ -13,6 +14,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\View\ViewHandlerInterface;
+use Manuxi\SuluAbbreviationsBundle\Entity\Models\AbbreviationSeoModel;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
 use Sulu\Bundle\RouteBundle\Manager\RouteManagerInterface;
 use Sulu\Bundle\TrashBundle\Application\TrashManager\TrashManagerInterface;
@@ -38,6 +40,8 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
     use RequestParametersTrait;
 
     private AbbreviationModel $abbreviationModel;
+    private AbbreviationSeoModel $abbreviationSeoModel;
+    private AbbreviationExcerptModel $abbreviationExcerptModel;
     private DoctrineListRepresentationFactory $doctrineListRepresentationFactory;
     private RouteManagerInterface $routeManager;
     private RouteRepositoryInterface $routeRepository;
@@ -46,6 +50,8 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
 
     public function __construct(
         AbbreviationModel $abbreviationModel,
+        AbbreviationSeoModel $abbreviationSeoModel,
+        AbbreviationExcerptModel $abbreviationExcerptModel,
         RouteManagerInterface $routeManager,
         RouteRepositoryInterface $routeRepository,
         DoctrineListRepresentationFactory $doctrineListRepresentationFactory,
@@ -55,7 +61,9 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
         ?TokenStorageInterface $tokenStorage = null
     ) {
         parent::__construct($viewHandler, $tokenStorage);
-        $this->abbreviationModel                        = $abbreviationModel;
+        $this->abbreviationModel                 = $abbreviationModel;
+        $this->abbreviationSeoModel              = $abbreviationSeoModel;
+        $this->abbreviationExcerptModel          = $abbreviationExcerptModel;
         $this->doctrineListRepresentationFactory = $doctrineListRepresentationFactory;
         $this->routeManager                      = $routeManager;
         $this->routeRepository                   = $routeRepository;
@@ -160,6 +168,9 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
     {
         $entity = $this->abbreviationModel->update($id, $request);
         $this->updateRoutesForEntity($entity);
+
+        $this->abbreviationSeoModel->updateEventSeo($entity->getEventSeo(), $request);
+        $this->abbreviationExcerptModel->updateEventExcerpt($entity->getEventExcerpt(), $request);
 
         return $this->handleView($this->view($entity));
     }
