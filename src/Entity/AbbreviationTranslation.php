@@ -9,10 +9,11 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Manuxi\SuluAbbreviationsBundle\Entity\Interfaces\AuditableInterface;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\AuditableTrait;
-use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ImageTrait;
-use Manuxi\SuluAbbreviationsBundle\Entity\Traits\PdfTrait;
-use Manuxi\SuluAbbreviationsBundle\Entity\Traits\UrlTrait;
 use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationTranslationRepository;
+use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ImageTrait;
+use Manuxi\SuluAbbreviationsBundle\Entity\Traits\PublishedTrait;
+use Manuxi\SuluAbbreviationsBundle\Entity\Traits\RouteTrait;
+use Manuxi\SuluAbbreviationsBundle\Entity\Traits\UrlTrait;
 
 /**
  * @ORM\Entity
@@ -21,8 +22,11 @@ use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationTranslationRepository;
  */
 class AbbreviationTranslation implements AuditableInterface
 {
-    use UrlTrait;
     use AuditableTrait;
+    use PublishedTrait;
+    use RouteTrait;
+    use UrlTrait;
+    use ImageTrait;
 
     /**
      * @ORM\Id()
@@ -56,21 +60,6 @@ class AbbreviationTranslation implements AuditableInterface
      * @ORM\Column(type="text", nullable=true)
      */
     private ?string $description = null;
-
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private ?bool $published = null;
-
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
-    private ?DateTime $publishedAt = null;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private string $routePath;
 
     public function __construct(Abbreviation $abbreviation, string $locale)
     {
@@ -132,41 +121,4 @@ class AbbreviationTranslation implements AuditableInterface
         return $this;
     }
 
-    public function isPublished(): ?bool
-    {
-        return $this->published ?? false;
-    }
-
-    public function setPublished(bool $published): self
-    {
-        $this->published = $published;
-        if($published === true){
-            $this->setPublishedAt(new DateTime());
-        } else {
-            $this->setPublishedAt(null);
-        }
-        return $this;
-    }
-
-    public function getPublishedAt(): ?DateTime
-    {
-        return $this->publishedAt;
-    }
-
-    public function setPublishedAt(?DateTime $publishedAt): self
-    {
-        $this->publishedAt = $publishedAt;
-        return $this;
-    }
-
-    public function getRoutePath(): string
-    {
-        return $this->routePath ?? '';
-    }
-
-    public function setRoutePath(string $routePath): self
-    {
-        $this->routePath = $routePath;
-        return $this;
-    }
 }

@@ -166,18 +166,20 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
 
     /**
      * @param int $id
+     * @param Request $request
      * @return Response
      * @throws EntityNotFoundException
      */
-    public function deleteAction(int $id): Response
+    public function deleteAction(int $id, Request $request): Response
     {
-        $entity = $this->abbreviationModel->get($id);
+        $entity = $this->abbreviationModel->get($id, $request);
+        $name = $entity->getName();
 
         $this->trashManager->store(Abbreviation::RESOURCE_KEY, $entity);
 
         $this->removeRoutesForEntity($entity);
 
-        $this->abbreviationModel->delete($id, $entity->getTitle());
+        $this->abbreviationModel->delete($id, $name);
         return $this->handleView($this->view(null, 204));
     }
 

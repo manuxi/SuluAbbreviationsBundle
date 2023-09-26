@@ -73,7 +73,7 @@
             <argument type="service" id="request_stack"/>
             <argument type="service" id="doctrine.orm.entity_manager" />
 
-            <tag name="sulu.smart_content.data_provider" alias="abbreviationlist"/>
+            <tag name="sulu.smart_content.data_provider" alias="abbreviations"/>
         </service>
 
         <service id="sulu_abbreviations.webspace_selector"

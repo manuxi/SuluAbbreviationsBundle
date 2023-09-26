@@ -9,10 +9,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Manuxi\SuluAbbreviationsBundle\Entity\Traits\PublishedTranslatableTrait;
 use Manuxi\SuluAbbreviationsBundle\Entity\Interfaces\AuditableTranslatableInterface;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\AuditableTranslatableTrait;
 use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationRepository;
 use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationTranslation;
+use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ImageTranslatableTrait;
+use Manuxi\SuluAbbreviationsBundle\Entity\Traits\RouteTranslatableTrait;
+use Manuxi\SuluAbbreviationsBundle\Entity\Traits\UrlTranslatableTrait;
 
 /**
  * @ORM\Entity
@@ -21,12 +25,16 @@ use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationTranslation;
  */
 class Abbreviation implements AuditableTranslatableInterface
 {
-    use AuditableTranslatableTrait;
-
     public const RESOURCE_KEY = 'abbreviations';
     public const FORM_KEY = 'abbreviation_details';
     public const LIST_KEY = 'abbreviations';
     public const SECURITY_CONTEXT = 'sulu.abbreviations.abbreviations';
+
+    use AuditableTranslatableTrait;
+    use PublishedTranslatableTrait;
+    use RouteTranslatableTrait;
+    use UrlTranslatableTrait;
+    use ImageTranslatableTrait;
 
     /**
      * @ORM\Id()
@@ -163,30 +171,6 @@ class Abbreviation implements AuditableTranslatableInterface
     }
 
     /**
-     * @Serializer\VirtualProperty(name="route_path")
-     */
-    public function getRoutePath(): ?string
-    {
-        $translation = $this->getTranslation($this->locale);
-        if (!$translation) {
-            return null;
-        }
-
-        return $translation->getRoutePath();
-    }
-
-    public function setRoutePath(string $routePath): self
-    {
-        $translation = $this->getTranslation($this->locale);
-        if (!$translation) {
-            $translation = $this->createTranslation($this->locale);
-        }
-
-        $translation->setRoutePath($routePath);
-        return $this;
-    }
-
-    /**
      * @Serializer\VirtualProperty("availableLocales")
      */
     public function getAvailableLocales(): array
@@ -217,55 +201,6 @@ class Abbreviation implements AuditableTranslatableInterface
 
            $this->setLocale($locale);
         }
-        return $this;
-    }
-
-    /**
-     * @Serializer\VirtualProperty("published")
-     */
-    public function getPublished(): ?bool
-    {
-        return $this->isPublished();
-    }
-
-    public function isPublished(): ?bool
-    {
-        $translation = $this->getTranslation($this->locale);
-        if (!$translation) {
-            return null;
-        }
-        return $translation->isPublished();
-    }
-
-    public function setPublished(bool $published): self
-    {
-        $translation = $this->getTranslation($this->locale);
-        if (!$translation) {
-            $translation = $this->createTranslation($this->locale);
-        }
-        $translation->setPublished($published);
-        return $this;
-    }
-
-    /**
-     * @Serializer\VirtualProperty(name="published_at")
-     */
-    public function getPublishedAt(): ?DateTime
-    {
-        $translation = $this->getTranslation($this->locale);
-        if(!$translation) {
-            return null;
-        }
-        return $translation->getPublishedAt();
-    }
-
-    public function setPublishedAt(?DateTime $date): self
-    {
-        $translation = $this->getTranslation($this->locale);
-        if(!$translation) {
-            $translation = $this->createTranslation($this->locale);
-        }
-        $translation->setPublishedAt($date);
         return $this;
     }
 

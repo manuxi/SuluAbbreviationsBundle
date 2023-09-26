@@ -60,7 +60,7 @@ class AbbreviationsTrashItemHandler implements StoreTrashItemHandlerInterface, R
         return $this->trashItemRepository->create(
             Abbreviation::RESOURCE_KEY,
             (string)$resource->getId(),
-            $resource->getTitle(),
+            $resource->getName(),
             $data,
             null,
             $options,

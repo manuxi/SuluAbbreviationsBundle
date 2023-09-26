@@ -8,6 +8,10 @@ sulu_abbreviations:
     published: "veröffentlicht"
     published_date: "Veröffentlichungsdatum"
     published_at: "Veröffentlicht am"
+    link: "Verlinkung"
+    website: "Webseite"
+    image: "Bild"
+    mainimage: "Hauptbild"
 
     header:
         content: "Inhalt"
@@ -32,9 +36,9 @@ sulu_abbreviations:
 
 sulu_activity:
     resource:
-        abbreviation: "Abkürzung"
+        abbreviations: "Abkürzung"
     description:
-        abbreviation:
+        abbreviations:
             created: "{userFullName} hat die Abkürzung \"{resourceTitle}\" erstellt."
             modified: "{userFullName} hat die Abkürzung \"{resourceTitle}\" geändert."
             removed: "{userFullName} hat die Abkürzung \"{resourceTitle}\" gelöscht."

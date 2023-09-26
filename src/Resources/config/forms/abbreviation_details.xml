@@ -37,12 +37,41 @@
                     </meta>
                     <tag name="sulu.rlp.part"/>
                 </property>
+            </properties>
+        </section>
+        <section name="optional">
+            <meta>
+                <title>sulu_abbreviations.header.optional</title>
+            </meta>
+            <properties>
 
                 <property name="description" type="text_editor">
                     <meta>
                         <title>sulu_abbreviations.description</title>
                     </meta>
                 </property>
+
+                <property name="image" type="single_media_selection" colspan="6">
+                    <meta>
+                        <title>sulu_abbreviations.mainimage</title>
+                    </meta>
+                    <params>
+                        <param name="types" value="image"/>
+                    </params>
+                </property>
+
+                <property name="url" type="url" colspan="6">
+                    <meta>
+                        <title>sulu_abbreviations.link</title>
+                    </meta>
+                    <params>
+                        <param name="schemes" type="collection">
+                            <param name="https://"/>
+                            <param name="http://"/>
+                        </param>
+                    </params>
+                </property>
+
             </properties>
         </section>
     </properties>

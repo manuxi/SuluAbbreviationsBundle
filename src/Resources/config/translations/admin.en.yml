@@ -8,6 +8,10 @@ sulu_abbreviations:
     published: "published"
     published_date: "Publish Date"
     published_at: "Published at"
+    link: "Link"
+    website: "Website"
+    image: "Image"
+    mainimage: "Main Image"
 
     header:
         content: "Content"
