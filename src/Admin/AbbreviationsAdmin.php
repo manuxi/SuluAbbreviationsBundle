@@ -12,8 +12,6 @@ use Sulu\Bundle\AdminBundle\Admin\View\TogglerToolbarAction;
 use Sulu\Bundle\AdminBundle\Admin\View\ToolbarAction;
 use Sulu\Bundle\AdminBundle\Admin\View\ViewBuilderFactoryInterface;
 use Sulu\Bundle\AdminBundle\Admin\View\ViewCollection;
-use Sulu\Bundle\AutomationBundle\Admin\AutomationAdmin;
-use Sulu\Bundle\AutomationBundle\Admin\View\AutomationViewBuilderFactoryInterface;
 use Sulu\Component\Security\Authorization\PermissionTypes;
 use Sulu\Component\Security\Authorization\SecurityCheckerInterface;
 use Sulu\Component\Webspace\Manager\WebspaceManagerInterface;
@@ -27,20 +25,13 @@ class AbbreviationsAdmin extends Admin
     public const ADD_FORM_DETAILS_VIEW = 'sulu_abbreviations.abbreviations.add_form.details';
     public const EDIT_FORM_VIEW = 'sulu_abbreviations.abbreviations.edit_form';
     public const EDIT_FORM_DETAILS_VIEW = 'sulu_abbreviations.abbreviations.edit_form.details';
-    public const SECURITY_CONTEXT = 'sulu.modules.news';
+    public const SECURITY_CONTEXT = 'sulu.modules.abbreviation';
 
-    //seo,excerpt, etc
-    public const EDIT_FORM_VIEW_SEO = 'sulu_abbreviations.abbreviations.edit_form.seo';
-    public const EDIT_FORM_VIEW_EXCERPT = 'sulu_abbreviations.abbreviations.edit_form.excerpt';
     public const EDIT_FORM_VIEW_SETTINGS = 'sulu_abbreviations.edit_form.settings';
-    public const EDIT_FORM_VIEW_AUTOMATION = 'sulu_abbreviations.abbreviations.edit_form.automation';
-    public const EDIT_FORM_VIEW_ACTIVITY = 'sulu_abbreviations.abbreviations.edit_form.activity';
 
     private ViewBuilderFactoryInterface $viewBuilderFactory;
     private SecurityCheckerInterface $securityChecker;
     private WebspaceManagerInterface $webspaceManager;
-
-    private ?AutomationViewBuilderFactoryInterface $automationViewBuilderFactory;
 
     private ?array $types = null;
 
@@ -58,7 +49,7 @@ class AbbreviationsAdmin extends Admin
     {
         if ($this->securityChecker->hasPermission(Abbreviation::SECURITY_CONTEXT, PermissionTypes::EDIT)) {
             $rootNavigationItem = new NavigationItem(static::NAV_ITEM);
-            $rootNavigationItem->setIcon('su-newspaper');
+            $rootNavigationItem->setIcon('su-enter');
             $rootNavigationItem->setPosition(30);
             $rootNavigationItem->setView(static::LIST_VIEW);
 

@@ -1,8 +1,7 @@
-app_abbreviation_api:
+app_abbreviations_api:
     type: rest
     prefix: /admin/api
     resource: Manuxi\SuluAbbreviationsBundle\Controller\Admin\AbbreviationsController
     name_prefix: sulu_abbreviations.
     options:
         expose: true
-

@@ -50,15 +50,10 @@ class AbbreviationsTrashItemHandler implements StoreTrashItemHandlerInterface, R
         $image = $resource->getImage();
 
         $data = [
-            "type" => $resource->getType(),
-            "title" => $resource->getTitle(),
-            "subtitle" => $resource->getName(),
-            "summary" => $resource->getExplanation(),
-            "text" => $resource->getDescription(),
-            "footer" => $resource->getFooter(),
+            "name" => $resource->getName(),
+            "explanation" => $resource->getExplanation(),
+            "description" => $resource->getDescription(),
             "slug" => $resource->getRoutePath(),
-            "ext" => $resource->getExt(),
-            "imageId" => $image ? $image->getId() : null,
             "published" => $resource->isPublished(),
             "publishedAt" => $resource->getPublishedAt()
         ];
@@ -80,27 +75,14 @@ class AbbreviationsTrashItemHandler implements StoreTrashItemHandlerInterface, R
         $data = $trashItem->getRestoreData();
         $abbreviationId = (int)$trashItem->getResourceId();
         $abbreviation = new Abbreviation();
-        $abbreviation->setType($data['type']);
-
-        $abbreviation->setTitle($data['title']);
-        $abbreviation->setName($data['subtitle']);
-        $abbreviation->setExplanation($data['summary']);
-        $abbreviation->setDescription($data['text']);
-        $abbreviation->setFooter($data['footer']);
-
-        $abbreviation->setPublished($data['published']);
-
+        $abbreviation->setName($data['name']);
+        $abbreviation->setExplanation($data['explanation']);
+        $abbreviation->setDescription($data['description']);
         $abbreviation->setRoutePath($data['slug']);
 
-        $abbreviation->setExt($data['ext']);
+        $abbreviation->setPublished($data['published']);
+        $abbreviation->setPublishedAt($data['publishedAt'] ? new DateTime($data['publishedAt']['date']) : null);
 
-        if($data['imageId']){
-            $abbreviation->setImage($this->entityManager->find(MediaInterface::class, $data['imageId']));
-        }
-
-        if(isset($data['publishedAt'])){
-            $abbreviation->setPublishedAt(new DateTime($data['publishedAt']['date']));
-        }
         $this->domainEventCollector->collect(
             new AbbreviationRestoredEvent($abbreviation, $data)
         );

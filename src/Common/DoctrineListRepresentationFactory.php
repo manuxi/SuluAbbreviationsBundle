@@ -80,7 +80,7 @@ class DoctrineListRepresentationFactory
         }
 
         $list = $this->addGhostLocaleToListElements($list, $parameters['locale'] ?? null);
-        $list = $this->addImagesToListElements($list, $parameters['locale'] ?? null);
+        //$list = $this->addImagesToListElements($list, $parameters['locale'] ?? null);
 
         return new PaginatedRepresentation(
             $list,
@@ -125,7 +125,7 @@ class DoctrineListRepresentationFactory
             $missingLocales = $this->abbreviationTranslationRepository->findMissingLocaleByIds($ids, $locale, $localesCount);
             foreach($missingLocales as $missingLocale) {
                 foreach ($listeElements as $key => $element) {
-                    if ($element['id'] === (int)$missingLocale['news'] && !array_key_exists('ghostLocale', $element)) {
+                    if ($element['id'] === (int)$missingLocale['abbreviation'] && !array_key_exists('ghostLocale', $element)) {
                         $listeElements[$key]['ghostLocale'] = $locale;
 //                        $listeElements[$key]['localizationState'] = [
 //                            'state' => 'ghost',

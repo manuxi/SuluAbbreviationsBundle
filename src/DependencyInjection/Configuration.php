@@ -24,7 +24,7 @@ class Configuration implements ConfigurationInterface
             ->arrayNode('objects')
                 ->addDefaultsIfNotSet()
                 ->children()
-                    ->arrayNode('news')
+                    ->arrayNode('abbreviation')
                         ->addDefaultsIfNotSet()
                         ->children()
                             ->scalarNode('model')->defaultValue(Abbreviation::class)->end()

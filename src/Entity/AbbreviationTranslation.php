@@ -67,6 +67,11 @@ class AbbreviationTranslation implements AuditableInterface
      */
     private ?DateTime $publishedAt = null;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private string $routePath;
+
     public function __construct(Abbreviation $abbreviation, string $locale)
     {
         $this->abbreviation  = $abbreviation;
@@ -154,4 +159,14 @@ class AbbreviationTranslation implements AuditableInterface
         return $this;
     }
 
+    public function getRoutePath(): string
+    {
+        return $this->routePath ?? '';
+    }
+
+    public function setRoutePath(string $routePath): self
+    {
+        $this->routePath = $routePath;
+        return $this;
+    }
 }

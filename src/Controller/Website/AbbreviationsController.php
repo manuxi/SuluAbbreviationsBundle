@@ -49,12 +49,12 @@ class AbbreviationsController extends AbstractController
      * @return Response
      * @throws \Exception
      */
-    public function indexAction(Abbreviation $abbreviation, string $view = 'pages/news', bool $preview = false, bool $partial = false): Response
+    public function indexAction(Abbreviation $abbreviation, string $view = 'pages/abbreviation', bool $preview = false, bool $partial = false): Response
     {
         $viewTemplate = $this->getViewTemplate($view, $this->request, $preview);
 
         $parameters = $this->templateAttributeResolver->resolve([
-            'news'   => $abbreviation,
+            'abbreviation'   => $abbreviation,
             'content' => [
                 'title' => $this->translator->trans('sulu_abbreviations.abbreviations'),
                 'name'  => $abbreviation->getName(),
@@ -70,7 +70,7 @@ class AbbreviationsController extends AbstractController
 
     /**
      * With the help of this method the corresponding localisations for the
-     * current news are found e.g. to be linked in the language switcher.
+     * current abbreviations are found e.g. to be linked in the language switcher.
      * @param Abbreviation $abbreviation
      * @return array<string, array>
      */

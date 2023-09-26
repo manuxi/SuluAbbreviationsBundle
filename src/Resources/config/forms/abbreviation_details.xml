@@ -21,14 +21,24 @@
                     <tag name="sulu.rlp.part"/>
                 </property>
 
-                <property name="explanation" type="text_line">
+                <property name="routePath" type="route" mandatory="true">
+                    <meta>
+                        <title>sulu_admin.url</title>
+                    </meta>
+                    <!--https://github.com/sulu/sulu/pull/5933-->
+                    <params>
+                        <param name="mode" value="leaf"/>
+                    </params>
+                </property>
+
+                <property name="explanation" type="text_area" mandatory="true">
                     <meta>
                         <title>sulu_abbreviations.explanation</title>
                     </meta>
                     <tag name="sulu.rlp.part"/>
                 </property>
 
-                <property name="description" type="text_area" mandatory="true">
+                <property name="description" type="text_editor">
                     <meta>
                         <title>sulu_abbreviations.description</title>
                     </meta>

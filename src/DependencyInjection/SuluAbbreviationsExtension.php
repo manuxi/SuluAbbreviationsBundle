@@ -42,9 +42,9 @@ class SuluAbbreviationsExtension extends Extension implements PrependExtensionIn
                 'sulu_search',
                 [
                     'indexes' => [
-                        'news' => [
+                        'abbreviation' => [
                             'name' => 'sulu_abbreviations.search_name',
-                            'icon' => 'su-newspaper',
+                            'icon' => 'su-enter',
                             'view' => [
                                 'name' => AbbreviationsAdmin::EDIT_FORM_VIEW,
                                 'result_to_view' => [
@@ -55,10 +55,10 @@ class SuluAbbreviationsExtension extends Extension implements PrependExtensionIn
                             'security_context' => AbbreviationsAdmin::SECURITY_CONTEXT,
                         ],
 /*                        'website' => [
-                            "name" => "news.search_name",
-                            'icon' => 'su-newspaper',
+                            "name" => "abbreviation.search_name",
+                            'icon' => 'su-enter',
                             "contexts" => [
-                                "news",
+                                "abbreviation",
                             ],
                         ],*/
                     ],
@@ -76,7 +76,7 @@ class SuluAbbreviationsExtension extends Extension implements PrependExtensionIn
                             'options' => [
                                 //@TODO: works not yet as expected, does not translate correctly
                                 //see https://github.com/sulu/sulu/pull/5920
-                                'route_schema' => '/{translator.trans("sulu_abbreviations.abbreviations")}/{implode("-", object)}'
+                                'route_schema' => '/{translator.trans("sulu_abbreviations.abbreviation")}/{implode("-", object)}'
                             ],
                             'resource_key' => Abbreviation::RESOURCE_KEY,
                         ],
@@ -100,7 +100,7 @@ class SuluAbbreviationsExtension extends Extension implements PrependExtensionIn
                         ],
                     ],
                     'resources' => [
-                        'news' => [
+                        'abbreviations' => [
                             'routes' => [
                                 'list' => 'sulu_abbreviations.get_abbreviations',
                                 'detail' => 'sulu_abbreviations.get_abbreviation',
@@ -123,9 +123,9 @@ class SuluAbbreviationsExtension extends Extension implements PrependExtensionIn
                                         'adapter' => 'table',
                                         'list_key' => Abbreviation::LIST_KEY,
                                         'display_properties' => [
-                                            'title'
+                                            'name'
                                         ],
-                                        'icon' => 'su-newspaper',
+                                        'icon' => 'su-enter',
                                         'label' => 'sulu_abbreviations.abbreviations_selection_label',
                                         'overlay_title' => 'sulu_abbreviations.select_abbreviation'
                                     ]
@@ -147,16 +147,16 @@ class SuluAbbreviationsExtension extends Extension implements PrependExtensionIn
                                         'adapter' => 'table',
                                         'list_key' => Abbreviation::LIST_KEY,
                                         'display_properties' => [
-                                            'title'
+                                            'name'
                                         ],
-                                        'icon' => 'su-calendar',
+                                        'icon' => 'su-enter',
                                         'empty_text' => 'sulu_abbreviations.no_abbreviation_selected',
                                         'overlay_title' => 'sulu_abbreviations.select_abbreviation'
                                     ],
                                     'auto_complete' => [
-                                        'display_property' => 'title',
+                                        'display_property' => 'name',
                                         'search_properties' => [
-                                            'title'
+                                            'name'
                                         ]
                                     ]
                                 ]

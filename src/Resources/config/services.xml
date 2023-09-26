@@ -8,7 +8,6 @@
             <argument type="service" id="sulu_admin.view_builder_factory"/>
             <argument type="service" id="sulu_security.security_checker"/>
             <argument type="service" id="sulu_core.webspace.webspace_manager"/>
-            <argument type="service" id="sulu_abbreviations.type_selection"/>
             <argument type="service" id="sulu_automation.automation_view_builder_factory"/>
 
             <tag name="sulu.admin"/>
@@ -27,12 +26,8 @@
             <tag name="sulu.context" context="admin"/>
         </service>
 
-        <service id="sulu_abbreviations.type_selection" class="Manuxi\SuluAbbreviationsBundle\Service\NewsTypeSelect" public="true">
-            <argument type="service" id="translator.default"/>
-        </service>
-
         <!-- Repositories -->
-        <service id="sulu_abbreviations.repository.abbreviation" class="Manuxi\SuluAbbreviationsBundle\Repository\NewsRepository" public="true" lazy="true">
+        <service id="sulu_abbreviations.repository.abbreviation" class="Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationRepository" public="true" lazy="true">
             <argument type="service" id="doctrine"/>
             <tag name="doctrine.repository_service"/>
         </service>
@@ -41,90 +36,44 @@
             <argument type="service" id="doctrine"/>
         </service>
 
-        <service id="sulu_abbreviations.repository.abbreviation_seo" class="Manuxi\SuluAbbreviationsBundle\Repository\NewsSeoRepository" public="true" lazy="true">
-            <argument type="service" id="doctrine"/>
-        </service>
-
-        <service id="sulu_abbreviations.repository.abbreviation_seo_translation" class="Manuxi\SuluAbbreviationsBundle\Repository\NewsSeoTranslationRepository" public="true" lazy="true">
-            <argument type="service" id="doctrine"/>
-        </service>
-
-        <service id="sulu_abbreviations.repository.abbreviation_excerpt" class="Manuxi\SuluAbbreviationsBundle\Repository\NewsExcerptRepository" public="true" lazy="true">
-            <argument type="service" id="doctrine"/>
-        </service>
-
-        <service id="sulu_abbreviations.repository.abbreviation_excerpt_translation" class="Manuxi\SuluAbbreviationsBundle\Repository\NewsExcerptTranslationRepository" public="true" lazy="true">
-            <argument type="service" id="doctrine"/>
-        </service>
-
-
         <!-- needed for massive search/automation bundle? -->
         <!-- Otherwise: "Make sure the service exists and is tagged with 'doctrine.repository_service'" -->
-        <service id="Manuxi\SuluAbbreviationsBundle\Repository\NewsRepository" public="true" lazy="true">
+        <service id="Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationRepository" public="true" lazy="true">
             <argument type="service" id="doctrine"/>
             <tag name="doctrine.repository_service"/>
         </service>
 
-        <!--
-        <service id="Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationTranslationRepository" lazy="true">
-            <argument type="service" id="doctrine"/>
-            <tag name="doctrine.repository_service"/>
-        </service>
-
-        <service id="Manuxi\SuluAbbreviationsBundle\Repository\NewsSeoRepository" public="true" lazy="true">
-            <argument type="service" id="doctrine"/>
-            <tag name="doctrine.repository_service"/>
-        </service>
-
-        <service id="Manuxi\SuluAbbreviationsBundle\Repository\NewsSeoTranslationRepository" public="true" lazy="true">
-            <argument type="service" id="doctrine"/>
-            <tag name="doctrine.repository_service"/>
-        </service>
-
-        <service id="Manuxi\SuluAbbreviationsBundle\Repository\NewsExcerptRepository" public="true" lazy="true">
-            <argument type="service" id="doctrine"/>
-            <tag name="doctrine.repository_service"/>
-        </service>
-
-        <service id="Manuxi\SuluAbbreviationsBundle\Repository\NewsExcerptTranslationRepository" public="true" lazy="true">
-            <argument type="service" id="doctrine"/>
-            <tag name="doctrine.repository_service"/>
-        </service>
-        -->
-
-
-
-        <service id="sulu_abbreviations.single_abbreviation_selection" class="Manuxi\SuluAbbreviationsBundle\Content\Type\SingleNewsSelection">
+        <service id="sulu_abbreviations.single_abbreviation_selection" class="Manuxi\SuluAbbreviationsBundle\Content\Type\SingleAbbreviationSelection">
             <argument type="service" id="doctrine.orm.default_entity_manager"/>
 
             <tag name="sulu.content.type" alias="single_abbreviation_selection" />
         </service>
 
-        <service id="sulu_abbreviations.abbreviations_selection" class="Manuxi\SuluAbbreviationsBundle\Content\Type\NewsSelection">
+        <service id="sulu_abbreviations.abbreviations_selection" class="Manuxi\SuluAbbreviationsBundle\Content\Type\AbbreviationsSelection">
             <argument type="service" id="doctrine.orm.default_entity_manager"/>
 
-            <tag name="sulu.content.type" alias="abbreviation_selection"/>
+            <tag name="sulu.content.type" alias="abbreviations_selection"/>
         </service>
 
-        <service id="Manuxi\SuluAbbreviationsBundle\Content\NewsSelectionContentType">
+        <service id="Manuxi\SuluAbbreviationsBundle\Content\AbbreviationsSelectionContentType">
             <argument type="service" id="sulu_abbreviations.repository.abbreviation"/>
 
-            <tag name="sulu.content.type" alias="abbreviation_selection"/>
+            <tag name="sulu.content.type" alias="abbreviations_selection"/>
         </service>
 
-        <service id="Manuxi\SuluAbbreviationsBundle\Routing\NewsRouteDefaultsProvider">
+        <service id="Manuxi\SuluAbbreviationsBundle\Routing\AbbreviationsRouteDefaultsProvider">
             <argument type="service" id="sulu_abbreviations.repository.abbreviation"/>
 
             <tag name="sulu_route.defaults_provider"/>
         </service>
 
-        <service id="sulu_abbreviations.abbreviations_data_provider" class="Manuxi\SuluAbbreviationsBundle\Content\NewsDataProvider">
+        <service id="sulu_abbreviations.abbreviations_data_provider" class="Manuxi\SuluAbbreviationsBundle\Content\AbbreviationsDataProvider">
             <argument type="service" id="sulu_abbreviations.repository.abbreviation"/>
             <argument type="service" id="sulu_core.array_serializer"/>
             <argument type="service" id="request_stack"/>
             <argument type="service" id="doctrine.orm.entity_manager" />
 
-            <tag name="sulu.smart_content.data_provider" alias="abbrevationlist"/>
+            <tag name="sulu.smart_content.data_provider" alias="abbreviationlist"/>
         </service>
 
         <service id="sulu_abbreviations.webspace_selector"
@@ -142,19 +91,19 @@
             <tag name="doctrine.event_subscriber"/>
         </service>
 
-        <service id="sulu_abbreviations.model.abbreviation" class="Manuxi\SuluAbbreviationsBundle\Entity\Models\NewsModel">
+        <service id="sulu_abbreviations.model.abbreviation" class="Manuxi\SuluAbbreviationsBundle\Entity\Models\AbbreviationModel">
             <argument type="service" id="sulu_abbreviations.repository.abbreviation"/>
             <argument type="service" id="sulu.repository.media"/>
             <argument type="service" id="sulu_security.user_repository"/>
             <argument type="service" id="sulu_activity.domain_event_collector"/>
         </service>
 
-        <service id="sulu_abbreviations.object_provider" public="true" class="Manuxi\SuluAbbreviationsBundle\Preview\NewsObjectProvider">
+        <service id="sulu_abbreviations.object_provider" public="true" class="Manuxi\SuluAbbreviationsBundle\Preview\AbbreviationsObjectProvider">
             <argument type="service" id="sulu_abbreviations.repository.abbreviation"/>
             <tag name="sulu_preview.object_provider" provider-key="abbreviation"/>
         </service>
 
-        <service id="sulu_abbreviations.routing_provider" public="true" class="Manuxi\SuluAbbreviationsBundle\Routing\NewsRouteDefaultsProvider">
+        <service id="sulu_abbreviations.routing_provider" public="true" class="Manuxi\SuluAbbreviationsBundle\Routing\AbbreviationsRouteDefaultsProvider">
             <argument type="service" id="sulu_abbreviations.repository.abbreviation"/>
             <tag name="sulu_route.defaults_provider"/>
         </service>

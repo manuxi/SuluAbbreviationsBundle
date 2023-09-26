@@ -102,7 +102,7 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
     }
 
     /**
-     * @Rest\Post("/news/{id}")
+     * @Rest\Post("/abbreviation/{id}")
      *
      * @param int $id
      * @param Request $request
@@ -155,8 +155,6 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
      * @param Request $request
      * @return Response
      * @throws EntityNotFoundException
-     * @throws ORMException
-     * @throws OptimisticLockException
      */
     public function putAction(int $id, Request $request): Response
     {
@@ -170,7 +168,6 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
      * @param int $id
      * @return Response
      * @throws EntityNotFoundException
-     * @throws ORMException
      */
     public function deleteAction(int $id): Response
     {
