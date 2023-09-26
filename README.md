@@ -1,7 +1,7 @@
 # SuluAbbreviationsBundle!
 ![php workflow](https://github.com/manuxi/SuluAbbreviationsBundle/actions/workflows/php.yml/badge.svg)
 ![symfony workflow](https://github.com/manuxi/SuluAbbreviationsBundle/actions/workflows/symfony.yml/badge.svg)
-<a href="https://github.com/manuxi/SuluAbbreviationsBundle/blob/main/LICENSE" target="_blank">
+<a href="https://github.com/manuxi/SuluAbbreviationsBundle/main/LICENSE" target="_blank">
 <img src="https://img.shields.io/github/license/manuxi/SuluAbbreviationsBundle" alt="GitHub license">
 </a>
 <a href="https://github.com/manuxi/SuluAbbreviationsBundle/tags" target="_blank">
