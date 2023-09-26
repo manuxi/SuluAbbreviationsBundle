@@ -1,4 +1,6 @@
-# SuluAbbrevationsBundle!
+# SuluAbbreviationsBundle!
+![php workflow](https://github.com/manuxi/SuluAbbreviationsBundle/actions/workflows/php.yml/badge.svg)
+![symfony workflow](https://github.com/manuxi/SuluAbbreviationsBundle/actions/workflows/symfony.yml/badge.svg)
 <a href="https://github.com/manuxi/SuluAbbreviationsBundle/blob/main/LICENSE" target="_blank">
 <img src="https://img.shields.io/github/license/manuxi/SuluAbbreviationsBundle" alt="GitHub license">
 </a>
@@ -48,7 +50,7 @@ Make sure you only process the bundles schema updates!
 
 ## 🎣 Usage
 First: Grant permissions for abbreviations. 
-After page reload you should see the abbreviations item in the navigation. 
+After reload you should see the abbreviations item in the navigation. 
 Start to create abbreviations.
 Use smart_content property type to show a list of abbreviations, e.g.:
 ```xml
