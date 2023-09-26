@@ -69,24 +69,24 @@ class AbbreviationTest extends SuluTestCase
 
     public function testAbbreviationSeo(): void
     {
-        $eventSeo = $this->prophesize(AbbreviationSeo::class);
-        $eventSeo->getId()->willReturn(42);
+        $abbreviationSeo = $this->prophesize(AbbreviationSeo::class);
+        $abbreviationSeo->getId()->willReturn(42);
 
-        $this->assertInstanceOf(AbbreviationSeo::class, $this->entity->getAbbreviationSeo());
-        $this->assertNull($this->entity->getAbbreviationSeo()->getId());
-        $this->assertSame($this->entity, $this->entity->setAbbreviationSeo($eventSeo->reveal()));
-        $this->assertSame($eventSeo->reveal(), $this->entity->getAbbreviationSeo());
+        $this->assertInstanceOf(AbbreviationSeo::class, $this->entity->getSeo());
+        $this->assertNull($this->entity->getSeo()->getId());
+        $this->assertSame($this->entity, $this->entity->setSeo($abbreviationSeo->reveal()));
+        $this->assertSame($abbreviationSeo->reveal(), $this->entity->getSeo());
     }
 
     public function testAbbreviationExcerpt(): void
     {
-        $eventExcerpt = $this->prophesize(AbbreviationExcerpt::class);
-        $eventExcerpt->getId()->willReturn(42);
+        $abbreviationExcerpt = $this->prophesize(AbbreviationExcerpt::class);
+        $abbreviationExcerpt->getId()->willReturn(42);
 
-        $this->assertInstanceOf(AbbreviationExcerpt::class, $this->entity->getAbbreviationExcerpt());
-        $this->assertNull($this->entity->getAbbreviationExcerpt()->getId());
-        $this->assertSame($this->entity, $this->entity->setAbbreviationExcerpt($eventExcerpt->reveal()));
-        $this->assertSame($eventExcerpt->reveal(), $this->entity->getAbbreviationExcerpt());
+        $this->assertInstanceOf(AbbreviationExcerpt::class, $this->entity->getExcerpt());
+        $this->assertNull($this->entity->getExcerpt()->getId());
+        $this->assertSame($this->entity, $this->entity->setExcerpt($abbreviationExcerpt->reveal()));
+        $this->assertSame($abbreviationExcerpt->reveal(), $this->entity->getExcerpt());
     }
 
     public function testExt(): void

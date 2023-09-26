@@ -236,7 +236,7 @@ class Abbreviation implements AuditableTranslatableInterface
         return $this;
     }
 
-    public function setExcerpt(): AbbreviationExcerpt
+    public function getExcerpt(): AbbreviationExcerpt
     {
         if (!$this->abbreviationExcerpt instanceof AbbreviationExcerpt) {
             $this->abbreviationExcerpt = new AbbreviationExcerpt();
@@ -246,7 +246,7 @@ class Abbreviation implements AuditableTranslatableInterface
         return $this->abbreviationExcerpt;
     }
 
-    public function setAbbreviationExcerpt(?AbbreviationExcerpt $abbreviationExcerpt): self
+    public function setExcerpt(?AbbreviationExcerpt $abbreviationExcerpt): self
     {
         $this->abbreviationExcerpt = $abbreviationExcerpt;
         return $this;
@@ -281,7 +281,7 @@ class Abbreviation implements AuditableTranslatableInterface
     {
         $abbreviationSeo = $this->getSeo();
         $abbreviationSeo->setLocale($locale);
-        $abbreviationExcerpt = $this->setExcerpt();
+        $abbreviationExcerpt = $this->getExcerpt();
         $abbreviationExcerpt->setLocale($locale);
         $this->initExt();
         return $this;
@@ -293,7 +293,7 @@ class Abbreviation implements AuditableTranslatableInterface
             $this->addExt('seo', $this->getSeo());
         }
         if (!$this->hasExt('excerpt')) {
-            $this->addExt('excerpt', $this->setExcerpt());
+            $this->addExt('excerpt', $this->getExcerpt());
         }
 
         return $this;

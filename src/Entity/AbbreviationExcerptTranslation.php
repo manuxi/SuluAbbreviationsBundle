@@ -30,7 +30,7 @@ class AbbreviationExcerptTranslation implements ExcerptTranslationInterface
         $this->initExcerptTranslationTrait();
     }
 
-    public function setExcerpt(): AbbreviationExcerpt
+    public function getExcerpt(): AbbreviationExcerpt
     {
         return $this->abbreviationExcerpt;
     }
