@@ -55,7 +55,12 @@ class AbbreviationsTrashItemHandler implements StoreTrashItemHandlerInterface, R
             "description" => $resource->getDescription(),
             "slug" => $resource->getRoutePath(),
             "published" => $resource->isPublished(),
-            "publishedAt" => $resource->getPublishedAt()
+            "publishedAt" => $resource->getPublishedAt(),
+            "ext" => $resource->getExt(),
+            "locale" => $resource->getLocale(),
+            "imageId" => $image ? $image->getId() : null,
+            "url" => $resource->getUrl(),
+
         ];
         return $this->trashItemRepository->create(
             Abbreviation::RESOURCE_KEY,
@@ -79,9 +84,14 @@ class AbbreviationsTrashItemHandler implements StoreTrashItemHandlerInterface, R
         $abbreviation->setExplanation($data['explanation']);
         $abbreviation->setDescription($data['description']);
         $abbreviation->setRoutePath($data['slug']);
-
+        $abbreviation->setExt($data['ext']);
+        $abbreviation->setUrl($data['url']);
         $abbreviation->setPublished($data['published']);
         $abbreviation->setPublishedAt($data['publishedAt'] ? new DateTime($data['publishedAt']['date']) : null);
+
+        if($data['imageId']){
+            $abbreviation->setImage($this->entityManager->find(MediaInterface::class, $data['imageId']));
+        }
 
         $this->domainEventCollector->collect(
             new AbbreviationRestoredEvent($abbreviation, $data)

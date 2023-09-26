@@ -225,6 +225,25 @@ class AbbreviationModel implements AbbreviationModelInterface
             $entity->setDescription($description);
         }
 
+        $routePath = $this->getProperty($data, 'routePath');
+        if ($routePath) {
+            $entity->setRoutePath($routePath);
+        }
+
+        $url = $this->getProperty($data, 'url');
+        if ($url) {
+            $entity->setUrl($url);
+        }
+
+        $imageId = $this->getPropertyMulti($data, ['image', 'id']);
+        if ($imageId) {
+            $image = $this->mediaRepository->findMediaById((int) $imageId);
+            if (!$image) {
+                throw new EntityNotFoundException($this->mediaRepository->getClassName(), $imageId);
+            }
+            $entity->setImage($image);
+        }
+
         return $entity;
     }
 

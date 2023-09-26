@@ -110,7 +110,7 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
     }
 
     /**
-     * @Rest\Post("/abbreviation/{id}")
+     * @Rest\Post("/abbreviations/{id}")
      *
      * @param int $id
      * @param Request $request
