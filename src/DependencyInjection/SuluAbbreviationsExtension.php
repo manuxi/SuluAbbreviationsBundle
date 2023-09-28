@@ -167,10 +167,10 @@ class SuluAbbreviationsExtension extends Extension implements PrependExtensionIn
             );
         }
 
-//        $container->prependExtensionConfig(
-//            'sulu_abbreviations',
-//            ['templates' => ['view' => 'news/index.html.twig']]
-//        );
+/*        $container->prependExtensionConfig(
+            'sulu_abbreviations',
+            ['templates' => ['view' => 'abbreviation.html.twig']]
+        );*/
 
         $container->loadFromExtension('framework', [
             'default_locale' => 'en',

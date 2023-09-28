@@ -2,7 +2,7 @@ sulu_abbreviations:
     id: "Id"
     name: "Abkürzung"
     explanation: "Kurzform"
-    description: "Bedeutung"
+    description: "Informationen, Bedeutung & Implikation"
     publish: "veröffentlichen"
     unpublish: "Veröffentlichen beenden"
     published: "veröffentlicht"

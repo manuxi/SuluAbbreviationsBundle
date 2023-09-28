@@ -49,7 +49,7 @@ class AbbreviationsController extends AbstractController
      * @return Response
      * @throws \Exception
      */
-    public function indexAction(Abbreviation $abbreviation, string $view = 'pages/abbreviation', bool $preview = false, bool $partial = false): Response
+    public function indexAction(Abbreviation $abbreviation, string $view = '@SuluAbbreviations/abbreviation', bool $preview = false, bool $partial = false): Response
     {
         $viewTemplate = $this->getViewTemplate($view, $this->request, $preview);
 

@@ -79,11 +79,9 @@ Example of the corresponding twig template for the abbreviations list:
     </div>
 {% endfor %}
 ```
-The template for the single abbreviations is located here
-`templates/pages/abbreviations.html.twig`.
 
 ## 🧶 Configuration
-There exists no configuration yet. I'm on it :)
+There exists no configuration.
 
 ## 👩‍🍳 Contributing
 For the sake of simplicity this extension was kept small.
