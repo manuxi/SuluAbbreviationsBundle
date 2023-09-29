@@ -128,7 +128,7 @@
             <tag name="sulu_route.defaults_provider"/>
         </service>
 
-        <service id="sulu_abbreviations.sitemap_provider" public="true" class="Manuxi\SuluAbbreviationsBundle\Sitemap\AbbreviationSitemapProvider">
+        <service id="sulu_abbreviations.sitemap_provider" public="true" class="Manuxi\SuluAbbreviationsBundle\Sitemap\AbbreviationsSitemapProvider">
             <argument type="service" id="sulu_abbreviations.repository.abbreviation"/>
             <argument type="service" id="sulu_core.webspace.webspace_manager"/>
             <tag name="sulu.sitemap.provider"/>
