@@ -31,7 +31,7 @@ sulu_abbreviations:
     shadow_abbreviation: "Shadow abbreviation"
     enable_shadow_abbreviation: "Enable shadow abbreviation"
     search_name: "Abbreviation"
-    empty_abbreviationlist: "No Abbreviation chosen"
+    empty_abbreviationlist: "Please choose abbreviation..."
     abbreviation: "Abbreviation"
     abbreviations: "Abbreviations"
 

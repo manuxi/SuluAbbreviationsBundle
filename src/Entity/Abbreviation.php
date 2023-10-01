@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Manuxi\SuluAbbreviationsBundle\Entity\Traits\LinkTranslatableTrait;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\PublishedTranslatableTrait;
 use Manuxi\SuluAbbreviationsBundle\Entity\Interfaces\AuditableTranslatableInterface;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\AuditableTranslatableTrait;
@@ -16,7 +17,6 @@ use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationRepository;
 use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationTranslation;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ImageTranslatableTrait;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\RouteTranslatableTrait;
-use Manuxi\SuluAbbreviationsBundle\Entity\Traits\UrlTranslatableTrait;
 
 /**
  * @ORM\Entity
@@ -33,7 +33,7 @@ class Abbreviation implements AuditableTranslatableInterface
     use AuditableTranslatableTrait;
     use PublishedTranslatableTrait;
     use RouteTranslatableTrait;
-    use UrlTranslatableTrait;
+    use LinkTranslatableTrait;
     use ImageTranslatableTrait;
 
     /**
@@ -76,6 +76,14 @@ class Abbreviation implements AuditableTranslatableInterface
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    /**
+     * @Serializer\VirtualProperty(name="title")
+     */
+    public function getTitle(): ?string
+    {
+        return $this->getName();
     }
 
     /**

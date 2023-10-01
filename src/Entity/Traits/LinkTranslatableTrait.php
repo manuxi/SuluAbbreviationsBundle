@@ -7,33 +7,33 @@ namespace Manuxi\SuluAbbreviationsBundle\Entity\Traits;
 use DateTime;
 use JMS\Serializer\Annotation as Serializer;
 
-trait UrlTranslatableTrait
+trait LinkTranslatableTrait
 {
 
     abstract public function getLocale();
     abstract protected function getTranslation(string $locale);
 
     /**
-     * @Serializer\VirtualProperty(name="url")
+     * @Serializer\VirtualProperty(name="link")
      */
-    public function getUrl(): ?string
+    public function getLink(): ?array
     {
         $translation = $this->getTranslation($this->getLocale());
         if (!$translation) {
             return null;
         }
 
-        return $translation->getUrl();
+        return $translation->getLink();
     }
 
-    public function setUrl(?string $url): self
+    public function setLink(?array $link): self
     {
         $translation = $this->getTranslation($this->getLocale());
         if (!$translation) {
             $translation = $this->createTranslation($this->getLocale());
         }
 
-        $translation->setUrl($url);
+        $translation->setLink($link);
         return $this;
     }
 }

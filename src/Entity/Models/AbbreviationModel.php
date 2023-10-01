@@ -230,9 +230,9 @@ class AbbreviationModel implements AbbreviationModelInterface
             $entity->setRoutePath($routePath);
         }
 
-        $url = $this->getProperty($data, 'url');
-        if ($url) {
-            $entity->setUrl($url);
+        $link = $this->getProperty($data, 'link');
+        if ($link) {
+            $entity->setLink($link);
         }
 
         $imageId = $this->getPropertyMulti($data, ['image', 'id']);

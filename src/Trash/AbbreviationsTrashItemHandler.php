@@ -59,7 +59,7 @@ class AbbreviationsTrashItemHandler implements StoreTrashItemHandlerInterface, R
             "ext" => $resource->getExt(),
             "locale" => $resource->getLocale(),
             "imageId" => $image ? $image->getId() : null,
-            "url" => $resource->getUrl(),
+            "link" => $resource->getLink(),
 
         ];
         return $this->trashItemRepository->create(
@@ -85,7 +85,7 @@ class AbbreviationsTrashItemHandler implements StoreTrashItemHandlerInterface, R
         $abbreviation->setDescription($data['description']);
         $abbreviation->setRoutePath($data['slug']);
         $abbreviation->setExt($data['ext']);
-        $abbreviation->setUrl($data['url']);
+        $abbreviation->setLink($data['link']);
         $abbreviation->setPublished($data['published']);
         $abbreviation->setPublishedAt($data['publishedAt'] ? new DateTime($data['publishedAt']['date']) : null);
 

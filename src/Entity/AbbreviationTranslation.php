@@ -9,11 +9,11 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Manuxi\SuluAbbreviationsBundle\Entity\Interfaces\AuditableInterface;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\AuditableTrait;
+use Manuxi\SuluAbbreviationsBundle\Entity\Traits\LinkTrait;
 use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationTranslationRepository;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ImageTrait;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\PublishedTrait;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\RouteTrait;
-use Manuxi\SuluAbbreviationsBundle\Entity\Traits\UrlTrait;
 
 /**
  * @ORM\Entity
@@ -25,7 +25,7 @@ class AbbreviationTranslation implements AuditableInterface
     use AuditableTrait;
     use PublishedTrait;
     use RouteTrait;
-    use UrlTrait;
+    use LinkTrait;
     use ImageTrait;
 
     /**
