@@ -126,8 +126,7 @@ class AbbreviationRepository extends ServiceEntityRepository implements DataProv
         $entityAlias = null,
         $permission = null
     ) {
-        $entities = $this->parentFindByFilters($filters, $page, $pageSize, $limit, $locale, $options);
-
+        $entities = $this->getPublishedAbbreviations($filters, $locale, $page, $pageSize, $limit, $options);
         return \array_map(
             function (Abbreviation $entity) use ($locale) {
                 return $entity->setLocale($locale);
@@ -151,7 +150,7 @@ class AbbreviationRepository extends ServiceEntityRepository implements DataProv
      */
     protected function append(QueryBuilder $queryBuilder, string $alias, string $locale, $options = []): array
     {
-        $queryBuilder->andWhere($alias . '.published = true');
+        //$queryBuilder->andWhere($alias . '.translation.published = true');
 
         return [];
     }
@@ -166,6 +165,69 @@ class AbbreviationRepository extends ServiceEntityRepository implements DataProv
     {
         $queryBuilder->innerJoin($alias . '.translations', 'translation', Join::WITH, 'translation.locale = :locale');
         $queryBuilder->setParameter('locale', $locale);
+    }
+
+    public function hasNextPage(array $filters, ?int $page, ?int $pageSize, ?int $limit, string $locale, array $options = []): bool
+    {
+        $pageCurrent = (key_exists('page', $options)) ? (int)$options['page'] : 0;
+        $totalArticles = $this->createQueryBuilder('n')
+            ->select('count(n.id)')
+            ->leftJoin('n.translations', 'translation')
+            ->where('translation.published = 1')
+            ->andWhere('translation.locale = :locale')->setParameter('locale', $locale)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        if ((int)($limit * $pageCurrent) + $limit < (int)$totalArticles) return true; else return false;
+
+    }
+
+    public function getPublishedAbbreviations(array $filters, string $locale, ?int $page, $pageSize, ?int $limit, array $options): array
+    {
+        $pageCurrent = (key_exists('page', $options)) ? (int)$options['page'] : 0;
+
+        $query = $this->createQueryBuilder('n')
+            ->leftJoin('n.translations', 'translation')
+            ->where('translation.published = 1')
+            ->andWhere('translation.locale = :locale')->setParameter('locale', $locale)
+            ->orderBy('translation.publishedAt', 'DESC')
+            ->setMaxResults($limit)
+            ->setFirstResult($pageCurrent * $limit);
+
+        if (!empty($filters['categories'])) {
+            $i = 0;
+            if ($filters['categoryOperator'] === "and") {
+                $andWhere = "";
+                foreach ($filters['categories'] as $category) {
+                    if ($i === 0) {
+                        $andWhere .= "n.category = :category" . $i;
+                    } else {
+                        $andWhere .= " AND n.category = :category" . $i;
+                    }
+                    $query->setParameter("category" . $i, $category);
+                    $i++;
+                }
+                $query->andWhere($andWhere);
+            } else if ($filters['categoryOperator'] === "or") {
+                $orWhere = "";
+                foreach ($filters['categories'] as $category) {
+                    if ($i === 0) {
+                        $orWhere .= "n.category = :category" . $i;
+                    } else {
+                        $orWhere .= " OR n.category = :category" . $i;
+                    }
+                    $query->setParameter("category" . $i, $category);
+                    $i++;
+                }
+                $query->andWhere($orWhere);
+            }
+        }
+        if (isset($filters['sortBy'])) $query->orderBy($filters['sortBy'], $filters['sortMethod']);
+        $news = $query->getQuery()->getResult();
+        if (!$news) {
+            return [];
+        }
+        return $news;
     }
 
 }

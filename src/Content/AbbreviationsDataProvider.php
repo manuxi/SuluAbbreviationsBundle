@@ -6,6 +6,7 @@ namespace Manuxi\SuluAbbreviationsBundle\Content;
 
 use Countable;
 use Doctrine\ORM\EntityManagerInterface;
+use Manuxi\SuluAbbreviationsBundle\Admin\AbbreviationsAdmin;
 use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use Sulu\Component\Serializer\ArraySerializerInterface;
 use Sulu\Component\SmartContent\Configuration\ProviderConfigurationInterface;
@@ -16,7 +17,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class AbbreviationsDataProvider extends BaseDataProvider
 {
-    private int $defaultLimit = 12;
+    private int $defaultLimit = 48;
 
     private RequestStack $requestStack;
     private EntityManagerInterface $entityManager;
@@ -36,12 +37,9 @@ class AbbreviationsDataProvider extends BaseDataProvider
                 ->enablePagination()
                 ->enablePresentAs()
                 ->enableCategories()
-                ->enableSorting([
-                        ['column' => 'translation.name', 'title' => 'sulu_abbreviation.name'],
-                        ['column' => 'translation.explanation', 'title' => 'sulu_abbreviation.explanation'],
-                        ['column' => 'translation.published_at', 'title' => 'sulu_abbreviation.published_at']
-                    ]
-                )
+                ->enableTags()
+                ->enableSorting($this->getSorting())
+                ->enableView(AbbreviationsAdmin::EDIT_FORM_VIEW, ['id' => 'id', 'properties/webspaceKey' => 'webspace'])
                 ->getConfiguration();
         }
 
@@ -63,8 +61,8 @@ class AbbreviationsDataProvider extends BaseDataProvider
         $locale = $options['locale'];
         $request = $this->requestStack->getCurrentRequest();
         $options['page'] = $request->get('p');
-        $abbreviation = $this->entityManager->getRepository(Abbreviation::class)->findByFilters($filters, $page, $pageSize, $limit, $locale, $options);
-        return new DataProviderResult($abbreviation, $this->entityManager->getRepository(Abbreviation::class)->hasNextPage($filters, $page, $pageSize, $limit, $locale, $options));
+        $abbreviations = $this->entityManager->getRepository(Abbreviation::class)->findByFilters($filters, $page, $pageSize, $limit, $locale, $options);
+        return new DataProviderResult($abbreviations, $this->entityManager->getRepository(Abbreviation::class)->hasNextPage($filters, $page, $pageSize, $limit, $locale, $options));
     }
 
     /**
@@ -106,6 +104,15 @@ class AbbreviationsDataProvider extends BaseDataProvider
         }
 
         return $count > ($page * $pageSize);
+    }
+
+    private function getSorting(): array
+    {
+        return [
+            ['column' => 'translation.name', 'title' => 'sulu_abbreviations.name'],
+            ['column' => 'translation.explanation', 'title' => 'sulu_abbreviations.explanation'],
+            ['column' => 'translation.published_at', 'title' => 'sulu_abbreviations.published_at']
+        ];
     }
 
 }
