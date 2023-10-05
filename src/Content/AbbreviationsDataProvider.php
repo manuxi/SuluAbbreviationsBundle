@@ -39,7 +39,7 @@ class AbbreviationsDataProvider extends BaseDataProvider
                 ->enableCategories()
                 ->enableTags()
                 ->enableSorting($this->getSorting())
-                ->enableView(AbbreviationsAdmin::EDIT_FORM_VIEW, ['id' => 'id', 'properties/webspaceKey' => 'webspace'])
+                ->enableView(AbbreviationsAdmin::EDIT_FORM_VIEW, ['id' => 'id'])
                 ->getConfiguration();
         }
 
