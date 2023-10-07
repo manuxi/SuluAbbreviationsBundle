@@ -76,7 +76,7 @@ class SuluAbbreviationsExtension extends Extension implements PrependExtensionIn
                             'options' => [
                                 //@TODO: works not yet as expected, does not translate correctly
                                 //see https://github.com/sulu/sulu/pull/5920
-                                'route_schema' => '/{translator.trans("sulu_abbreviations.abbreviation")}/{implode("-", object)}'
+                                'route_schema' => '/{translator.trans("sulu_abbreviations.abbreviations")}/{implode("-", object)}'
                             ],
                             'resource_key' => Abbreviation::RESOURCE_KEY,
                         ],
