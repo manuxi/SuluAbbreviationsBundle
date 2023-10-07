@@ -186,48 +186,106 @@ class AbbreviationRepository extends ServiceEntityRepository implements DataProv
     {
         $pageCurrent = (key_exists('page', $options)) ? (int)$options['page'] : 0;
 
-        $query = $this->createQueryBuilder('n')
-            ->leftJoin('n.translations', 'translation')
+        $queryBuilder = $this->createQueryBuilder('abbreviation')
+            ->leftJoin('abbreviation.translations', 'translation')
             ->where('translation.published = 1')
             ->andWhere('translation.locale = :locale')->setParameter('locale', $locale)
             ->orderBy('translation.publishedAt', 'DESC')
             ->setMaxResults($limit)
             ->setFirstResult($pageCurrent * $limit);
 
+        $this->prepareFilter($queryBuilder, $filters);
+
+        $abbreviation = $queryBuilder->getQuery()->getResult();
+        if (!$abbreviation) {
+            return [];
+        }
+        return $abbreviation;
+    }
+
+    private function prepareFilter(QueryBuilder $queryBuilder, array $filters): void
+    {
+        if (isset($filters['sortBy'])) {
+            $queryBuilder->orderBy($filters['sortBy'], $filters['sortMethod']);
+        }
+
+        if (!empty($filters['tags']) || !empty($filters['categories'])) {
+            $queryBuilder->leftJoin('abbreviation.abbreviationExcerpt', 'excerpt')
+                ->leftJoin('excerpt.translations', 'excerpt_translation');
+        }
+
+        $this->prepareTagsFilter($queryBuilder, $filters);
+        $this->prepareCategoriesFilter($queryBuilder, $filters);
+    }
+
+    private function prepareTagsFilter(QueryBuilder $queryBuilder, array $filters):void
+    {
+        if (!empty($filters['tags'])) {
+
+            $queryBuilder->leftJoin('excerpt_translation.tags', 'tags');
+
+            $i = 0;
+            if ($filters['tagOperator'] === "and") {
+                $andWhere = "";
+                foreach ($filters['tags'] as $tag) {
+                    if ($i === 0) {
+                        $andWhere .= "tags = :tag" . $i;
+                    } else {
+                        $andWhere .= " AND tags = :tag" . $i;
+                    }
+                    $queryBuilder->setParameter("tag" . $i, $tag);
+                    $i++;
+                }
+                $queryBuilder->andWhere($andWhere);
+            } else if ($filters['tagOperator'] === "or") {
+                $orWhere = "";
+                foreach ($filters['tags'] as $tag) {
+                    if ($i === 0) {
+                        $orWhere .= "tags = :tag" . $i;
+                    } else {
+                        $orWhere .= " OR tags = :tag" . $i;
+                    }
+                    $queryBuilder->setParameter("tag" . $i, $tag);
+                    $i++;
+                }
+                $queryBuilder->andWhere($orWhere);
+            }
+        }
+    }
+
+    private function prepareCategoriesFilter(QueryBuilder $queryBuilder, array $filters):void
+    {
         if (!empty($filters['categories'])) {
+
+            $queryBuilder->leftJoin('excerpt_translation.categories', 'categories');
+
             $i = 0;
             if ($filters['categoryOperator'] === "and") {
                 $andWhere = "";
                 foreach ($filters['categories'] as $category) {
                     if ($i === 0) {
-                        $andWhere .= "n.category = :category" . $i;
+                        $andWhere .= "categories = :category" . $i;
                     } else {
-                        $andWhere .= " AND n.category = :category" . $i;
+                        $andWhere .= " AND categories = :category" . $i;
                     }
-                    $query->setParameter("category" . $i, $category);
+                    $queryBuilder->setParameter("category" . $i, $category);
                     $i++;
                 }
-                $query->andWhere($andWhere);
+                $queryBuilder->andWhere($andWhere);
             } else if ($filters['categoryOperator'] === "or") {
                 $orWhere = "";
                 foreach ($filters['categories'] as $category) {
                     if ($i === 0) {
-                        $orWhere .= "n.category = :category" . $i;
+                        $orWhere .= "categories = :category" . $i;
                     } else {
-                        $orWhere .= " OR n.category = :category" . $i;
+                        $orWhere .= " OR categories = :category" . $i;
                     }
-                    $query->setParameter("category" . $i, $category);
+                    $queryBuilder->setParameter("category" . $i, $category);
                     $i++;
                 }
-                $query->andWhere($orWhere);
+                $queryBuilder->andWhere($orWhere);
             }
         }
-        if (isset($filters['sortBy'])) $query->orderBy($filters['sortBy'], $filters['sortMethod']);
-        $news = $query->getQuery()->getResult();
-        if (!$news) {
-            return [];
-        }
-        return $news;
     }
 
 }
