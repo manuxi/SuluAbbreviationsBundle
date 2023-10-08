@@ -12,7 +12,6 @@ sulu_abbreviations:
     website: "Webseite"
     image: "Bild"
     mainimage: "Hauptbild"
-
     header:
         content: "Inhalt"
         additional: "Weitere Informationen"

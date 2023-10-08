@@ -56,15 +56,7 @@ class AbbreviationsAdmin extends Admin
             $rootNavigationItem->setPosition(30);
             $rootNavigationItem->setView(static::LIST_VIEW);
 
-            // Configure a NavigationItem with a View
-            $navigationItem = new NavigationItem(static::NAV_ITEM);
-            $navigationItem->setPosition(10);
-            $navigationItem->setView(static::LIST_VIEW);
-
-            $rootNavigationItem->addChild($navigationItem);
-
             $navigationItemCollection->add($rootNavigationItem);
-
         }
     }
 
