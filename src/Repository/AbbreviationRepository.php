@@ -10,7 +10,6 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
-use Sulu\Component\Security\Authentication\UserInterface;
 use Sulu\Component\SmartContent\Orm\DataProviderRepositoryInterface;
 use Sulu\Component\SmartContent\Orm\DataProviderRepositoryTrait;
 
@@ -106,10 +105,6 @@ class AbbreviationRepository extends ServiceEntityRepository implements DataProv
      * @param int $limit
      * @param string $locale
      * @param mixed[] $options
-     * @param UserInterface|null $user
-     * @param null $entityClass
-     * @param null $entityAlias
-     * @param null $permission
      * @return object[]
      * @noinspection PhpMissingReturnTypeInspection
      * @noinspection PhpMissingParamTypeInspection
@@ -120,11 +115,7 @@ class AbbreviationRepository extends ServiceEntityRepository implements DataProv
         $pageSize,
         $limit,
         $locale,
-        $options = [],
-        ?UserInterface $user = null,
-        $entityClass = null,
-        $entityAlias = null,
-        $permission = null
+        $options = []
     ) {
         $entities = $this->getPublishedAbbreviations($filters, $locale, $page, $pageSize, $limit, $options);
         return \array_map(

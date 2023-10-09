@@ -10,6 +10,8 @@ use JMS\Serializer\Annotation as Serializer;
 use Manuxi\SuluAbbreviationsBundle\Entity\Interfaces\AuditableInterface;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\AuditableTrait;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\LinkTrait;
+use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ShowAuthorTrait;
+use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ShowDateTrait;
 use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationTranslationRepository;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ImageTrait;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\PublishedTrait;
@@ -23,6 +25,8 @@ use Manuxi\SuluAbbreviationsBundle\Entity\Traits\RouteTrait;
 class AbbreviationTranslation implements AuditableInterface
 {
     use AuditableTrait;
+    use ShowAuthorTrait;
+    use ShowDateTrait;
     use PublishedTrait;
     use RouteTrait;
     use LinkTrait;

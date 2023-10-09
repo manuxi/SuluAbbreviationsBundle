@@ -16,8 +16,8 @@ use Manuxi\SuluAbbreviationsBundle\Entity\Interfaces\AbbreviationModelInterface;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ArrayPropertyTrait;
 use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationRepository;
 use Sulu\Bundle\ActivityBundle\Application\Collector\DomainEventCollectorInterface;
+use Sulu\Bundle\ContactBundle\Entity\ContactRepository;
 use Sulu\Bundle\MediaBundle\Entity\MediaRepositoryInterface;
-use Sulu\Bundle\SecurityBundle\Entity\UserRepository;
 use Sulu\Component\Rest\Exception\EntityNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -27,18 +27,18 @@ class AbbreviationModel implements AbbreviationModelInterface
 
     private AbbreviationRepository $abbreviationRepository;
     private MediaRepositoryInterface $mediaRepository;
-    private UserRepository $userRepository;
+    private ContactRepository $contactRepository;
     private DomainEventCollectorInterface $domainEventCollector;
 
     public function __construct(
         AbbreviationRepository $abbreviationRepository,
         MediaRepositoryInterface $mediaRepository,
-        UserRepository $userRepository,
+        ContactRepository $contactRepository,
         DomainEventCollectorInterface $domainEventCollector
     ) {
         $this->mediaRepository = $mediaRepository;
         $this->abbreviationRepository = $abbreviationRepository;
-        $this->userRepository = $userRepository;
+        $this->contactRepository = $contactRepository;
         $this->domainEventCollector = $domainEventCollector;
     }
 
@@ -210,6 +210,16 @@ class AbbreviationModel implements AbbreviationModelInterface
             $entity->setPublished($published);
         }
 
+        $showAuthor = $this->getProperty($data, 'showAuthor');
+        if ($showAuthor) {
+            $entity->setShowAuthor($showAuthor);
+        }
+
+        $showDate = $this->getProperty($data, 'showDate');
+        if ($showDate) {
+            $entity->setShowDate($showDate);
+        }
+
         $name = $this->getProperty($data, 'name');
         if ($name) {
             $entity->setName($name);
@@ -258,9 +268,9 @@ class AbbreviationModel implements AbbreviationModelInterface
         //settings (author, authored) changeable
         $authorId = $this->getProperty($data, 'author');
         if ($authorId) {
-            $author = $this->userRepository->findUserById($authorId);
+            $author = $this->contactRepository->findById($authorId);
             if (!$author) {
-                throw new EntityNotFoundException($this->userRepository->getClassName(), $authorId);
+                throw new EntityNotFoundException($this->contactRepository->getClassName(), $authorId);
             }
             $entity->setAuthor($author);
         }

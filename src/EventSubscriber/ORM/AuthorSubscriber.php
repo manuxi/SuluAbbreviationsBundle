@@ -9,6 +9,7 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Events;
 use Doctrine\Persistence\Event\LoadClassMetadataEventArgs;
 use Manuxi\SuluAbbreviationsBundle\Entity\Interfaces\AuthorInterface;
+use Sulu\Bundle\ContactBundle\Entity\ContactInterface;
 use Sulu\Component\Security\Authentication\UserInterface;
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -51,7 +52,7 @@ class AuthorSubscriber implements EventSubscriber
                     'targetEntity' => $this->userClass,
                     'joinColumns' => [
                         [
-                            'name' => 'idUsersAuthor',
+                            'name' => 'author_contact_id',
                             'onDelete' => 'SET NULL',
                             'referencedColumnName' => 'id',
                             'nullable' => true,
@@ -82,11 +83,13 @@ class AuthorSubscriber implements EventSubscriber
             return;
         }
 
-        $this->handleAuthor($abbreviation, $user, true);
-        $this->handleAuthor($abbreviation, $user, false);
+        $contact = $user->getContact();
+
+        $this->handleAuthor($abbreviation, $contact, true);
+        $this->handleAuthor($abbreviation, $contact, false);
     }
 
-    private function handleAuthor(OnFlushEventArgs $event, UserInterface $user, bool $insertions)
+    private function handleAuthor(OnFlushEventArgs $event, ContactInterface $contact, bool $insertions)
     {
         $manager = $event->getObjectManager();
         $unitOfWork = $manager->getUnitOfWork();
@@ -107,7 +110,7 @@ class AuthorSubscriber implements EventSubscriber
             if ($insertions
                 && (!isset($changeset[self::AUTHOR_PROPERTY_NAME]) || null === $changeset[self::AUTHOR_PROPERTY_NAME][1])
             ) {
-                $meta->setFieldValue($authorEntity, self::AUTHOR_PROPERTY_NAME, $user);
+                $meta->setFieldValue($authorEntity, self::AUTHOR_PROPERTY_NAME, $contact);
                 $recompute = true;
             }
 

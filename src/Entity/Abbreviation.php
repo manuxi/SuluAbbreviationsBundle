@@ -13,6 +13,8 @@ use Manuxi\SuluAbbreviationsBundle\Entity\Traits\LinkTranslatableTrait;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\PublishedTranslatableTrait;
 use Manuxi\SuluAbbreviationsBundle\Entity\Interfaces\AuditableTranslatableInterface;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\AuditableTranslatableTrait;
+use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ShowAuthorTranslatableTrait;
+use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ShowDateTranslatableTrait;
 use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationRepository;
 use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationTranslation;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ImageTranslatableTrait;
@@ -31,6 +33,8 @@ class Abbreviation implements AuditableTranslatableInterface
     public const SECURITY_CONTEXT = 'sulu.abbreviations.abbreviations';
 
     use AuditableTranslatableTrait;
+    use ShowAuthorTranslatableTrait;
+    use ShowDateTranslatableTrait;
     use PublishedTranslatableTrait;
     use RouteTranslatableTrait;
     use LinkTranslatableTrait;

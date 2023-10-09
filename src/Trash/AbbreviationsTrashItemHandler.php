@@ -10,6 +10,7 @@ use Manuxi\SuluAbbreviationsBundle\Admin\AbbreviationsAdmin;
 use Manuxi\SuluAbbreviationsBundle\Domain\Event\AbbreviationRestoredEvent;
 use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use Sulu\Bundle\ActivityBundle\Application\Collector\DomainEventCollectorInterface;
+use Sulu\Bundle\ContactBundle\Entity\ContactInterface;
 use Sulu\Bundle\MediaBundle\Entity\MediaInterface;
 use Sulu\Bundle\RouteBundle\Entity\Route;
 use Sulu\Bundle\TrashBundle\Application\DoctrineRestoreHelper\DoctrineRestoreHelperInterface;
@@ -19,6 +20,7 @@ use Sulu\Bundle\TrashBundle\Application\TrashItemHandler\RestoreTrashItemHandler
 use Sulu\Bundle\TrashBundle\Application\TrashItemHandler\StoreTrashItemHandlerInterface;
 use Sulu\Bundle\TrashBundle\Domain\Model\TrashItemInterface;
 use Sulu\Bundle\TrashBundle\Domain\Repository\TrashItemRepositoryInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class AbbreviationsTrashItemHandler implements StoreTrashItemHandlerInterface, RestoreTrashItemHandlerInterface, RestoreConfigurationProviderInterface
 {
@@ -60,6 +62,10 @@ class AbbreviationsTrashItemHandler implements StoreTrashItemHandlerInterface, R
             "locale" => $resource->getLocale(),
             "imageId" => $image ? $image->getId() : null,
             "link" => $resource->getLink(),
+            "showAuthor" => $resource->getShowAuthor(),
+            "showDate" => $resource->getShowDate(),
+            "authored" => $resource->getAuthored(),
+            "author" => $resource->getAuthor(),
 
         ];
         return $this->trashItemRepository->create(
@@ -77,17 +83,30 @@ class AbbreviationsTrashItemHandler implements StoreTrashItemHandlerInterface, R
 
     public function restore(TrashItemInterface $trashItem, array $restoreFormData = []): object
     {
+
         $data = $trashItem->getRestoreData();
         $abbreviationId = (int)$trashItem->getResourceId();
         $abbreviation = new Abbreviation();
+        $abbreviation->setLocale($data['locale']);
         $abbreviation->setName($data['name']);
         $abbreviation->setExplanation($data['explanation']);
         $abbreviation->setDescription($data['description']);
         $abbreviation->setRoutePath($data['slug']);
         $abbreviation->setExt($data['ext']);
-        $abbreviation->setLink($data['link']);
         $abbreviation->setPublished($data['published']);
         $abbreviation->setPublishedAt($data['publishedAt'] ? new DateTime($data['publishedAt']['date']) : null);
+        $abbreviation->setShowAuthor($data['showAuthor']);
+        $abbreviation->setShowDate($data['showDate']);
+
+        $abbreviation->setAuthored($data['authored'] ? new DateTime($data['authored']['date']) : new DateTime());
+
+        if ($data['author']) {
+            $abbreviation->setAuthor($this->entityManager->find(ContactInterface::class, $data['author']));
+        }
+
+        if($data['link']) {
+            $abbreviation->setLink($data['link']);
+        }
 
         if($data['imageId']){
             $abbreviation->setImage($this->entityManager->find(MediaInterface::class, $data['imageId']));
@@ -98,16 +117,16 @@ class AbbreviationsTrashItemHandler implements StoreTrashItemHandlerInterface, R
         );
 
         $this->doctrineRestoreHelper->persistAndFlushWithId($abbreviation, $abbreviationId);
-        $this->createRoute($this->entityManager, $abbreviationId, $abbreviation->getRoutePath(), Abbreviation::class);
+        $this->createRoute($this->entityManager, $abbreviationId, $data['locale'], $abbreviation->getRoutePath(), Abbreviation::class);
         $this->entityManager->flush();
         return $abbreviation;
     }
 
-    private function createRoute(EntityManagerInterface $manager, int $id, string $slug, string $class)
+    private function createRoute(EntityManagerInterface $manager, int $id, string $locale, string $slug, string $class)
     {
         $route = new Route();
         $route->setPath($slug);
-        $route->setLocale('en');
+        $route->setLocale($locale);
         $route->setEntityClass($class);
         $route->setEntityId($id);
         $route->setHistory(0);

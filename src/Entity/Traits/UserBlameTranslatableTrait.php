@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Manuxi\SuluAbbreviationsBundle\Entity\Traits;
 
 use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 trait UserBlameTranslatableTrait
 {
@@ -24,6 +25,17 @@ trait UserBlameTranslatableTrait
         return $translation->getCreator()->getId();
     }
 
+    public function setCreator(?UserInterface $creator): self
+    {
+        $translation = $this->getTranslation($this->locale);
+        if (!$translation) {
+            $translation = $this->createTranslation($this->locale);
+        }
+
+        $translation->setCreator($creator);
+        return $this;
+    }
+
     /**
      * @Serializer\VirtualProperty(name="changer")
      */
@@ -35,5 +47,16 @@ trait UserBlameTranslatableTrait
         }
 
         return $translation->getChanger()->getId();
+    }
+
+    public function setChanger(?UserInterface $author): self
+    {
+        $translation = $this->getTranslation($this->locale);
+        if (!$translation) {
+            $translation = $this->createTranslation($this->locale);
+        }
+
+        $translation->setChanger($author);
+        return $this;
     }
 }

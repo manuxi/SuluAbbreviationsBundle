@@ -25,6 +25,17 @@ trait TimestampableTranslatableTrait
         return $translation->getCreated();
     }
 
+    public function setCreated(\DateTime $created): self
+    {
+        $translation = $this->getTranslation($this->getLocale());
+        if (!$translation) {
+            $translation = $this->createTranslation($this->getLocale());
+        }
+
+        $translation->setCreated($created);
+        return $this;
+    }
+
     /**
      * @Serializer\VirtualProperty(name="changed")
      */
@@ -36,5 +47,16 @@ trait TimestampableTranslatableTrait
         }
 
         return $translation->getChanged();
+    }
+
+    public function setChanged(\DateTime $changed): self
+    {
+        $translation = $this->getTranslation($this->getLocale());
+        if (!$translation) {
+            $translation = $this->createTranslation($this->getLocale());
+        }
+
+        $translation->setChanged($changed);
+        return $this;
     }
 }
