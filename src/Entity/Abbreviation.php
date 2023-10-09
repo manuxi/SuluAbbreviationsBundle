@@ -151,7 +151,7 @@ class Abbreviation implements AuditableTranslatableInterface
         return $translation->getDescription();
     }
 
-    public function setDescription(string $description): self
+    public function setDescription(?string $description): self
     {
         $translation = $this->getTranslation($this->locale);
         if (!$translation) {

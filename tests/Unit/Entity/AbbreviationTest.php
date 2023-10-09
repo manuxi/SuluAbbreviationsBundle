@@ -7,13 +7,7 @@ namespace Manuxi\SuluAbbreviationsBundle\Tests\Unit\Entity;
 use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationExcerpt;
 use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationSeo;
-use Manuxi\SuluAbbreviationsBundle\Entity\NewsExcerpt;
-use Manuxi\SuluAbbreviationsBundle\Entity\NewsSeo;
 use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationTranslation;
-use Manuxi\SuluAbbreviationsBundle\Entity\Location;
-use DateTimeImmutable;
-use Prophecy\Prophecy\ObjectProphecy;
-use Sulu\Bundle\MediaBundle\Entity\MediaInterface;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 
 class AbbreviationTest extends SuluTestCase

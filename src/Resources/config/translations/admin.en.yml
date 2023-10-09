@@ -20,7 +20,7 @@ sulu_abbreviations:
     changer: "Last change by"
     header:
         content: "Content"
-        additional: "Further Information"
+        additional: "Additional Options"
         mandatory: "Mandatory Fields"
         optional: "Optional Fields"
         change_author: "Modify Author Information"

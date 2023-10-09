@@ -205,34 +205,14 @@ class AbbreviationModel implements AbbreviationModelInterface
      */
     private function mapDataToEntity(Abbreviation $entity, array $data): Abbreviation
     {
-        $published = $this->getProperty($data, 'published');
-        if ($published) {
-            $entity->setPublished($published);
-        }
-
-        $showAuthor = $this->getProperty($data, 'showAuthor');
-        if ($showAuthor) {
-            $entity->setShowAuthor($showAuthor);
-        }
-
-        $showDate = $this->getProperty($data, 'showDate');
-        if ($showDate) {
-            $entity->setShowDate($showDate);
-        }
-
         $name = $this->getProperty($data, 'name');
         if ($name) {
             $entity->setName($name);
         }
 
-        $explanation = $this->getProperty($data, 'explanation');
-        if ($explanation) {
-            $entity->setExplanation($explanation);
-        }
-
-        $description = $this->getProperty($data, 'description');
-        if ($description) {
-            $entity->setDescription($description);
+        $published = $this->getProperty($data, 'published');
+        if ($published) {
+            $entity->setPublished($published);
         }
 
         $routePath = $this->getProperty($data, 'routePath');
@@ -240,10 +220,20 @@ class AbbreviationModel implements AbbreviationModelInterface
             $entity->setRoutePath($routePath);
         }
 
+        $showAuthor = $this->getProperty($data, 'showAuthor');
+        $entity->setShowAuthor($showAuthor ? true : false);
+
+        $showDate = $this->getProperty($data, 'showDate');
+        $entity->setShowDate($showDate ? true : false);
+
         $link = $this->getProperty($data, 'link');
-        if ($link) {
-            $entity->setLink($link);
-        }
+        $entity->setLink($link ?: null);
+
+        $explanation = $this->getProperty($data, 'explanation');
+        $entity->setExplanation($explanation ?: null);
+
+        $description = $this->getProperty($data, 'description');
+        $entity->setDescription($description ?: null);
 
         $imageId = $this->getPropertyMulti($data, ['image', 'id']);
         if ($imageId) {
@@ -252,6 +242,8 @@ class AbbreviationModel implements AbbreviationModelInterface
                 throw new EntityNotFoundException($this->mediaRepository->getClassName(), $imageId);
             }
             $entity->setImage($image);
+        } else {
+            $entity->setImage(null);
         }
 
         return $entity;

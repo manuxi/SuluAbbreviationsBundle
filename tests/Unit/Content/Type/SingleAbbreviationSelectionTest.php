@@ -14,7 +14,7 @@ use Sulu\Component\Content\Compat\PropertyInterface;
 
 class SingleAbbreviationSelectionTest extends TestCase
 {
-    private SingleAbbreviationSelection $singleNewsSelection;
+    private SingleAbbreviationSelection $singleAbbreviationSelection;
 
     private ObjectProphecy $abbreviationRepository;
 
@@ -24,7 +24,7 @@ class SingleAbbreviationSelectionTest extends TestCase
         $entityManager         = $this->prophesize(EntityManagerInterface::class);
         $entityManager->getRepository(Abbreviation::class)->willReturn($this->abbreviationRepository->reveal());
 
-        $this->singleNewsSelection = new SingleAbbreviationSelection($entityManager->reveal());
+        $this->singleAbbreviationSelection = new SingleAbbreviationSelection($entityManager->reveal());
     }
 
     public function testNullValue(): void
@@ -32,8 +32,8 @@ class SingleAbbreviationSelectionTest extends TestCase
         $property = $this->prophesize(PropertyInterface::class);
         $property->getValue()->willReturn(null);
 
-        $this->assertNull($this->singleNewsSelection->getContentData($property->reveal()));
-        $this->assertSame(['id' => null], $this->singleNewsSelection->getViewData($property->reveal()));
+        $this->assertNull($this->singleAbbreviationSelection->getContentData($property->reveal()));
+        $this->assertSame(['id' => null], $this->singleAbbreviationSelection->getViewData($property->reveal()));
     }
 
     public function testValidValue(): void
@@ -45,7 +45,7 @@ class SingleAbbreviationSelectionTest extends TestCase
 
         $this->abbreviationRepository->find(45)->willReturn($abbreviation45->reveal());
 
-        $this->assertSame($abbreviation45->reveal(), $this->singleNewsSelection->getContentData($property->reveal()));
-        $this->assertSame(['id' => 45], $this->singleNewsSelection->getViewData($property->reveal()));
+        $this->assertSame($abbreviation45->reveal(), $this->singleAbbreviationSelection->getContentData($property->reveal()));
+        $this->assertSame(['id' => 45], $this->singleAbbreviationSelection->getViewData($property->reveal()));
     }
 }

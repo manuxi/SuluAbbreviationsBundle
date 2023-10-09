@@ -29,13 +29,13 @@ class AbbreviationsSitemapProvider implements SitemapProviderInterface
         $locale = $this->getLocaleByHost($host);
 
         $result = [];
-        foreach ($this->findAbbreviations(self::PAGE_SIZE, ($page - 1) * self::PAGE_SIZE) as $event) {
-            $event->setLocale($locale);
+        foreach ($this->findAbbreviations(self::PAGE_SIZE, ($page - 1) * self::PAGE_SIZE) as $abbr) {
+            $abbr->setLocale($locale);
             $result[] = new SitemapUrl(
-                $scheme . '://' . $host . $event->getRoutePath(),
-                $event->getLocale(),
-                $event->getLocale(),
-                $event->getChanged()
+                $scheme . '://' . $host . $abbr->getRoutePath(),
+                $abbr->getLocale(),
+                $abbr->getLocale(),
+                $abbr->getChanged()
             );
         }
 
@@ -49,7 +49,7 @@ class AbbreviationsSitemapProvider implements SitemapProviderInterface
 
     public function getAlias()
     {
-        return 'events';
+        return 'abbreviations';
     }
 
     /**

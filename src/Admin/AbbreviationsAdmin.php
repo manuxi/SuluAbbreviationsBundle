@@ -28,8 +28,8 @@ class AbbreviationsAdmin extends Admin
     public const SECURITY_CONTEXT = 'sulu.modules.abbreviation';
 
     //seo,excerpt, etc
-    public const EDIT_FORM_VIEW_SEO = 'sulu_event.event.edit_form.seo';
-    public const EDIT_FORM_VIEW_EXCERPT = 'sulu_event.event.edit_form.excerpt';
+    public const EDIT_FORM_VIEW_SEO = 'sulu_abbreviations.edit_form.seo';
+    public const EDIT_FORM_VIEW_EXCERPT = 'sulu_abbreviations.edit_form.excerpt';
     public const EDIT_FORM_VIEW_SETTINGS = 'sulu_abbreviations.edit_form.settings';
 
     private ViewBuilderFactoryInterface $viewBuilderFactory;
