@@ -49,8 +49,9 @@ class AbbreviationLinkProvider implements LinkProviderInterface
         }
 
         $result = [];
-        $elements = $this->abbreviationRepository->findBy(['id' => $hrefs, 'locale' => $locale]); // load items by id
+        $elements = $this->abbreviationRepository->findBy(['id' => $hrefs]); // load items by id
         foreach ($elements as $element) {
+            $element->setLocale($locale);
             $result[] = new LinkItem($element->getId(), $element->getName(), $element->getRoutePath(), $element->isPublished()); // create link-item foreach item
         }
 
