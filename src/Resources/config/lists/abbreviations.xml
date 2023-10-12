@@ -59,13 +59,13 @@
             <joins ref="translation"/>
         </property>
 
-        <property name="published" visibility="yes" translation="sulu_abbreviations.published" type="bool">
+        <property name="publishedState" visibility="yes" translation="sulu_abbreviations.published" type="bool">
             <field-name>published</field-name>
             <entity-name>%sulu.model.abbreviation_translation.class%</entity-name>
 
         </property>
 
-        <property name="publishedAt" visibility="yes" translation="sulu_abbreviations.published_date" type="datetime">
+        <property name="published" visibility="yes" translation="sulu_abbreviations.published_date" type="datetime">
             <field-name>publishedAt</field-name>
             <entity-name>%sulu.model.abbreviation_translation.class%</entity-name>
 

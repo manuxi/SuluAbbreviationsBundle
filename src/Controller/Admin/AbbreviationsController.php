@@ -190,7 +190,7 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
 
         $this->removeRoutesForEntity($entity);
 
-        $this->abbreviationModel->delete($id, $name);
+        $this->abbreviationModel->delete($id, $name ?? '');
         return $this->handleView($this->view(null, 204));
     }
 
