@@ -7,7 +7,21 @@
 </a>
 
 I made this bundle to have the possibility to manage abbreviations in my projects.
-The abbreviations are translatable. Please feel comfortable submitting feature requests. 
+
+This bundle contains
+- Several filters for Abbreviations Content Type
+- Link Provider
+- Sitemap Provider
+- Handler for Trash Items
+- Handler for Automation
+- Possibility to assign a contact as author
+- Twig Extension for resolving Abbreviations / get a list of Abbreviations
+- Events for displaying Activities
+and more...
+
+The abbreviations are translatable.
+
+Please feel comfortable submitting feature requests. 
 This bundle is still in development. Use at own risk 🤞🏻
 
 
