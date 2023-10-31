@@ -45,6 +45,7 @@ class SuluAbbreviationsExtension extends Extension implements PrependExtensionIn
                         'abbreviation' => [
                             'name' => 'sulu_abbreviations.search_name',
                             'icon' => 'su-enter',
+                            'security_context' => Abbreviation::SECURITY_CONTEXT,
                             'view' => [
                                 'name' => AbbreviationsAdmin::EDIT_FORM_VIEW,
                                 'result_to_view' => [
@@ -52,7 +53,7 @@ class SuluAbbreviationsExtension extends Extension implements PrependExtensionIn
                                     'locale' => 'locale',
                                 ],
                             ],
-                            'security_context' => AbbreviationsAdmin::SECURITY_CONTEXT,
+
                         ],
 /*                        'website' => [
                             "name" => "abbreviation.search_name",
@@ -167,15 +168,9 @@ class SuluAbbreviationsExtension extends Extension implements PrependExtensionIn
             );
         }
 
-/*        $container->prependExtensionConfig(
-            'sulu_abbreviations',
-            ['templates' => ['view' => 'abbreviation.html.twig']]
-        );*/
-
         $container->loadFromExtension('framework', [
             'default_locale' => 'en',
             'translator' => ['paths' => [__DIR__ . '/../Resources/config/translations/']],
-            // ...
         ]);
     }
 }
