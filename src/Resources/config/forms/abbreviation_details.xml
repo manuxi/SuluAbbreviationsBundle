@@ -25,7 +25,6 @@
                     <meta>
                         <title>sulu_admin.url</title>
                     </meta>
-                    <!--https://github.com/sulu/sulu/pull/5933-->
                     <params>
                         <param name="mode" value="leaf"/>
                     </params>
