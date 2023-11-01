@@ -3,8 +3,8 @@
     <mapping class="Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation">
         <index value="abbreviation"/>
         <id property="id"/>
-        <title property="object.getName()"/>
-        <description property="object.getExplanation()"/>
+        <title expr="object.getName()"/>
+        <description expr="object.getExplanation()"/>
         <url expr="object.getRoutePath()" />
         <locale property="locale"/>
         <fields>
