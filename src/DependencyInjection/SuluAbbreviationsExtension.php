@@ -55,13 +55,6 @@ class SuluAbbreviationsExtension extends Extension implements PrependExtensionIn
                             ],
 
                         ],
-/*                        'website' => [
-                            "name" => "sulu_abbreviations.search_name",
-                            'icon' => 'su-enter',
-                            "contexts" => [
-                                "abbreviation",
-                            ],
-                        ],*/
                     ],
                 ]
             );
