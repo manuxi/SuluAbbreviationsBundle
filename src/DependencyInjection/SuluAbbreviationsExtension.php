@@ -44,7 +44,7 @@ class SuluAbbreviationsExtension extends Extension implements PrependExtensionIn
                     'indexes' => [
                         'abbreviation' => [
                             'name' => 'sulu_abbreviations.search_name',
-                            'icon' => 'su-enter',
+                            'icon' => 'su-tag-pen',
                             'security_context' => Abbreviation::SECURITY_CONTEXT,
                             'view' => [
                                 'name' => AbbreviationsAdmin::EDIT_FORM_VIEW,
@@ -119,7 +119,7 @@ class SuluAbbreviationsExtension extends Extension implements PrependExtensionIn
                                         'display_properties' => [
                                             'name'
                                         ],
-                                        'icon' => 'su-enter',
+                                        'icon' => 'su-tag-pen',
                                         'label' => 'sulu_abbreviations.abbreviations_selection_label',
                                         'overlay_title' => 'sulu_abbreviations.select_abbreviation'
                                     ]
@@ -143,7 +143,7 @@ class SuluAbbreviationsExtension extends Extension implements PrependExtensionIn
                                         'display_properties' => [
                                             'name'
                                         ],
-                                        'icon' => 'su-enter',
+                                        'icon' => 'su-tag-pen',
                                         'empty_text' => 'sulu_abbreviations.no_abbreviation_selected',
                                         'overlay_title' => 'sulu_abbreviations.select_abbreviation'
                                     ],

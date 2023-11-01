@@ -35,7 +35,7 @@ class AbbreviationLinkProvider implements LinkProviderInterface
             ->setDisplayProperties(['title'])
             ->setOverlayTitle($this->translator->trans('sulu_abbreviations.abbreviation',[],'admin'))
             ->setEmptyText($this->translator->trans('sulu_abbreviations.empty_abbreviationlist',[],'admin'))
-            ->setIcon('su-enter')
+            ->setIcon('su-tag-pen')
             ->getLinkConfiguration();
     }
 

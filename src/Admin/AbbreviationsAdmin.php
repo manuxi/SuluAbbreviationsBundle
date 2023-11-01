@@ -52,7 +52,7 @@ class AbbreviationsAdmin extends Admin
     {
         if ($this->securityChecker->hasPermission(Abbreviation::SECURITY_CONTEXT, PermissionTypes::EDIT)) {
             $rootNavigationItem = new NavigationItem(static::NAV_ITEM);
-            $rootNavigationItem->setIcon('su-enter');
+            $rootNavigationItem->setIcon('su-tag-pen');
             $rootNavigationItem->setPosition(30);
             $rootNavigationItem->setView(static::LIST_VIEW);
 
