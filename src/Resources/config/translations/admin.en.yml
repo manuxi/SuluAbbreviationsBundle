@@ -42,6 +42,18 @@ sulu_abbreviations:
     abbreviation: "Abbreviation"
     abbreviations: "Abbreviations"
 
+    config:
+        tab: "Settings"
+        title:
+            navi: "Settings"
+            general: "Settings for Single View"
+            breadcrumbs: "Target Pages for Breadcrumbs"
+        properties:
+            toggle_header: "Display Header"
+            toggle_hero: "Display Default Hero"
+            toggle_breadcrumbs: "Display Breadcrumbs"
+            page_abbreviations: "Overview Abbreviations"
+
 sulu_activity:
     resource:
         abbreviation: "Abbreviation"
@@ -53,3 +65,5 @@ sulu_activity:
             restored: "{userFullName} restored the abbreviation \"{resourceTitle}\"."
             published: "{userFullName} published the abbreviation \"{resourceTitle}\"."
             unpublished: "{userFullName} unpublished the abbreviation \"{resourceTitle}\"."
+        abbreviations_settings:
+            modified: "{userFullName} modified the settings for abbreviations."

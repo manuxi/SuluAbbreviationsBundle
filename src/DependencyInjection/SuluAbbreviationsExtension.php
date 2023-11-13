@@ -100,6 +100,11 @@ class SuluAbbreviationsExtension extends Extension implements PrependExtensionIn
                                 'detail' => 'sulu_abbreviations.get_abbreviation',
                             ],
                         ],
+                        'abbreviations-settings' => [
+                            'routes' => [
+                                'detail' => 'sulu_abbreviations.get_abbreviations-settings',
+                            ],
+                        ],
                     ],
                     'field_type_options' => [
                         'selection' => [

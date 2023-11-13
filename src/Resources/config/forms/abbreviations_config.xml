@@ -1,0 +1,62 @@
+<?xml version="1.0" ?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="http://schemas.sulu.io/template/template"
+      xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/form-1.0.xsd"
+>
+    <key>abbreviations_config</key>
+
+    <properties>
+        <section name="abbreviations-settings">
+            <meta>
+                <title>sulu_abbreviations.config.title.general</title>
+            </meta>
+            <properties>
+
+                <property name="toggleHeader" type="checkbox" colspan="3">
+                    <meta>
+                        <title>sulu_abbreviations.config.properties.toggle_header</title>
+                    </meta>
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="default_value" value="true"/>
+                    </params>
+                </property>
+
+                <property name="toggleHero" type="checkbox" colspan="3">
+                    <meta>
+                        <title>sulu_abbreviations.config.properties.toggle_hero</title>
+                    </meta>
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="default_value" value="true"/>
+                    </params>
+                </property>
+
+                <property name="toggleBreadcrumbs" type="checkbox" colspan="3">
+                    <meta>
+                        <title>sulu_abbreviations.config.properties.toggle_breadcrumbs</title>
+                    </meta>
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="default_value" value="true"/>
+                    </params>
+                </property>
+
+            </properties>
+        </section>
+
+        <section name="abbreviations-settings-breadcrumbs">
+            <meta>
+                <title>sulu_abbreviations.config.title.breadcrumbs</title>
+            </meta>
+            <properties>
+                <property name="pageAbbreviations" type="single_page_selection" colspan="6">
+                    <meta>
+                        <title>sulu_abbreviations.config.properties.page_abbreviations</title>
+                    </meta>
+                </property>
+            </properties>
+        </section>
+
+    </properties>
+</form>

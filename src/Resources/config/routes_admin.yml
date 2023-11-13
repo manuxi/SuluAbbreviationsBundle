@@ -5,3 +5,10 @@ app_abbreviations_api:
     name_prefix: sulu_abbreviations.
     options:
         expose: true
+sulu_abbreviations_settings_api:
+    type: rest
+    prefix: /admin/api
+    resource: Manuxi\SuluAbbreviationsBundle\Controller\Admin\SettingsController
+    name_prefix: sulu_abbreviations.
+    options:
+        expose: true

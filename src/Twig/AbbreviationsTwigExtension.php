@@ -9,7 +9,7 @@ use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationRepository;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class AbbreviationExtension extends AbstractExtension
+class AbbreviationsTwigExtension extends AbstractExtension
 {
     private AbbreviationRepository $abbreviationRepository;
 

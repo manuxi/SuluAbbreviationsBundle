@@ -56,6 +56,13 @@ class AbbreviationsAdmin extends Admin
             $rootNavigationItem->setPosition(30);
             $rootNavigationItem->setView(static::LIST_VIEW);
 
+            // Configure a NavigationItem with a View
+            $abbrNavigationItem = new NavigationItem(static::NAV_ITEM);
+            $abbrNavigationItem->setPosition(10);
+            $abbrNavigationItem->setView(static::LIST_VIEW);
+
+            $rootNavigationItem->addChild($abbrNavigationItem);
+
             $navigationItemCollection->add($rootNavigationItem);
         }
     }
@@ -217,7 +224,7 @@ class AbbreviationsAdmin extends Admin
     {
         return [
             self::SULU_ADMIN_SECURITY_SYSTEM => [
-                'Abbreviation' => [
+                'Abbreviations' => [
                     Abbreviation::SECURITY_CONTEXT => [
                         PermissionTypes::VIEW,
                         PermissionTypes::ADD,

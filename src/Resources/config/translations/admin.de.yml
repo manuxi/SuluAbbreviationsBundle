@@ -41,6 +41,18 @@ sulu_abbreviations:
     abbreviation: "Abkürzung"
     abbreviations: "Abkürzungen"
 
+    config:
+        tab: "Einstellungen"
+        title:
+            navi: "Einstellungen"
+            general: "Einstellungen für Einzelansicht"
+            breadcrumbs: "Zielseiten für Breadcrumbs"
+        properties:
+            toggle_header: "Header anzeigen"
+            toggle_hero: "Standard Hero anzeigen"
+            toggle_breadcrumbs: "Breadcrumbs anzeigen"
+            page_abbreviations: "Übersichtsseite Alle Abkürzungen"
+
 sulu_activity:
     resource:
         abbreviations: "Abkürzung"
@@ -52,3 +64,5 @@ sulu_activity:
             restored: "{userFullName} hat die Abkürzung \"{resourceTitle}\" wieder hergestellt."
             published: "{userFullName} hat die Abkürzung \"{resourceTitle}\" veröffentlicht."
             unpublished: "{userFullName} hat die Veröffentlichung der Abkürzung \"{resourceTitle}\" beendet."
+        abbreviations_settings:
+            modified: "{userFullName} hat die Einstellungen für Abkürzungen geändert."
