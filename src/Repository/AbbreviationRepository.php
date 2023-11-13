@@ -72,27 +72,32 @@ class AbbreviationRepository extends ServiceEntityRepository implements DataProv
         return $entity;
     }
 
-    public function findAllForSitemap(int $page, int $limit): array
+    public function findAllForSitemap(string $locale, int $limit = null, int $offset = null): array
     {
-        $offset = ($page * $limit) - $limit;
-        $criteria = [
-            'published' => true,
-        ];
-        return $this->findBy($criteria, [], $limit, $offset);
+        $queryBuilder = $this->createQueryBuilder('abbreviation')
+            ->leftJoin('abbreviation.translations', 'translation')
+            ->where('translation.published = 1')
+            ->andWhere('translation.locale = :locale')->setParameter('locale', $locale)
+            ->orderBy('translation.publishedAt', 'DESC')
+            ->setMaxResults($limit)
+            ->setFirstResult($offset);
+
+        $this->prepareFilter($queryBuilder, []);
+
+        $abbreviations = $queryBuilder->getQuery()->getResult();
+        if (!$abbreviations) {
+            return [];
+        }
+        return $abbreviations;
     }
 
-    public function countForSitemap()
+    public function countForSitemap(string $locale)
     {
-        $query = $this->createQueryBuilder('e')
-            ->select('count(e)');
+        $query = $this->createQueryBuilder('abbreviation')
+            ->select('count(abbreviation)')
+            ->leftJoin('abbreviation.translations', 'translation')
+            ->andWhere('translation.locale = :locale')->setParameter('locale', $locale);
         return $query->getQuery()->getSingleScalarResult();
-    }
-
-    public static function createEnabledCriteria(): Criteria
-    {
-        return Criteria::create()
-            ->andWhere(Criteria::expr()->eq('published', true))
-            ;
     }
 
     /**

@@ -29,8 +29,7 @@ class AbbreviationsSitemapProvider implements SitemapProviderInterface
         $locale = $this->getLocaleByHost($host);
 
         $result = [];
-        foreach ($this->findAbbreviations(self::PAGE_SIZE, ($page - 1) * self::PAGE_SIZE) as $abbr) {
-            $abbr->setLocale($locale);
+        foreach ($this->findAbbreviations($locale,self::PAGE_SIZE, ($page - 1) * self::PAGE_SIZE) as $abbr) {
             $result[] = new SitemapUrl(
                 $scheme . '://' . $host . $abbr->getRoutePath(),
                 $abbr->getLocale(),
@@ -57,7 +56,8 @@ class AbbreviationsSitemapProvider implements SitemapProviderInterface
      */
     public function getMaxPage($scheme, $host)
     {
-        return ceil(count($this->findAbbreviations()) / self::PAGE_SIZE);
+        $locale = $this->getLocaleByHost($host);
+        return ceil($this->repository->countForSitemap($locale) / self::PAGE_SIZE);
     }
 
     private function getLocaleByHost($host) {
@@ -72,12 +72,8 @@ class AbbreviationsSitemapProvider implements SitemapProviderInterface
         return $this->locales[$host];
     }
 
-    private function findAbbreviations($limit = null, $offset = null)
+    private function findAbbreviations(string $locale, int $limit = null, int $offset = null): array
     {
-        $criteria = [
-            'published' => true,
-        ];
-
-        return $this->repository->findBy($criteria, [], $limit, $offset);
+        return $this->repository->findAllForSitemap($locale, $limit, $offset);
     }
 }
