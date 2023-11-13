@@ -162,11 +162,11 @@
         </service>
 
         <!--Twig-->
-        <service id="sulu_abbreviations.twig_extension" class="Manuxi\SuluAbbreviationsBundle\Twig\AbbreviationsTwigExtension">
+        <service id="sulu_abbreviations.default.twig_extension" class="Manuxi\SuluAbbreviationsBundle\Twig\AbbreviationsTwigExtension">
             <argument type="service" id="sulu_abbreviations.repository.abbreviation"/>
             <tag name="twig.extension"/>
         </service>
-        <service id="sulu_abbreviations.twig_extension" class="Manuxi\SuluAbbreviationsBundle\Twig\AbbreviationsSettingsTwigExtension">
+        <service id="sulu_abbreviations.settings.twig_extension" class="Manuxi\SuluAbbreviationsBundle\Twig\AbbreviationsSettingsTwigExtension">
             <argument type="service" id="doctrine.orm.default_entity_manager"/>
             <tag name="twig.extension"/>
         </service>
