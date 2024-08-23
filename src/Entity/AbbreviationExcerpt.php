@@ -13,30 +13,22 @@ use Manuxi\SuluAbbreviationsBundle\Entity\Interfaces\ExcerptInterface;
 use Manuxi\SuluAbbreviationsBundle\Entity\Interfaces\ExcerptTranslatableInterface;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ExcerptTrait;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ExcerptTranslatableTrait;
+use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationExcerptRepository;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="app_abbreviation_excerpt")
- * @ORM\Entity(repositoryClass="Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationExcerptRepository")
- */
+#[ORM\Entity(repositoryClass: AbbreviationExcerptRepository::class)]
+#[ORM\Table(name: 'app_abbreviation_excerpt')]
 class AbbreviationExcerpt implements ExcerptInterface, ExcerptTranslatableInterface
 {
     use ExcerptTrait;
     use ExcerptTranslatableTrait;
 
-    /**
-     * @ORM\OneToOne(targetEntity="Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation", inversedBy="abbreviationExcerpt", cascade={"persist", "remove"})
-     * @JoinColumn(name="abbreviation_id", referencedColumnName="id", nullable=false)
-     *
-     * @Serializer\Exclude
-     */
+    #[Serializer\Exclude]
+    #[ORM\OneToOne(inversedBy: 'abbreviationExcerpt', targetEntity: Abbreviation::class, cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(name: 'abbreviation_id', referencedColumnName: "id", nullable: false)]
     private ?Abbreviation $abbreviation = null;
 
-    /**
-     * @ORM\OneToMany(targetEntity="AbbreviationExcerptTranslation", mappedBy="abbreviationExcerpt", cascade={"ALL"}, indexBy="locale")
-     *
-     * @Serializer\Exclude
-     */
+    #[Serializer\Exclude]
+    #[ORM\OneToMany(mappedBy: 'abbreviationExcerpt', targetEntity: AbbreviationExcerptTranslation::class, cascade: ['all'], indexBy: 'locale')]
     private Collection $translations;
 
     public function __construct()

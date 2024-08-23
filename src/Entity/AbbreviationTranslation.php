@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace Manuxi\SuluAbbreviationsBundle\Entity;
 
-use DateTime;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use Manuxi\SuluAbbreviationsBundle\Entity\Interfaces\AuditableInterface;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\AuditableTrait;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\LinkTrait;
@@ -17,11 +16,8 @@ use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ImageTrait;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\PublishedTrait;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\RouteTrait;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="app_abbreviation_translation")
- * @ORM\Entity(repositoryClass=AbbreviationTranslationRepository::class)
- */
+#[ORM\Entity(repositoryClass: AbbreviationTranslationRepository::class)]
+#[ORM\Table(name: 'app_abbreviation_translation')]
 class AbbreviationTranslation implements AuditableInterface
 {
     use AuditableTrait;
@@ -32,37 +28,25 @@ class AbbreviationTranslation implements AuditableInterface
     use LinkTrait;
     use ImageTrait;
 
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
-    private ?int $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: Types::INTEGER)]
+    private ?int $id = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Abbreviation::class, inversedBy="translations")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: Abbreviation::class, inversedBy: 'translations')]
+    #[ORM\JoinColumn(nullable: false)]
     private Abbreviation $abbreviation;
 
-    /**
-     * @ORM\Column(type="string", length=5)
-     */
+    #[ORM\Column(type: Types::STRING, length: 5)]
     private string $locale;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private ?string $name = null;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $explanation = null;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
     public function __construct(Abbreviation $abbreviation, string $locale)

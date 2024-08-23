@@ -12,9 +12,7 @@ trait ImageTranslatableTrait
     abstract public function getLocale();
     abstract protected function getTranslation(string $locale);
 
-    /**
-     * @Serializer\VirtualProperty(name="image")
-     */
+    #[Serializer\VirtualProperty(name: "image")]
     public function getImage(): ?MediaInterface
     {
         $translation = $this->getTranslation($this->getLocale());
@@ -29,6 +27,8 @@ trait ImageTranslatableTrait
      * @Serializer\VirtualProperty
      * @Serializer\SerializedName("image")
      */
+    #[Serializer\VirtualProperty]
+    #[Serializer\SerializedName("image")]
     public function getImageData(): ?array
     {
         $translation = $this->getTranslation($this->getLocale());

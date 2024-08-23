@@ -7,8 +7,10 @@ namespace Manuxi\SuluAbbreviationsBundle\Entity;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use JMS\Serializer\Annotation\VirtualProperty;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\LinkTranslatableTrait;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\PublishedTranslatableTrait;
 use Manuxi\SuluAbbreviationsBundle\Entity\Interfaces\AuditableTranslatableInterface;
@@ -20,11 +22,8 @@ use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationTranslation;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ImageTranslatableTrait;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\RouteTranslatableTrait;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="app_abbreviation")
- * @ORM\Entity(repositoryClass=AbbreviationRepository::class)
- */
+#[ORM\Entity(repositoryClass: AbbreviationRepository::class)]
+#[ORM\Table(name: 'app_abbreviation')]
 class Abbreviation implements AuditableTranslatableInterface
 {
     public const RESOURCE_KEY = 'abbreviations';
@@ -40,31 +39,21 @@ class Abbreviation implements AuditableTranslatableInterface
     use LinkTranslatableTrait;
     use ImageTranslatableTrait;
 
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: Types::INTEGER)]
     private ?int $id = null;
 
-    /**
-     * @ORM\OneToOne(targetEntity="Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationSeo", mappedBy="abbreviation", cascade={"persist", "remove"})
-     *
-     * @Serializer\Exclude
-     */
+    #[Serializer\Exclude]
+    #[ORM\OneToOne(mappedBy: 'abbreviation', targetEntity: AbbreviationSeo::class, cascade: ['persist', 'remove'])]
     private ?AbbreviationSeo $abbreviationSeo = null;
 
-    /**
-     * @ORM\OneToOne(targetEntity="Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationExcerpt", mappedBy="abbreviation", cascade={"persist", "remove"})
-     *
-     * @Serializer\Exclude
-     */
+    #[Serializer\Exclude]
+    #[ORM\OneToOne(mappedBy: 'abbreviation', targetEntity: AbbreviationExcerpt::class, cascade: ['persist', 'remove'])]
     private ?AbbreviationExcerpt $abbreviationExcerpt = null;
 
-    /**
-     * @ORM\OneToMany(targetEntity=AbbreviationTranslation::class, mappedBy="abbreviation", cascade={"ALL"}, indexBy="locale", fetch="EXTRA_LAZY")
-     * @Serializer\Exclude
-     */
+    #[Serializer\Exclude]
+    #[ORM\OneToMany(mappedBy: 'abbreviation', targetEntity: AbbreviationTranslation::class, cascade: ['all'], fetch: 'EXTRA_LAZY', indexBy: 'locale')]
     private Collection $translations;
 
     private string $locale = 'de';
@@ -82,17 +71,13 @@ class Abbreviation implements AuditableTranslatableInterface
         return $this->id;
     }
 
-    /**
-     * @Serializer\VirtualProperty(name="title")
-     */
+    #[Serializer\VirtualProperty(name: "title")]
     public function getTitle(): ?string
     {
         return $this->getName();
     }
 
-    /**
-     * @Serializer\VirtualProperty(name="name")
-     */
+    #[Serializer\VirtualProperty(name: "name")]
     public function getName(): ?string
     {
         $translation = $this->getTranslation($this->locale);
@@ -114,9 +99,7 @@ class Abbreviation implements AuditableTranslatableInterface
         return $this;
     }
 
-    /**
-     * @Serializer\VirtualProperty(name="explanation")
-     */
+    #[Serializer\VirtualProperty(name: "explanation")]
     public function getExplanation(): ?string
     {
         $translation = $this->getTranslation($this->locale);
@@ -138,9 +121,7 @@ class Abbreviation implements AuditableTranslatableInterface
         return $this;
     }
 
-    /**
-     * @Serializer\VirtualProperty(name="description")
-     */
+    #[Serializer\VirtualProperty(name: "description")]
     public function getDescription(): ?string
     {
         $translation = $this->getTranslation($this->locale);
@@ -198,9 +179,7 @@ class Abbreviation implements AuditableTranslatableInterface
         return $translation;
     }
 
-    /**
-     * @Serializer\VirtualProperty("availableLocales")
-     */
+    #[Serializer\VirtualProperty(name: "availableLocales")]
     public function getAvailableLocales(): array
     {
         return \array_values($this->translations->getKeys());
@@ -264,9 +243,7 @@ class Abbreviation implements AuditableTranslatableInterface
         return $this;
     }
 
-    /**
-     * @Serializer\VirtualProperty(name="ext")
-     */
+    #[Serializer\VirtualProperty(name: "ext")]
     public function getExt(): array
     {
         return $this->ext;

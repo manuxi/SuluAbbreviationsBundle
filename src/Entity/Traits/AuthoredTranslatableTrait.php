@@ -11,9 +11,7 @@ trait AuthoredTranslatableTrait
     abstract public function getLocale();
     abstract protected function getTranslation(string $locale);
 
-    /**
-     * @Serializer\VirtualProperty(name="authored")
-     */
+    #[Serializer\VirtualProperty(name: "authored")]
     public function getAuthored(): ?\DateTime
     {
         $translation = $this->getTranslation($this->getLocale());
@@ -24,7 +22,7 @@ trait AuthoredTranslatableTrait
         return $translation->getAuthored();
     }
 
-    public function setAuthored(\DateTime $authored): self
+    public function setAuthored(?\DateTime $authored): self
     {
         $translation = $this->getTranslation($this->getLocale());
         if (!$translation) {

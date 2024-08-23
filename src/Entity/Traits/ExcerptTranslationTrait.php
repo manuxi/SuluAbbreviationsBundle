@@ -6,41 +6,37 @@ namespace Manuxi\SuluAbbreviationsBundle\Entity\Traits;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\InverseJoinColumn;
+use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\JoinTable;
+use Doctrine\ORM\Mapping\ManyToMany;
 use JMS\Serializer\Annotation as Serializer;
+use Sulu\Bundle\CategoryBundle\Entity\Category;
 use Sulu\Bundle\CategoryBundle\Entity\CategoryInterface;
 use Sulu\Bundle\MediaBundle\Entity\MediaInterface;
 use Sulu\Bundle\TagBundle\Tag\TagInterface;
 
 trait ExcerptTranslationTrait
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
-    private $id;
 
-    /**
-     * @ORM\Column(type="string", length=5)
-     */
-    private $locale = 'en';
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: Types::INTEGER)]
+    private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $title;
+    #[ORM\Column(type: Types::STRING, length: 5)]
+    private string $locale = 'de';
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $more;
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    private ?string $title = null;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
-    private $description;
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    private ?string $more = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $description = null;
 
     /**
      * @ORM\ManyToMany(targetEntity="Sulu\Bundle\CategoryBundle\Entity\Category")
@@ -49,7 +45,11 @@ trait ExcerptTranslationTrait
      *      inverseJoinColumns={@ORM\JoinColumn(name="category_id", referencedColumnName="id")}
      *      )
      */
-    private $categories;
+    #[ManyToMany(targetEntity: Category::class)]
+    #[JoinTable(name: 'app_abbreviation_excerpt_categories')]
+    #[JoinColumn(name: "excerpt_id", referencedColumnName: "id")]
+    #[InverseJoinColumn(name: "category_id", referencedColumnName: "id")]
+    private ?Collection $categories = null;
 
     /**
      * @ORM\ManyToMany(targetEntity="Sulu\Bundle\TagBundle\Tag\TagInterface")
@@ -58,12 +58,16 @@ trait ExcerptTranslationTrait
      *      inverseJoinColumns={@ORM\JoinColumn(name="tag_id", referencedColumnName="id")}
      *      )
      */
-    private $tags;
+    #[ManyToMany(targetEntity: TagInterface::class)]
+    #[JoinTable(name: 'app_abbreviation_excerpt_tags')]
+    #[JoinColumn(name: "excerpt_id", referencedColumnName: "id")]
+    #[InverseJoinColumn(name: "tag_id", referencedColumnName: "id")]
+    private ?Collection $tags = null;
 
     /**
      * @TODO
      */
-    private $segments;
+    private array $segments;
 
     /**
      * @ORM\ManyToMany(targetEntity="Sulu\Bundle\MediaBundle\Entity\MediaInterface")
@@ -72,7 +76,11 @@ trait ExcerptTranslationTrait
      *      inverseJoinColumns={@ORM\JoinColumn(name="icon_id", referencedColumnName="id")}
      *      )
      */
-    private $icons;
+    #[ManyToMany(targetEntity: MediaInterface::class)]
+    #[JoinTable(name: 'app_abbreviation_excerpt_icons')]
+    #[JoinColumn(name: "excerpt_id", referencedColumnName: "id")]
+    #[InverseJoinColumn(name: "icon_id", referencedColumnName: "id")]
+    private ?Collection $icons = null;
 
     /**
      * @ORM\ManyToMany(targetEntity="Sulu\Bundle\MediaBundle\Entity\MediaInterface")
@@ -81,7 +89,11 @@ trait ExcerptTranslationTrait
      *      inverseJoinColumns={@ORM\JoinColumn(name="image_id", referencedColumnName="id")}
      *      )
      */
-    private $images;
+    #[ManyToMany(targetEntity: MediaInterface::class)]
+    #[JoinTable(name: 'app_abbreviation_excerpt_images')]
+    #[JoinColumn(name: "excerpt_id", referencedColumnName: "id")]
+    #[InverseJoinColumn(name: "image_id", referencedColumnName: "id")]
+    private ?Collection $images = null;
 
     private function initExcerptTranslationTrait(): void
     {
@@ -259,9 +271,7 @@ trait ExcerptTranslationTrait
         return $this->icons;
     }
 
-    /**
-     * @Serializer\VirtualProperty(name="icon")
-     */
+    #[Serializer\VirtualProperty(name: "icon")]
     public function getIconIds(): array
     {
         $icons = [];

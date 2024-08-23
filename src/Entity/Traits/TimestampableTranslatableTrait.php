@@ -12,9 +12,7 @@ trait TimestampableTranslatableTrait
     abstract public function getLocale();
     abstract protected function getTranslation(string $locale);
 
-    /**
-     * @Serializer\VirtualProperty(name="created")
-     */
+    #[Serializer\VirtualProperty(name: "created")]
     public function getCreated(): ?DateTime
     {
         $translation = $this->getTranslation($this->getLocale());
@@ -36,9 +34,7 @@ trait TimestampableTranslatableTrait
         return $this;
     }
 
-    /**
-     * @Serializer\VirtualProperty(name="changed")
-     */
+    #[Serializer\VirtualProperty(name: "changed")]
     public function getChanged(): ?DateTime
     {
         $translation = $this->getTranslation($this->getLocale());

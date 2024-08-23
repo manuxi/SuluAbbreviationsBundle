@@ -13,30 +13,22 @@ use Manuxi\SuluAbbreviationsBundle\Entity\Interfaces\SeoInterface;
 use Manuxi\SuluAbbreviationsBundle\Entity\Interfaces\SeoTranslatableInterface;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\SeoTrait;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\SeoTranslatableTrait;
+use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationSeoRepository;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="app_abbreviation_seo")
- * @ORM\Entity(repositoryClass="Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationSeoRepository")
- */
+#[ORM\Entity(repositoryClass: AbbreviationSeoRepository::class)]
+#[ORM\Table(name: 'app_abbreviation_seo')]
 class AbbreviationSeo implements SeoInterface, SeoTranslatableInterface
 {
     use SeoTrait;
     use SeoTranslatableTrait;
 
-    /**
-     * @ORM\OneToOne(targetEntity="Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation", inversedBy="abbreviationSeo", cascade={"persist", "remove"})
-     * @JoinColumn(name="abbreviation_id", referencedColumnName="id", nullable=false)
-     *
-     * @Serializer\Exclude
-     */
+    #[Serializer\Exclude]
+    #[ORM\OneToOne(inversedBy: 'abbreviationSeo', targetEntity: Abbreviation::class, cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(name: 'abbreviation_id', referencedColumnName: "id", nullable: false)]
     private ?Abbreviation $abbreviation = null;
 
-    /**
-     * @ORM\OneToMany(targetEntity="AbbreviationSeoTranslation", mappedBy="abbreviationSeo", cascade={"ALL"}, indexBy="locale")
-     *
-     * @Serializer\Exclude
-     */
+    #[Serializer\Exclude]
+    #[ORM\OneToMany(mappedBy: 'abbreviationSeo', targetEntity: AbbreviationSeoTranslation::class, cascade: ['all'], indexBy: 'locale')]
     private Collection $translations;
 
     public function __construct()

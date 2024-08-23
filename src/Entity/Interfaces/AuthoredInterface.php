@@ -7,5 +7,5 @@ namespace Manuxi\SuluAbbreviationsBundle\Entity\Interfaces;
 interface AuthoredInterface
 {
     public function getAuthored(): ?\DateTime;
-    public function setAuthored(\DateTime $authored);
+    public function setAuthored(?\DateTime $authored);
 }

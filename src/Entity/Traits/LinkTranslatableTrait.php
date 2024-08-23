@@ -13,9 +13,7 @@ trait LinkTranslatableTrait
     abstract public function getLocale();
     abstract protected function getTranslation(string $locale);
 
-    /**
-     * @Serializer\VirtualProperty(name="link")
-     */
+    #[Serializer\VirtualProperty(name: "link")]
     public function getLink(): ?array
     {
         $translation = $this->getTranslation($this->getLocale());

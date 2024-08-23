@@ -11,6 +11,8 @@ trait ImageTrait
     /**
      * @ORM\ManyToOne(targetEntity=MediaInterface::class)
      */
+    #[ORM\ManyToOne(targetEntity: MediaInterface::class)]
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?MediaInterface $image = null;
 
     public function getImage(): ?MediaInterface
@@ -22,6 +24,8 @@ trait ImageTrait
      * @Serializer\VirtualProperty
      * @Serializer\SerializedName("image")
      */
+    #[Serializer\VirtualProperty]
+    #[Serializer\SerializedName("image")]
     public function getImageData(): ?array
     {
         if ($image = $this->getImage()) {
