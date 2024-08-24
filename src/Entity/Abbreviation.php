@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace Manuxi\SuluAbbreviationsBundle\Entity;
 
-use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
-use JMS\Serializer\Annotation\VirtualProperty;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\LinkTranslatableTrait;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\PublishedTranslatableTrait;
 use Manuxi\SuluAbbreviationsBundle\Entity\Interfaces\AuditableTranslatableInterface;
@@ -18,7 +16,6 @@ use Manuxi\SuluAbbreviationsBundle\Entity\Traits\AuditableTranslatableTrait;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ShowAuthorTranslatableTrait;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ShowDateTranslatableTrait;
 use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationRepository;
-use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationTranslation;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ImageTranslatableTrait;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\RouteTranslatableTrait;
 

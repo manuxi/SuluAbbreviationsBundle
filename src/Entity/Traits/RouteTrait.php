@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 trait RouteTrait
 {
+
     #[ORM\Column(type: Types::STRING, length: 255)]
     private string $routePath;
 

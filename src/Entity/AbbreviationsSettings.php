@@ -22,7 +22,7 @@ class AbbreviationsSettings implements AuditableInterface
     #[ORM\Column(type: Types::INTEGER)]
     private ?int $id = null;
 
-    #[ORM\Column(type: Types::BOOLEAN)]
+    #[ORM\Column(type: Types::BOOLEAN, nullable: true)]
     private ?bool $toggleHeader = null;
 
     #[ORM\Column(type: Types::BOOLEAN, nullable: true)]

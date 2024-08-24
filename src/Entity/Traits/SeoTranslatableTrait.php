@@ -8,7 +8,7 @@ use JMS\Serializer\Annotation as Serializer;
 
 trait SeoTranslatableTrait
 {
-    private string $locale = 'de';
+    private string $locale = 'en';
 
     abstract protected function getTranslation(string $locale);
     abstract protected function createTranslation(string $locale);

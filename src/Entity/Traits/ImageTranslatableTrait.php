@@ -23,10 +23,6 @@ trait ImageTranslatableTrait
         return $translation->getImage();
     }
 
-    /**
-     * @Serializer\VirtualProperty
-     * @Serializer\SerializedName("image")
-     */
     #[Serializer\VirtualProperty]
     #[Serializer\SerializedName("image")]
     public function getImageData(): ?array

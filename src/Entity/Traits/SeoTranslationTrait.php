@@ -9,7 +9,6 @@ use Doctrine\ORM\Mapping as ORM;
 
 trait SeoTranslationTrait
 {
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]

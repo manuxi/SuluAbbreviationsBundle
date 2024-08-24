@@ -8,9 +8,7 @@ use Sulu\Bundle\MediaBundle\Entity\MediaInterface;
 
 trait ImageTrait
 {
-    /**
-     * @ORM\ManyToOne(targetEntity=MediaInterface::class)
-     */
+
     #[ORM\ManyToOne(targetEntity: MediaInterface::class)]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?MediaInterface $image = null;
@@ -20,10 +18,6 @@ trait ImageTrait
         return $this->image;
     }
 
-    /**
-     * @Serializer\VirtualProperty
-     * @Serializer\SerializedName("image")
-     */
     #[Serializer\VirtualProperty]
     #[Serializer\SerializedName("image")]
     public function getImageData(): ?array

@@ -5,8 +5,6 @@ namespace Manuxi\SuluAbbreviationsBundle\Entity\Traits;
 use DateTime;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
-use Sulu\Bundle\MediaBundle\Entity\MediaInterface;
 
 trait PublishedTrait
 {

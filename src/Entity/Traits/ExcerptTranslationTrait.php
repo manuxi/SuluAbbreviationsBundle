@@ -38,26 +38,12 @@ trait ExcerptTranslationTrait
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="Sulu\Bundle\CategoryBundle\Entity\Category")
-     * @JoinTable(name="app_abbreviation_excerpt_categories",
-     *      joinColumns={@ORM\JoinColumn(name="excerpt_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="category_id", referencedColumnName="id")}
-     *      )
-     */
     #[ManyToMany(targetEntity: Category::class)]
     #[JoinTable(name: 'app_abbreviation_excerpt_categories')]
     #[JoinColumn(name: "excerpt_id", referencedColumnName: "id")]
     #[InverseJoinColumn(name: "category_id", referencedColumnName: "id")]
     private ?Collection $categories = null;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="Sulu\Bundle\TagBundle\Tag\TagInterface")
-     * @JoinTable(name="app_abbreviation_excerpt_tags",
-     *      joinColumns={@ORM\JoinColumn(name="excerpt_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="tag_id", referencedColumnName="id")}
-     *      )
-     */
     #[ManyToMany(targetEntity: TagInterface::class)]
     #[JoinTable(name: 'app_abbreviation_excerpt_tags')]
     #[JoinColumn(name: "excerpt_id", referencedColumnName: "id")]
@@ -67,28 +53,14 @@ trait ExcerptTranslationTrait
     /**
      * @TODO
      */
-    private array $segments;
+    private ?Collection $segments = null;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="Sulu\Bundle\MediaBundle\Entity\MediaInterface")
-     * @JoinTable(name="app_abbreviation_excerpt_icons",
-     *      joinColumns={@ORM\JoinColumn(name="excerpt_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="icon_id", referencedColumnName="id")}
-     *      )
-     */
     #[ManyToMany(targetEntity: MediaInterface::class)]
     #[JoinTable(name: 'app_abbreviation_excerpt_icons')]
     #[JoinColumn(name: "excerpt_id", referencedColumnName: "id")]
     #[InverseJoinColumn(name: "icon_id", referencedColumnName: "id")]
     private ?Collection $icons = null;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="Sulu\Bundle\MediaBundle\Entity\MediaInterface")
-     * @JoinTable(name="app_abbreviation_excerpt_images",
-     *      joinColumns={@ORM\JoinColumn(name="excerpt_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="image_id", referencedColumnName="id")}
-     *      )
-     */
     #[ManyToMany(targetEntity: MediaInterface::class)]
     #[JoinTable(name: 'app_abbreviation_excerpt_images')]
     #[JoinColumn(name: "excerpt_id", referencedColumnName: "id")]
