@@ -2,11 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Manuxi\SuluAbbreviationsBundle\EventSubscriber\ORM;
+namespace Manuxi\SuluAbbreviationsBundle\EventListener\Doctrine;
 
-use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\OnFlushEventArgs;
-use Doctrine\ORM\Events;
 use Doctrine\Persistence\Event\LoadClassMetadataEventArgs;
 use Manuxi\SuluAbbreviationsBundle\Entity\Interfaces\AuthorInterface;
 use Sulu\Bundle\ContactBundle\Entity\ContactInterface;
@@ -15,7 +13,7 @@ use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class AuthorSubscriber implements EventSubscriber
+class AuthorListener
 {
     const AUTHOR_PROPERTY_NAME = 'author';
 
@@ -26,14 +24,6 @@ class AuthorSubscriber implements EventSubscriber
     {
         $this->tokenStorage = $tokenStorage;
         $this->userClass = $userClass;
-    }
-
-    public function getSubscribedEvents()
-    {
-        return [
-            Events::loadClassMetadata,
-            Events::onFlush,
-        ];
     }
 
     /**
