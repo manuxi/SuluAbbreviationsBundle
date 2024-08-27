@@ -178,7 +178,7 @@ class AbbreviationRepository extends ServiceEntityRepository implements DataProv
 
     }
 
-    public function getPublishedAbbreviations(array $filters, string $locale, ?int $page, $pageSize, ?int $limit, array $options): array
+    public function getPublishedAbbreviations(array $filters, string $locale, ?int $page, $pageSize, $limit = null, array $options): array
     {
         $pageCurrent = (key_exists('page', $options)) ? (int)$options['page'] : 0;
 
