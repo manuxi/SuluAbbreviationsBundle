@@ -265,7 +265,6 @@ class AbbreviationRepository extends ServiceEntityRepository implements DataProv
                         $andWhere .= " AND categories = :category" . $i;
                     }
                     $queryBuilder->setParameter("category" . $i, $category);
-                    $i++;
                 }
                 $queryBuilder->andWhere($andWhere);
             } else if ($filters['categoryOperator'] === "or") {
@@ -277,7 +276,6 @@ class AbbreviationRepository extends ServiceEntityRepository implements DataProv
                         $orWhere .= " OR categories = :category" . $i;
                     }
                     $queryBuilder->setParameter("category" . $i, $category);
-                    $i++;
                 }
                 $queryBuilder->andWhere($orWhere);
             }
