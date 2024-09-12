@@ -39,10 +39,6 @@ class AbbreviationsSelectionContentType extends SimpleContentType
         return $abbreviations;
     }
 
-    /**
-     * @param PropertyInterface $property
-     * @return mixed[]
-     */
     public function getViewData(PropertyInterface $property): mixed
     {
         return $property->getValue();
