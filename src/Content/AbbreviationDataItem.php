@@ -8,9 +8,7 @@ use JMS\Serializer\Annotation as Serializer;
 use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use Sulu\Component\SmartContent\ItemInterface;
 
-/**
- * @Serializer\ExclusionPolicy("all")
- */
+#[Serializer\ExclusionPolicy("all")]
 class AbbreviationDataItem implements ItemInterface
 {
 
@@ -21,49 +19,37 @@ class AbbreviationDataItem implements ItemInterface
         $this->entity = $entity;
     }
 
-    /**
-     * @Serializer\VirtualProperty
-     */
+    #[Serializer\VirtualProperty]
     public function getId(): string
     {
         return (string) $this->entity->getId();
     }
 
-    /**
-     * @Serializer\VirtualProperty
-     */
+    #[Serializer\VirtualProperty]
     public function getTitle(): string
     {
         return (string) $this->entity->getName();
     }
 
-    /**
-     * @Serializer\VirtualProperty
-     */
+    #[Serializer\VirtualProperty]
     public function getImage(): ?string
     {
         return null;
     }
 
-    /**
-     * @Serializer\VirtualProperty
-     */
+    #[Serializer\VirtualProperty]
     public function getName(): string
     {
         return (string) $this->entity->getName();
     }
 
-    /**
-     * @Serializer\VirtualProperty
-     */
+    #[Serializer\VirtualProperty]
     public function getExplanation(): string
     {
         return (string) $this->entity->getExplanation();
     }
 
-    /**
-     * @Serializer\VirtualProperty
-     */
+    #[Serializer\VirtualProperty]
     public function getDescription(): ?string
     {
         return (string) $this->entity->getDescription();
