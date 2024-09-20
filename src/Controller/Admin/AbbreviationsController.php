@@ -8,15 +8,11 @@ use Manuxi\SuluAbbreviationsBundle\Common\DoctrineListRepresentationFactory;
 use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use Manuxi\SuluAbbreviationsBundle\Entity\Models\AbbreviationExcerptModel;
 use Manuxi\SuluAbbreviationsBundle\Entity\Models\AbbreviationModel;
-use Doctrine\ORM\OptimisticLockException;
-use Doctrine\ORM\ORMException;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\View\ViewHandlerInterface;
 use Manuxi\SuluAbbreviationsBundle\Entity\Models\AbbreviationSeoModel;
-use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
-use Sulu\Bundle\RouteBundle\Manager\RouteManagerInterface;
 use Sulu\Bundle\TrashBundle\Application\TrashManager\TrashManagerInterface;
 use Sulu\Component\Rest\AbstractRestController;
 use Sulu\Component\Rest\Exception\EntityNotFoundException;
@@ -43,8 +39,6 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
     private AbbreviationSeoModel $abbreviationSeoModel;
     private AbbreviationExcerptModel $abbreviationExcerptModel;
     private DoctrineListRepresentationFactory $doctrineListRepresentationFactory;
-    private RouteManagerInterface $routeManager;
-    private RouteRepositoryInterface $routeRepository;
     private SecurityCheckerInterface $securityChecker;
     private TrashManagerInterface $trashManager;
 
@@ -52,8 +46,6 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
         AbbreviationModel $abbreviationModel,
         AbbreviationSeoModel $abbreviationSeoModel,
         AbbreviationExcerptModel $abbreviationExcerptModel,
-        RouteManagerInterface $routeManager,
-        RouteRepositoryInterface $routeRepository,
         DoctrineListRepresentationFactory $doctrineListRepresentationFactory,
         SecurityCheckerInterface $securityChecker,
         ViewHandlerInterface $viewHandler,
@@ -65,8 +57,6 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
         $this->abbreviationSeoModel              = $abbreviationSeoModel;
         $this->abbreviationExcerptModel          = $abbreviationExcerptModel;
         $this->doctrineListRepresentationFactory = $doctrineListRepresentationFactory;
-        $this->routeManager                      = $routeManager;
-        $this->routeRepository                   = $routeRepository;
         $this->securityChecker                   = $securityChecker;
         $this->trashManager = $trashManager;
     }
@@ -104,8 +94,6 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
     public function postAction(Request $request): Response
     {
         $entity = $this->abbreviationModel->create($request);
-        $this->updateRoutesForEntity($entity);
-
         return $this->handleView($this->view($entity, 201));
     }
 
@@ -167,7 +155,6 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
     public function putAction(int $id, Request $request): Response
     {
         $entity = $this->abbreviationModel->update($id, $request);
-        $this->updateRoutesForEntity($entity);
 
         $this->abbreviationSeoModel->updateAbbreviationSeo($entity->getSeo(), $request);
         $this->abbreviationExcerptModel->updateAbbreviationExcerpt($entity->getExcerpt(), $request);
@@ -184,13 +171,10 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
     public function deleteAction(int $id, Request $request): Response
     {
         $entity = $this->abbreviationModel->get($id, $request);
-        $name = $entity->getName();
 
         $this->trashManager->store(Abbreviation::RESOURCE_KEY, $entity);
 
-        $this->removeRoutesForEntity($entity);
-
-        $this->abbreviationModel->delete($id, $name ?? '');
+        $this->abbreviationModel->delete($entity);
         return $this->handleView($this->view(null, 204));
     }
 
@@ -199,26 +183,4 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
         return Abbreviation::SECURITY_CONTEXT;
     }
 
-    protected function updateRoutesForEntity(Abbreviation $entity): void
-    {
-        $this->routeManager->createOrUpdateByAttributes(
-            Abbreviation::class,
-            (string) $entity->getId(),
-            $entity->getLocale(),
-            $entity->getRoutePath()
-        );
-    }
-
-    protected function removeRoutesForEntity(Abbreviation $entity): void
-    {
-        $routes = $this->routeRepository->findAllByEntity(
-            Abbreviation::class,
-            (string) $entity->getId(),
-            $entity->getLocale()
-        );
-
-        foreach ($routes as $route) {
-            $this->routeRepository->remove($route);
-        }
-    }
 }

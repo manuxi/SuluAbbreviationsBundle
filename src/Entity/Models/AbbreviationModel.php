@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Manuxi\SuluAbbreviationsBundle\Entity\Models;
 
 use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
 use Manuxi\SuluAbbreviationsBundle\Domain\Event\AbbreviationCopiedLanguageEvent;
 use Manuxi\SuluAbbreviationsBundle\Domain\Event\AbbreviationCreatedEvent;
 use Manuxi\SuluAbbreviationsBundle\Domain\Event\AbbreviationModifiedEvent;
@@ -18,6 +19,8 @@ use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationRepository;
 use Sulu\Bundle\ActivityBundle\Application\Collector\DomainEventCollectorInterface;
 use Sulu\Bundle\ContactBundle\Entity\ContactRepository;
 use Sulu\Bundle\MediaBundle\Entity\MediaRepositoryInterface;
+use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
+use Sulu\Bundle\RouteBundle\Manager\RouteManagerInterface;
 use Sulu\Component\Rest\Exception\EntityNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -25,22 +28,15 @@ class AbbreviationModel implements AbbreviationModelInterface
 {
     use ArrayPropertyTrait;
 
-    private AbbreviationRepository $abbreviationRepository;
-    private MediaRepositoryInterface $mediaRepository;
-    private ContactRepository $contactRepository;
-    private DomainEventCollectorInterface $domainEventCollector;
-
     public function __construct(
-        AbbreviationRepository $abbreviationRepository,
-        MediaRepositoryInterface $mediaRepository,
-        ContactRepository $contactRepository,
-        DomainEventCollectorInterface $domainEventCollector
-    ) {
-        $this->mediaRepository = $mediaRepository;
-        $this->abbreviationRepository = $abbreviationRepository;
-        $this->contactRepository = $contactRepository;
-        $this->domainEventCollector = $domainEventCollector;
-    }
+        private AbbreviationRepository $abbreviationRepository,
+        private MediaRepositoryInterface $mediaRepository,
+        private ContactRepository $contactRepository,
+        private RouteManagerInterface $routeManager,
+        private RouteRepositoryInterface $routeRepository,
+        private EntityManagerInterface $entityManager,
+        private DomainEventCollectorInterface $domainEventCollector
+    ) {}
 
     /**
      * @param int $id
@@ -56,12 +52,13 @@ class AbbreviationModel implements AbbreviationModelInterface
         return $this->findByIdAndLocale($id, $request);
     }
 
-    public function delete(int $id, string $title): void
+    public function delete(Abbreviation $entity): void
     {
         $this->domainEventCollector->collect(
-            new AbbreviationRemovedEvent($id, $title)
+            new AbbreviationRemovedEvent($entity->getId(), $entity->getTitle() ?? '')
         );
-        $this->abbreviationRepository->remove($id);
+        $this->removeRoutesForEntity($entity);
+        $this->abbreviationRepository->remove($entity->getId());
     }
 
     /**
@@ -78,7 +75,15 @@ class AbbreviationModel implements AbbreviationModelInterface
             new AbbreviationCreatedEvent($entity, $request->request->all())
         );
 
-        return $this->abbreviationRepository->save($entity);
+        //need the id for updateRoutesForEntity(), so we have to persist and flush here
+        $entity = $this->abbreviationRepository->save($entity);
+
+        $this->updateRoutesForEntity($entity);
+
+        //explicit flush to save routes persisted by updateRoutesForEntity()
+        $this->entityManager->flush();
+
+        return $entity;
     }
 
     /**
@@ -92,6 +97,7 @@ class AbbreviationModel implements AbbreviationModelInterface
         $entity = $this->findByIdAndLocale($id, $request);
         $entity = $this->mapDataToEntity($entity, $request->request->all());
         $entity = $this->mapSettingsToEntity($entity, $request->request->all());
+        $this->updateRoutesForEntity($entity);
 
         $this->domainEventCollector->collect(
             new AbbreviationModifiedEvent($entity, $request->request->all())
@@ -276,5 +282,28 @@ class AbbreviationModel implements AbbreviationModelInterface
             $entity->setAuthored(null);
         }
         return $entity;
+    }
+
+    private function updateRoutesForEntity(Abbreviation $entity): void
+    {
+        $this->routeManager->createOrUpdateByAttributes(
+            Abbreviation::class,
+            (string) $entity->getId(),
+            $entity->getLocale(),
+            $entity->getRoutePath()
+        );
+    }
+
+    private function removeRoutesForEntity(Abbreviation $entity): void
+    {
+        $routes = $this->routeRepository->findAllByEntity(
+            Abbreviation::class,
+            (string) $entity->getId(),
+            $entity->getLocale()
+        );
+
+        foreach ($routes as $route) {
+            $this->routeRepository->remove($route);
+        }
     }
 }

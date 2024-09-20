@@ -116,6 +116,9 @@
             <argument type="service" id="sulu_abbreviations.repository.abbreviation"/>
             <argument type="service" id="sulu.repository.media"/>
             <argument type="service" id="sulu.repository.contact"/>
+            <argument type="service" id="sulu_route.manager.route_manager"/>
+            <argument type="service" id="sulu.repository.route"/>
+            <argument type="service" id="doctrine.orm.entity_manager" />
             <argument type="service" id="sulu_activity.domain_event_collector"/>
         </service>
 
