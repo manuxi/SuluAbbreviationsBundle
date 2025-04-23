@@ -24,6 +24,7 @@ The abbreviations are translatable.
 Please feel comfortable submitting feature requests. 
 This bundle is still in development. Use at own risk 🤞🏻
 
+![image](https://github.com/user-attachments/assets/fbd68da1-710d-436c-bee2-9f83a7a8ca32)
 
 ## 👩🏻‍🏭 Installation
 Install the package with:
