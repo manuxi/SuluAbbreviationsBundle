@@ -17,7 +17,6 @@ This bundle contains
 - Possibility to assign a contact as author
 - Twig Extension for resolving Abbreviations / get a list of Abbreviations
 - Events for displaying Activities
-- Automation
 - Search indexes
     - refresh whenever entity is changed
     - distinct between normal and draft
