@@ -44,6 +44,18 @@ Please add the following to your `routes_admin.yaml`:
 SuluAbbreviationsBundle:
     resource: '@SuluAbbreviationsBundle/Resources/config/routes_admin.yml'
 ```
+Don't forget fo add the index to your sulu_search.yaml:
+
+add "abbreviations"!
+
+"abbreviations" is the index of published, "abbreviations_draft" the index of unpublished elements.
+```yaml
+sulu_search:
+    website:
+        indexes:
+            - abbreviations
+            - ...
+``` 
 Last but not least the schema of the database needs to be updated.  
 
 Some tables will be created (prefixed with app_):  

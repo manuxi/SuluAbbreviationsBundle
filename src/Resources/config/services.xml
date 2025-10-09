@@ -156,6 +156,12 @@
             <tag name="sulu.link.provider" alias="abbreviation"/>
         </service>
 
+        <!--SearchSubscriber-->
+        <service id="sulu_abbreviations.search_subscriber" class="Manuxi\SuluAbbreviationsBundle\Search\AbbreviationsSearchSubscriber">
+            <argument type="service" id="massive_search.search_manager"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <!--Trash-->
         <service id="sulu_abbreviations.abbreviations_trash_item_handler" class="Manuxi\SuluAbbreviationsBundle\Trash\AbbreviationsTrashItemHandler">
             <argument type="service" id="sulu_trash.trash_item_repository"/>

@@ -13,6 +13,10 @@ use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\View\ViewHandlerInterface;
 use Manuxi\SuluAbbreviationsBundle\Entity\Models\AbbreviationSeoModel;
+use Manuxi\SuluAbbreviationsBundle\Search\Event\AbbreviationPublishedEvent;
+use Manuxi\SuluAbbreviationsBundle\Search\Event\AbbreviationRemovedEvent;
+use Manuxi\SuluAbbreviationsBundle\Search\Event\AbbreviationSavedEvent;
+use Manuxi\SuluAbbreviationsBundle\Search\Event\AbbreviationUnpublishedEvent;
 use Sulu\Bundle\TrashBundle\Application\TrashManager\TrashManagerInterface;
 use Sulu\Component\Rest\AbstractRestController;
 use Sulu\Component\Rest\Exception\EntityNotFoundException;
@@ -27,6 +31,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @RouteResource("abbreviation")
@@ -35,30 +40,18 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
 {
     use RequestParametersTrait;
 
-    private AbbreviationModel $abbreviationModel;
-    private AbbreviationSeoModel $abbreviationSeoModel;
-    private AbbreviationExcerptModel $abbreviationExcerptModel;
-    private DoctrineListRepresentationFactory $doctrineListRepresentationFactory;
-    private SecurityCheckerInterface $securityChecker;
-    private TrashManagerInterface $trashManager;
-
     public function __construct(
-        AbbreviationModel $abbreviationModel,
-        AbbreviationSeoModel $abbreviationSeoModel,
-        AbbreviationExcerptModel $abbreviationExcerptModel,
-        DoctrineListRepresentationFactory $doctrineListRepresentationFactory,
-        SecurityCheckerInterface $securityChecker,
+        private readonly AbbreviationModel $abbreviationModel,
+        private readonly AbbreviationSeoModel $abbreviationSeoModel,
+        private readonly AbbreviationExcerptModel $abbreviationExcerptModel,
+        private readonly DoctrineListRepresentationFactory $doctrineListRepresentationFactory,
+        private readonly SecurityCheckerInterface $securityChecker,
+        private readonly TrashManagerInterface $trashManager,
+        private readonly EventDispatcherInterface $dispatcher,
         ViewHandlerInterface $viewHandler,
-        TrashManagerInterface $trashManager,
         ?TokenStorageInterface $tokenStorage = null
     ) {
         parent::__construct($viewHandler, $tokenStorage);
-        $this->abbreviationModel                 = $abbreviationModel;
-        $this->abbreviationSeoModel              = $abbreviationSeoModel;
-        $this->abbreviationExcerptModel          = $abbreviationExcerptModel;
-        $this->doctrineListRepresentationFactory = $doctrineListRepresentationFactory;
-        $this->securityChecker                   = $securityChecker;
-        $this->trashManager = $trashManager;
     }
 
     public function cgetAction(Request $request): Response
@@ -94,6 +87,7 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
     public function postAction(Request $request): Response
     {
         $entity = $this->abbreviationModel->create($request);
+        $this->dispatcher->dispatch(new AbbreviationSavedEvent($entity));
         return $this->handleView($this->view($entity, 201));
     }
 
@@ -113,12 +107,15 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
             switch ($action) {
                 case 'publish':
                     $entity = $this->abbreviationModel->publish($id, $request);
+                    $this->dispatcher->dispatch(new AbbreviationPublishedEvent($entity));
                     break;
                 case 'unpublish':
                     $entity = $this->abbreviationModel->unpublish($id, $request);
+                    $this->dispatcher->dispatch(new AbbreviationUnpublishedEvent($entity));
                     break;
                 case 'copy':
                     $entity = $this->abbreviationModel->copy($id, $request);
+                    $this->dispatcher->dispatch(new AbbreviationSavedEvent($entity));
                     break;
                 case 'copy-locale':
                     $locale = $this->getRequestParameter($request, 'locale', true);
@@ -134,6 +131,7 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
                     }
 
                     $entity = $this->abbreviationModel->copyLanguage($id, $request, $srcLocale, $destLocales);
+                    $this->dispatcher->dispatch(new AbbreviationSavedEvent($entity));
                     break;
                 default:
                     throw new BadRequestHttpException(sprintf('Unknown action "%s".', $action));
@@ -159,6 +157,8 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
         $this->abbreviationSeoModel->updateAbbreviationSeo($entity->getSeo(), $request);
         $this->abbreviationExcerptModel->updateAbbreviationExcerpt($entity->getExcerpt(), $request);
 
+        $this->dispatcher->dispatch(new AbbreviationSavedEvent($entity));
+
         return $this->handleView($this->view($entity));
     }
 
@@ -175,6 +175,9 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
         $this->trashManager->store(Abbreviation::RESOURCE_KEY, $entity);
 
         $this->abbreviationModel->delete($entity);
+
+        $this->dispatcher->dispatch(new AbbreviationRemovedEvent($entity));
+
         return $this->handleView($this->view(null, 204));
     }
 

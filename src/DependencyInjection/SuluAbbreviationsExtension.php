@@ -32,6 +32,15 @@ class SuluAbbreviationsExtension extends Extension implements PrependExtensionIn
         $loader->load('services.xml');
         $loader->load('controller.xml');
 
+        if ($container->hasParameter('kernel.bundles')) {
+            /** @var string[] $bundles */
+            $bundles = $container->getParameter('kernel.bundles');
+
+            if (\array_key_exists('SuluAutomationBundle', $bundles)) {
+                $loader->load('automation.xml');
+            }
+        }
+
         $this->configurePersistence($config['objects'], $container);
     }
 
@@ -42,7 +51,7 @@ class SuluAbbreviationsExtension extends Extension implements PrependExtensionIn
                 'sulu_search',
                 [
                     'indexes' => [
-                        'abbreviation' => [
+                        'abbreviations' => [
                             'name' => 'sulu_abbreviations.search_name',
                             'icon' => 'su-tag-pen',
                             'security_context' => Abbreviation::SECURITY_CONTEXT,

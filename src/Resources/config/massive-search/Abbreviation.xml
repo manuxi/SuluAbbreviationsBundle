@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <massive-search-mapping xmlns="http://massiveart.com/schema/dic/massive-search-mapping">
     <mapping class="Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation">
-        <index value="abbreviation"/>
+        <index value="'abbreviations' ~ (object.isPublished() ? '' : '_draft')" expr="'abbreviations' ~ (object.isPublished() ? '' : '_draft')"/>
         <id property="id"/>
         <title expr="object.getName()"/>
         <description expr="object.getExplanation()"/>

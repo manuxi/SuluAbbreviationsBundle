@@ -5,6 +5,7 @@
     "keywords": [
         "sulu",
         "suluCms",
+        "sulu bundle",
         "abbreviations"
     ],
     "homepage": "https://github.com/manuxi/SuluAbbreviationsBundle",
@@ -18,7 +19,9 @@
     "require": {
         "php": "^8.1",
         "doctrine/doctrine-bundle": "^2.12",
+        "massive/search-bundle": "^2.9",
         "phpcr/phpcr-migrations-bundle": "^1.6",
+        "sulu/automation-bundle": "^2.1",
         "sulu/sulu": "^2.5",
         "symfony/config": "^6.2 | ^7.0",
         "symfony/dependency-injection": "^6.2 | ^7.0",
