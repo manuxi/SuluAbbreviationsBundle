@@ -17,6 +17,10 @@ This bundle contains
 - Possibility to assign a contact as author
 - Twig Extension for resolving Abbreviations / get a list of Abbreviations
 - Events for displaying Activities
+- Automation
+- Search indexes
+    - refresh whenever entity is changed
+    - distinct between normal and draft
 and more...
 
 The abbreviations are translatable.
@@ -24,6 +28,7 @@ The abbreviations are translatable.
 Please feel comfortable submitting feature requests. 
 This bundle is still in development. Use at own risk 🤞🏻
 
+![image](https://github.com/user-attachments/assets/fbd68da1-710d-436c-bee2-9f83a7a8ca32)
 
 ## 👩🏻‍🏭 Installation
 Install the package with:
@@ -104,9 +109,7 @@ Example of the corresponding twig template for the abbreviations list:
 {% endfor %}
 ```
 
-## 🧶 Configuration
-There exists no configuration.
-
 ## 👩‍🍳 Contributing
 For the sake of simplicity this extension was kept small.
 Please feel comfortable submitting issues or pull requests. As always I'd be glad to get your feedback to improve the extension :).
+>>>>>>> 9a0f74c1de53f730bf1857b0d6b617dc4b47ab03
