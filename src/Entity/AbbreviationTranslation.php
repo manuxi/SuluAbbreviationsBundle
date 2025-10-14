@@ -8,25 +8,25 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Manuxi\SuluAbbreviationsBundle\Entity\Interfaces\AuditableInterface;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\AuditableTrait;
+use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ImageTrait;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\LinkTrait;
+use Manuxi\SuluAbbreviationsBundle\Entity\Traits\PublishedTrait;
+use Manuxi\SuluAbbreviationsBundle\Entity\Traits\RouteTrait;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ShowAuthorTrait;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ShowDateTrait;
 use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationTranslationRepository;
-use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ImageTrait;
-use Manuxi\SuluAbbreviationsBundle\Entity\Traits\PublishedTrait;
-use Manuxi\SuluAbbreviationsBundle\Entity\Traits\RouteTrait;
 
 #[ORM\Entity(repositoryClass: AbbreviationTranslationRepository::class)]
 #[ORM\Table(name: 'app_abbreviation_translation')]
 class AbbreviationTranslation implements AuditableInterface
 {
     use AuditableTrait;
-    use ShowAuthorTrait;
-    use ShowDateTrait;
+    use ImageTrait;
+    use LinkTrait;
     use PublishedTrait;
     use RouteTrait;
-    use LinkTrait;
-    use ImageTrait;
+    use ShowAuthorTrait;
+    use ShowDateTrait;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -51,7 +51,7 @@ class AbbreviationTranslation implements AuditableInterface
 
     public function __construct(Abbreviation $abbreviation, string $locale)
     {
-        $this->abbreviation  = $abbreviation;
+        $this->abbreviation = $abbreviation;
         $this->locale = $locale;
     }
 
@@ -73,6 +73,7 @@ class AbbreviationTranslation implements AuditableInterface
     public function setLocale(string $locale): self
     {
         $this->locale = $locale;
+
         return $this;
     }
 
@@ -84,6 +85,7 @@ class AbbreviationTranslation implements AuditableInterface
     public function setName(?string $name): self
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -95,6 +97,7 @@ class AbbreviationTranslation implements AuditableInterface
     public function setExplanation(?string $explanation): self
     {
         $this->explanation = $explanation;
+
         return $this;
     }
 
@@ -106,7 +109,7 @@ class AbbreviationTranslation implements AuditableInterface
     public function setDescription(?string $description): self
     {
         $this->description = $description;
+
         return $this;
     }
-
 }

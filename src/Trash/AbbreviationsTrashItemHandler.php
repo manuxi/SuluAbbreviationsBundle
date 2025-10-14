@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Manuxi\SuluAbbreviationsBundle\Trash;
 
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Manuxi\SuluAbbreviationsBundle\Admin\AbbreviationsAdmin;
 use Manuxi\SuluAbbreviationsBundle\Domain\Event\AbbreviationRestoredEvent;
 use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
+use Manuxi\SuluAbbreviationsBundle\Search\Event\AbbreviationRemovedEvent;
+use Manuxi\SuluAbbreviationsBundle\Search\Event\AbbreviationSavedEvent;
 use Sulu\Bundle\ActivityBundle\Application\Collector\DomainEventCollectorInterface;
 use Sulu\Bundle\ContactBundle\Entity\ContactInterface;
 use Sulu\Bundle\MediaBundle\Entity\MediaInterface;
@@ -20,60 +21,56 @@ use Sulu\Bundle\TrashBundle\Application\TrashItemHandler\RestoreTrashItemHandler
 use Sulu\Bundle\TrashBundle\Application\TrashItemHandler\StoreTrashItemHandlerInterface;
 use Sulu\Bundle\TrashBundle\Domain\Model\TrashItemInterface;
 use Sulu\Bundle\TrashBundle\Domain\Repository\TrashItemRepositoryInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class AbbreviationsTrashItemHandler implements StoreTrashItemHandlerInterface, RestoreTrashItemHandlerInterface, RestoreConfigurationProviderInterface
 {
-    private TrashItemRepositoryInterface $trashItemRepository;
-    private EntityManagerInterface $entityManager;
-    private DoctrineRestoreHelperInterface $doctrineRestoreHelper;
-    private DomainEventCollectorInterface $domainEventCollector;
-
     public function __construct(
-        TrashItemRepositoryInterface   $trashItemRepository,
-        EntityManagerInterface         $entityManager,
-        DoctrineRestoreHelperInterface $doctrineRestoreHelper,
-        DomainEventCollectorInterface  $domainEventCollector
-    )
-    {
-        $this->trashItemRepository = $trashItemRepository;
-        $this->entityManager = $entityManager;
-        $this->doctrineRestoreHelper = $doctrineRestoreHelper;
-        $this->domainEventCollector = $domainEventCollector;
-    }
+        private readonly TrashItemRepositoryInterface   $trashItemRepository,
+        private readonly EntityManagerInterface         $entityManager,
+        private readonly DoctrineRestoreHelperInterface $doctrineRestoreHelper,
+        private readonly DomainEventCollectorInterface $domainEventCollector,
+        private readonly EventDispatcherInterface $dispatcher,
+    ) {}
 
     public static function getResourceKey(): string
     {
         return Abbreviation::RESOURCE_KEY;
     }
 
-    public function store(object $resource, array $options = []): TrashItemInterface
+    public function store(object $entity, array $options = []): TrashItemInterface
     {
-        $image = $resource->getImage();
+        /* @var Abbreviation $entity */
+
+        $image = $entity->getImage();
 
         $data = [
-            "name" => $resource->getName(),
-            "explanation" => $resource->getExplanation(),
-            "description" => $resource->getDescription(),
-            "slug" => $resource->getRoutePath(),
-            "published" => $resource->isPublished(),
-            "publishedAt" => $resource->getPublishedAt(),
-            "ext" => $resource->getExt(),
-            "locale" => $resource->getLocale(),
-            "imageId" => $image ? $image->getId() : null,
-            "link" => $resource->getLink(),
-            "showAuthor" => $resource->getShowAuthor(),
-            "showDate" => $resource->getShowDate(),
-            "authored" => $resource->getAuthored(),
-            "author" => $resource->getAuthor(),
-
+            'name' => $entity->getName(),
+            'explanation' => $entity->getExplanation(),
+            'description' => $entity->getDescription(),
+            'slug' => $entity->getRoutePath(),
+            'published' => $entity->isPublished(),
+            'publishedAt' => $entity->getPublishedAt(),
+            'ext' => $entity->getExt(),
+            'locale' => $entity->getLocale(),
+            'imageId' => $image?->getId(),
+            'link' => $entity->getLink(),
+            'showAuthor' => $entity->getShowAuthor(),
+            'showDate' => $entity->getShowDate(),
+            'authored' => $entity->getAuthored(),
+            'author' => $entity->getAuthor(),
         ];
+
+        $restoreType = isset($options['locale']) ? 'translation' : null;
+
+        $this->dispatcher->dispatch(new AbbreviationRemovedEvent($entity));
+
         return $this->trashItemRepository->create(
             Abbreviation::RESOURCE_KEY,
-            (string)$resource->getId(),
-            $resource->getName(),
+            (string) $entity->getId(),
+            $entity->getName(),
             $data,
-            null,
+            $restoreType,
             $options,
             Abbreviation::SECURITY_CONTEXT,
             null,
@@ -83,9 +80,9 @@ class AbbreviationsTrashItemHandler implements StoreTrashItemHandlerInterface, R
 
     public function restore(TrashItemInterface $trashItem, array $restoreFormData = []): object
     {
-
         $data = $trashItem->getRestoreData();
-        $abbreviationId = (int)$trashItem->getResourceId();
+
+        $abbreviationId = (int) $trashItem->getResourceId();
         $abbreviation = new Abbreviation();
         $abbreviation->setLocale($data['locale']);
         $abbreviation->setName($data['name']);
@@ -94,21 +91,21 @@ class AbbreviationsTrashItemHandler implements StoreTrashItemHandlerInterface, R
         $abbreviation->setRoutePath($data['slug']);
         $abbreviation->setExt($data['ext']);
         $abbreviation->setPublished($data['published']);
-        $abbreviation->setPublishedAt($data['publishedAt'] ? new DateTime($data['publishedAt']['date']) : null);
+        $abbreviation->setPublishedAt($data['publishedAt'] ? new \DateTime($data['publishedAt']['date']) : null);
         $abbreviation->setShowAuthor($data['showAuthor']);
         $abbreviation->setShowDate($data['showDate']);
 
-        $abbreviation->setAuthored($data['authored'] ? new DateTime($data['authored']['date']) : new DateTime());
+        $abbreviation->setAuthored($data['authored'] ? new \DateTime($data['authored']['date']) : new \DateTime());
 
         if ($data['author']) {
             $abbreviation->setAuthor($this->entityManager->find(ContactInterface::class, $data['author']));
         }
 
-        if($data['link']) {
+        if ($data['link']) {
             $abbreviation->setLink($data['link']);
         }
 
-        if($data['imageId']){
+        if ($data['imageId']) {
             $abbreviation->setImage($this->entityManager->find(MediaInterface::class, $data['imageId']));
         }
 
@@ -119,6 +116,9 @@ class AbbreviationsTrashItemHandler implements StoreTrashItemHandlerInterface, R
         $this->doctrineRestoreHelper->persistAndFlushWithId($abbreviation, $abbreviationId);
         $this->createRoute($this->entityManager, $abbreviationId, $data['locale'], $abbreviation->getRoutePath(), Abbreviation::class);
         $this->entityManager->flush();
+
+        $this->dispatcher->dispatch(new AbbreviationSavedEvent($abbreviation));
+
         return $abbreviation;
     }
 
@@ -130,8 +130,8 @@ class AbbreviationsTrashItemHandler implements StoreTrashItemHandlerInterface, R
         $route->setEntityClass($class);
         $route->setEntityId($id);
         $route->setHistory(0);
-        $route->setCreated(new DateTime());
-        $route->setChanged(new DateTime());
+        $route->setCreated(new \DateTime());
+        $route->setChanged(new \DateTime());
         $manager->persist($route);
     }
 

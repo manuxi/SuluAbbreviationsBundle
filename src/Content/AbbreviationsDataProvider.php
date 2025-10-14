@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Manuxi\SuluAbbreviationsBundle\Content;
 
-use Countable;
 use Doctrine\ORM\EntityManagerInterface;
 use Manuxi\SuluAbbreviationsBundle\Admin\AbbreviationsAdmin;
 use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
@@ -46,28 +45,24 @@ class AbbreviationsDataProvider extends BaseDataProvider
         return parent::getConfiguration();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resolveResourceItems(
         array $filters,
         array $propertyParameter,
         array $options = [],
         $limit = null,
         $page = 1,
-        $pageSize = null
+        $pageSize = null,
     ) {
-
         $locale = $options['locale'];
         $request = $this->requestStack->getCurrentRequest();
         $options['page'] = $request->get('p');
         $abbreviations = $this->entityManager->getRepository(Abbreviation::class)->findByFilters($filters, $page, $pageSize, $limit, $locale, $options);
+
         return new DataProviderResult($abbreviations, $this->entityManager->getRepository(Abbreviation::class)->hasNextPage($filters, $page, $pageSize, $limit, $locale, $options));
     }
 
     /**
      * @param mixed[] $data
-     * @return array
      */
     protected function decorateDataItems(array $data): array
     {
@@ -84,13 +79,8 @@ class AbbreviationsDataProvider extends BaseDataProvider
      * It combines the limit/query-count with the page and page-size.
      *
      * @noinspection PhpUnusedPrivateMethodInspection
-     * @param Countable $queryResult
-     * @param int|null $limit
-     * @param int $page
-     * @param int|null $pageSize
-     * @return bool
      */
-    private function hasNextPage(Countable $queryResult, ?int $limit, int $page, ?int $pageSize): bool
+    private function hasNextPage(\Countable $queryResult, ?int $limit, int $page, ?int $pageSize): bool
     {
         $count = $queryResult->count();
 
@@ -111,8 +101,7 @@ class AbbreviationsDataProvider extends BaseDataProvider
         return [
             ['column' => 'translation.name', 'title' => 'sulu_abbreviations.name'],
             ['column' => 'translation.explanation', 'title' => 'sulu_abbreviations.explanation'],
-            ['column' => 'translation.published_at', 'title' => 'sulu_abbreviations.published_at']
+            ['column' => 'translation.published_at', 'title' => 'sulu_abbreviations.published_at'],
         ];
     }
-
 }

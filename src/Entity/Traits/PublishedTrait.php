@@ -2,20 +2,26 @@
 
 namespace Manuxi\SuluAbbreviationsBundle\Entity\Traits;
 
-use DateTime;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 trait PublishedTrait
 {
-
     #[ORM\Column(type: Types::BOOLEAN, nullable: true)]
     private ?bool $published = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?DateTime $publishedAt = null;
+    private ?\DateTime $publishedAt = null;
+
+    #[ORM\Column(type: Types::INTEGER, nullable: true)]
+    private ?int $publishedState = null;
 
     public function isPublished(): ?bool
+    {
+        return $this->published ?? false;
+    }
+
+    public function getPublished(): ?bool
     {
         return $this->published ?? false;
     }
@@ -23,22 +29,39 @@ trait PublishedTrait
     public function setPublished(bool $published): self
     {
         $this->published = $published;
-        if($published === true){
-            $this->setPublishedAt(new DateTime());
+        $this->publishedState = $published;
+        if (true === $published) {
+            $this->setPublishedAt(new \DateTime());
+            $this->setPublishedState(1);
         } else {
             $this->setPublishedAt(null);
+            $this->setPublishedState(0);
         }
+
         return $this;
     }
 
-    public function getPublishedAt(): ?DateTime
+    public function getPublishedAt(): ?\DateTime
     {
         return $this->publishedAt;
     }
 
-    public function setPublishedAt(?DateTime $publishedAt): self
+    public function setPublishedAt(?\DateTime $publishedAt): self
     {
         $this->publishedAt = $publishedAt;
+
+        return $this;
+    }
+
+    public function getPublishedState(): ?int
+    {
+        return $this->publishedState;
+    }
+
+    public function setPublishedState(?int $publishedState): self
+    {
+        $this->publishedState = $publishedState;
+
         return $this;
     }
 }

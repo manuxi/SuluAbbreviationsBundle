@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Manuxi\SuluAbbreviationsBundle\Automation;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Manuxi\SuluNewsBundle\Domain\Event\NewsPublishedEvent;
-use Manuxi\SuluNewsBundle\Entity\News;
-use Manuxi\SuluNewsBundle\Search\Event\NewsPublishedEvent as NewsPublishedEventForSearch;
+use Manuxi\SuluAbbreviationsBundle\Domain\Event\AbbreviationPublishedEvent;
+use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
+use Manuxi\SuluAbbreviationsBundle\Search\Event\AbbreviationPublishedEvent as SearchPublishedEvent;
+use Manuxi\SuluAbbreviationsBundle\Search\Event\AbbreviationUnpublishedEvent as SearchUnpublishedEvent;
 use Sulu\Bundle\ActivityBundle\Application\Collector\DomainEventCollectorInterface;
 use Sulu\Bundle\AutomationBundle\TaskHandler\AutomationTaskHandlerInterface;
 use Sulu\Bundle\AutomationBundle\TaskHandler\TaskHandlerConfiguration;
@@ -17,13 +18,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AbbreviationPublishTaskHandler implements AutomationTaskHandlerInterface
 {
-
     public function __construct(
-        private readonly EntityManagerInterface        $entityManager,
-        private readonly TranslatorInterface           $translator,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly TranslatorInterface $translator,
         private readonly DomainEventCollectorInterface $domainEventCollector,
-        private readonly EventDispatcherInterface      $dispatcher
-    ) {}
+        private readonly EventDispatcherInterface $dispatcher,
+    ) {
+    }
 
     public function handle($workload): void
     {
@@ -32,21 +33,21 @@ class AbbreviationPublishTaskHandler implements AutomationTaskHandlerInterface
         }
         $class = $workload['class'];
         $repository = $this->entityManager->getRepository($class);
-        $entity = $repository->findById((int)$workload['id'], $workload['locale']);
-        if ($entity === null) {
+        $entity = $repository->findById((int) $workload['id'], $workload['locale']);
+        if (null === $entity) {
             return;
         }
+        $this->dispatcher->dispatch(new SearchUnpublishedEvent($entity));
 
         $entity->setPublished(true);
 
         $this->domainEventCollector->collect(
-            new NewsPublishedEvent($entity, $workload)
+            new AbbreviationPublishedEvent($entity, $workload)
         );
 
         $repository->save($entity);
 
-        $this->dispatcher->dispatch(new NewsPublishedEventForSearch($entity));
-
+        $this->dispatcher->dispatch(new SearchPublishedEvent($entity));
     }
 
     public function configureOptionsResolver(OptionsResolver $optionsResolver): OptionsResolver
@@ -58,11 +59,11 @@ class AbbreviationPublishTaskHandler implements AutomationTaskHandlerInterface
 
     public function supports(string $entityClass): bool
     {
-        return $entityClass === News::class || \is_subclass_of($entityClass, News::class);
+        return Abbreviation::class === $entityClass || \is_subclass_of($entityClass, Abbreviation::class);
     }
 
     public function getConfiguration(): TaskHandlerConfiguration
     {
-        return TaskHandlerConfiguration::create($this->translator->trans("sulu_news.publish", [], 'admin'));
+        return TaskHandlerConfiguration::create($this->translator->trans('sulu_abbreviation.publish', [], 'admin'));
     }
 }

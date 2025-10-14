@@ -120,6 +120,7 @@
             <argument type="service" id="sulu.repository.route"/>
             <argument type="service" id="doctrine.orm.entity_manager" />
             <argument type="service" id="sulu_activity.domain_event_collector"/>
+            <argument type="service" id="event_dispatcher"/>
         </service>
 
         <service id="sulu_abbreviation.model.abbreviation_seo" class="Manuxi\SuluAbbreviationsBundle\Entity\Models\AbbreviationSeoModel">
@@ -169,6 +170,7 @@
             <argument type="service" id="doctrine.orm.default_entity_manager"/>
             <argument type="service" id="sulu_trash.doctrine_restore_helper"/>
             <argument type="service" id="sulu_activity.domain_event_collector"/>
+            <argument type="service" id="event_dispatcher"/>
 
             <tag name="sulu_trash.store_trash_item_handler"/>
             <tag name="sulu_trash.restore_trash_item_handler"/>

@@ -9,32 +9,32 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
-use Manuxi\SuluAbbreviationsBundle\Entity\Traits\LinkTranslatableTrait;
-use Manuxi\SuluAbbreviationsBundle\Entity\Traits\PublishedTranslatableTrait;
 use Manuxi\SuluAbbreviationsBundle\Entity\Interfaces\AuditableTranslatableInterface;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\AuditableTranslatableTrait;
+use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ImageTranslatableTrait;
+use Manuxi\SuluAbbreviationsBundle\Entity\Traits\LinkTranslatableTrait;
+use Manuxi\SuluAbbreviationsBundle\Entity\Traits\PublishedTranslatableTrait;
+use Manuxi\SuluAbbreviationsBundle\Entity\Traits\RouteTranslatableTrait;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ShowAuthorTranslatableTrait;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ShowDateTranslatableTrait;
 use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationRepository;
-use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ImageTranslatableTrait;
-use Manuxi\SuluAbbreviationsBundle\Entity\Traits\RouteTranslatableTrait;
 
 #[ORM\Entity(repositoryClass: AbbreviationRepository::class)]
 #[ORM\Table(name: 'app_abbreviation')]
 class Abbreviation implements AuditableTranslatableInterface
 {
+    use AuditableTranslatableTrait;
+    use ImageTranslatableTrait;
+    use LinkTranslatableTrait;
+    use PublishedTranslatableTrait;
+    use RouteTranslatableTrait;
+    use ShowAuthorTranslatableTrait;
+    use ShowDateTranslatableTrait;
+
     public const RESOURCE_KEY = 'abbreviations';
     public const FORM_KEY = 'abbreviation_details';
     public const LIST_KEY = 'abbreviations';
     public const SECURITY_CONTEXT = 'sulu.abbreviations.abbreviations';
-
-    use AuditableTranslatableTrait;
-    use ShowAuthorTranslatableTrait;
-    use ShowDateTranslatableTrait;
-    use PublishedTranslatableTrait;
-    use RouteTranslatableTrait;
-    use LinkTranslatableTrait;
-    use ImageTranslatableTrait;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -68,13 +68,13 @@ class Abbreviation implements AuditableTranslatableInterface
         return $this->id;
     }
 
-    #[Serializer\VirtualProperty(name: "title")]
+    #[Serializer\VirtualProperty(name: 'title')]
     public function getTitle(): ?string
     {
         return $this->getName();
     }
 
-    #[Serializer\VirtualProperty(name: "name")]
+    #[Serializer\VirtualProperty(name: 'name')]
     public function getName(): ?string
     {
         $translation = $this->getTranslation($this->locale);
@@ -93,10 +93,11 @@ class Abbreviation implements AuditableTranslatableInterface
         }
 
         $translation->setName($name);
+
         return $this;
     }
 
-    #[Serializer\VirtualProperty(name: "explanation")]
+    #[Serializer\VirtualProperty(name: 'explanation')]
     public function getExplanation(): ?string
     {
         $translation = $this->getTranslation($this->locale);
@@ -115,10 +116,11 @@ class Abbreviation implements AuditableTranslatableInterface
         }
 
         $translation->setExplanation($explanation);
+
         return $this;
     }
 
-    #[Serializer\VirtualProperty(name: "description")]
+    #[Serializer\VirtualProperty(name: 'description')]
     public function getDescription(): ?string
     {
         $translation = $this->getTranslation($this->locale);
@@ -137,6 +139,7 @@ class Abbreviation implements AuditableTranslatableInterface
         }
 
         $translation->setDescription($description);
+
         return $this;
     }
 
@@ -149,6 +152,7 @@ class Abbreviation implements AuditableTranslatableInterface
     {
         $this->locale = $locale;
         $this->propagateLocale($locale);
+
         return $this;
     }
 
@@ -173,10 +177,11 @@ class Abbreviation implements AuditableTranslatableInterface
     {
         $translation = new AbbreviationTranslation($this, $locale);
         $this->translations->set($locale, $translation);
+
         return $translation;
     }
 
-    #[Serializer\VirtualProperty(name: "availableLocales")]
+    #[Serializer\VirtualProperty(name: 'availableLocales')]
     public function getAvailableLocales(): array
     {
         return \array_values($this->translations->getKeys());
@@ -184,6 +189,7 @@ class Abbreviation implements AuditableTranslatableInterface
 
     /**
      * @todo implement opject cloning/copy
+     *
      * @return $this|null
      */
     public function copy(): ?static
@@ -194,17 +200,18 @@ class Abbreviation implements AuditableTranslatableInterface
     public function copyToLocale(string $locale): self
     {
         if ($currentTranslation = $this->getTranslation($this->getLocale())) {
-           $newTranslation = clone $currentTranslation;
-           $newTranslation->setLocale($locale);
-           $this->translations->set($locale, $newTranslation);
+            $newTranslation = clone $currentTranslation;
+            $newTranslation->setLocale($locale);
+            $this->translations->set($locale, $newTranslation);
 
-           //copy ext also...
-           foreach($this->ext as $translatable) {
-               $translatable->copyToLocale($locale);
-           }
+            // copy ext also...
+            foreach ($this->ext as $translatable) {
+                $translatable->copyToLocale($locale);
+            }
 
-           $this->setLocale($locale);
+            $this->setLocale($locale);
         }
+
         return $this;
     }
 
@@ -221,6 +228,7 @@ class Abbreviation implements AuditableTranslatableInterface
     public function setSeo(?AbbreviationSeo $abbreviationSeo): self
     {
         $this->abbreviationSeo = $abbreviationSeo;
+
         return $this;
     }
 
@@ -237,10 +245,11 @@ class Abbreviation implements AuditableTranslatableInterface
     public function setExcerpt(?AbbreviationExcerpt $abbreviationExcerpt): self
     {
         $this->abbreviationExcerpt = $abbreviationExcerpt;
+
         return $this;
     }
 
-    #[Serializer\VirtualProperty(name: "ext")]
+    #[Serializer\VirtualProperty(name: 'ext')]
     public function getExt(): array
     {
         return $this->ext;
@@ -249,12 +258,14 @@ class Abbreviation implements AuditableTranslatableInterface
     public function setExt(array $ext): self
     {
         $this->ext = $ext;
+
         return $this;
     }
 
     public function addExt(string $key, $value): self
     {
         $this->ext[$key] = $value;
+
         return $this;
     }
 
@@ -270,6 +281,7 @@ class Abbreviation implements AuditableTranslatableInterface
         $abbreviationExcerpt = $this->getExcerpt();
         $abbreviationExcerpt->setLocale($locale);
         $this->initExt();
+
         return $this;
     }
 

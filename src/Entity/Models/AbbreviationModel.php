@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Manuxi\SuluAbbreviationsBundle\Entity\Models;
 
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Manuxi\SuluAbbreviationsBundle\Domain\Event\AbbreviationCopiedLanguageEvent;
 use Manuxi\SuluAbbreviationsBundle\Domain\Event\AbbreviationCreatedEvent;
@@ -16,6 +15,10 @@ use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use Manuxi\SuluAbbreviationsBundle\Entity\Interfaces\AbbreviationModelInterface;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ArrayPropertyTrait;
 use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationRepository;
+use Manuxi\SuluAbbreviationsBundle\Search\Event\AbbreviationPublishedEvent as SearchPublishedEvent;
+use Manuxi\SuluAbbreviationsBundle\Search\Event\AbbreviationRemovedEvent as SearchRemovedEvent;
+use Manuxi\SuluAbbreviationsBundle\Search\Event\AbbreviationSavedEvent as SearchSavedEvent;
+use Manuxi\SuluAbbreviationsBundle\Search\Event\AbbreviationUnpublishedEvent as SearchUnpublishedEvent;
 use Sulu\Bundle\ActivityBundle\Application\Collector\DomainEventCollectorInterface;
 use Sulu\Bundle\ContactBundle\Entity\ContactRepository;
 use Sulu\Bundle\MediaBundle\Entity\MediaRepositoryInterface;
@@ -23,47 +26,45 @@ use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
 use Sulu\Bundle\RouteBundle\Manager\RouteManagerInterface;
 use Sulu\Component\Rest\Exception\EntityNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class AbbreviationModel implements AbbreviationModelInterface
 {
     use ArrayPropertyTrait;
 
     public function __construct(
-        private AbbreviationRepository $abbreviationRepository,
-        private MediaRepositoryInterface $mediaRepository,
-        private ContactRepository $contactRepository,
-        private RouteManagerInterface $routeManager,
-        private RouteRepositoryInterface $routeRepository,
-        private EntityManagerInterface $entityManager,
-        private DomainEventCollectorInterface $domainEventCollector
-    ) {}
+        private readonly AbbreviationRepository $abbreviationRepository,
+        private readonly MediaRepositoryInterface $mediaRepository,
+        private readonly ContactRepository $contactRepository,
+        private readonly RouteManagerInterface $routeManager,
+        private readonly RouteRepositoryInterface $routeRepository,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly DomainEventCollectorInterface $domainEventCollector,
+        private readonly EventDispatcherInterface      $dispatcher,
+    ) {
+    }
 
     /**
-     * @param int $id
-     * @param Request|null $request
-     * @return Abbreviation
      * @throws EntityNotFoundException
      */
-    public function get(int $id, Request $request = null): Abbreviation
+    public function get(int $id, ?Request $request = null): Abbreviation
     {
-        if(null === $request) {
+        if (null === $request) {
             return $this->findById($id);
         }
+
         return $this->findByIdAndLocale($id, $request);
     }
 
     public function delete(Abbreviation $entity): void
     {
-        $this->domainEventCollector->collect(
-            new AbbreviationRemovedEvent($entity->getId(), $entity->getTitle() ?? '')
-        );
+        $this->domainEventCollector->collect(new AbbreviationRemovedEvent($entity->getId(), $entity->getTitle() ?? ''));
+        $this->dispatcher->dispatch(new SearchRemovedEvent($entity));
         $this->removeRoutesForEntity($entity);
         $this->abbreviationRepository->remove($entity->getId());
     }
 
     /**
-     * @param Request $request
-     * @return Abbreviation
      * @throws EntityNotFoundException
      */
     public function create(Request $request): Abbreviation
@@ -75,79 +76,99 @@ class AbbreviationModel implements AbbreviationModelInterface
             new AbbreviationCreatedEvent($entity, $request->request->all())
         );
 
-        //need the id for updateRoutesForEntity(), so we have to persist and flush here
+        // need the id for updateRoutesForEntity(), so we have to persist and flush here
         $entity = $this->abbreviationRepository->save($entity);
 
         $this->updateRoutesForEntity($entity);
 
-        //explicit flush to save routes persisted by updateRoutesForEntity()
+        // explicit flush to save routes persisted by updateRoutesForEntity()
         $this->entityManager->flush();
+
+        $this->dispatcher->dispatch(new SearchSavedEvent($entity));
 
         return $entity;
     }
 
     /**
-     * @param int $id
-     * @param Request $request
-     * @return Abbreviation
      * @throws EntityNotFoundException
      */
     public function update(int $id, Request $request): Abbreviation
     {
         $entity = $this->findByIdAndLocale($id, $request);
+        $this->dispatcher->dispatch(new SearchUnpublishedEvent($entity));
+
         $entity = $this->mapDataToEntity($entity, $request->request->all());
         $entity = $this->mapSettingsToEntity($entity, $request->request->all());
-        $this->updateRoutesForEntity($entity);
 
         $this->domainEventCollector->collect(
             new AbbreviationModifiedEvent($entity, $request->request->all())
         );
 
-        return $this->abbreviationRepository->save($entity);
+        $entity = $this->abbreviationRepository->save($entity);
+
+        $this->updateRoutesForEntity($entity);
+        $this->entityManager->flush();
+
+        $this->dispatcher->dispatch(new SearchSavedEvent($entity));
+
+        return $entity;
     }
 
     /**
-     * @param int $id
-     * @param Request $request
-     * @return Abbreviation
      * @throws EntityNotFoundException
      */
     public function publish(int $id, Request $request): Abbreviation
     {
         $entity = $this->findByIdAndLocale($id, $request);
+        $this->dispatcher->dispatch(new SearchUnpublishedEvent($entity));
+
         $entity->setPublished(true);
+        $entity = $this->abbreviationRepository->save($entity);
 
         $this->domainEventCollector->collect(
             new AbbreviationPublishedEvent($entity, $request->request->all())
         );
 
-        return $this->abbreviationRepository->save($entity);
+        $this->dispatcher->dispatch(new SearchPublishedEvent($entity));
+
+        return $entity;
     }
 
     /**
-     * @param int $id
-     * @param Request $request
-     * @return Abbreviation
      * @throws EntityNotFoundException
      */
     public function unpublish(int $id, Request $request): Abbreviation
     {
         $entity = $this->findByIdAndLocale($id, $request);
+        $this->dispatcher->dispatch(new SearchUnpublishedEvent($entity));
+
         $entity->setPublished(false);
+        $entity = $this->abbreviationRepository->save($entity);
 
         $this->domainEventCollector->collect(
             new AbbreviationUnpublishedEvent($entity, $request->request->all())
         );
 
-        return $this->abbreviationRepository->save($entity);
+        $this->dispatcher->dispatch(new SearchPublishedEvent($entity));
+
+        return $entity;
     }
 
     public function copy(int $id, Request $request): Abbreviation
     {
-        $entity = $this->findById($id);
-        $copy = $entity->copy();
+        $locale = $this->getLocaleFromRequest($request);
 
-        return $this->abbreviationRepository->save($copy);
+        $entity = $this->findById($id);
+        $entity->setLocale($locale);
+
+        $copy = $this->abbreviationRepository->create($locale);
+
+        $copy = $entity->copy($copy);
+        $copy = $this->abbreviationRepository->save($copy);
+        $this->dispatcher->dispatch(new SearchSavedEvent($copy));
+
+        return $copy;
+
     }
 
     public function copyLanguage(int $id, Request $request, string $srcLocale, array $destLocales): Abbreviation
@@ -155,24 +176,24 @@ class AbbreviationModel implements AbbreviationModelInterface
         $entity = $this->findById($id);
         $entity->setLocale($srcLocale);
 
-        foreach($destLocales as $destLocale) {
+        foreach ($destLocales as $destLocale) {
             $entity = $entity->copyToLocale($destLocale);
         }
 
-        //@todo: test with more than one different locale
+        // @todo: test with more than one different locale
         $entity->setLocale($this->getLocaleFromRequest($request));
 
         $this->domainEventCollector->collect(
             new AbbreviationCopiedLanguageEvent($entity, $request->request->all())
         );
 
-        return $this->abbreviationRepository->save($entity);
+        $entity = $this->abbreviationRepository->save($entity);
+        $this->dispatcher->dispatch(new SearchSavedEvent($entity));
+
+        return $entity;
     }
 
     /**
-     * @param int $id
-     * @param Request $request
-     * @return Abbreviation
      * @throws EntityNotFoundException
      */
     private function findByIdAndLocale(int $id, Request $request): Abbreviation
@@ -181,12 +202,11 @@ class AbbreviationModel implements AbbreviationModelInterface
         if (!$entity) {
             throw new EntityNotFoundException($this->abbreviationRepository->getClassName(), $id);
         }
+
         return $entity;
     }
 
     /**
-     * @param int $id
-     * @return Abbreviation
      * @throws EntityNotFoundException
      */
     private function findById(int $id): Abbreviation
@@ -195,6 +215,7 @@ class AbbreviationModel implements AbbreviationModelInterface
         if (!$entity) {
             throw new EntityNotFoundException($this->abbreviationRepository->getClassName(), $id);
         }
+
         return $entity;
     }
 
@@ -204,9 +225,6 @@ class AbbreviationModel implements AbbreviationModelInterface
     }
 
     /**
-     * @param Abbreviation $entity
-     * @param array $data
-     * @return Abbreviation
      * @throws \Exception
      */
     private function mapDataToEntity(Abbreviation $entity, array $data): Abbreviation
@@ -256,14 +274,11 @@ class AbbreviationModel implements AbbreviationModelInterface
     }
 
     /**
-     * @param Abbreviation $entity
-     * @param array $data
-     * @return Abbreviation
      * @throws EntityNotFoundException
      */
     private function mapSettingsToEntity(Abbreviation $entity, array $data): Abbreviation
     {
-        //settings (author, authored) changeable
+        // settings (author, authored) changeable
         $authorId = $this->getProperty($data, 'author');
         if ($authorId) {
             $author = $this->contactRepository->findById($authorId);
@@ -277,10 +292,11 @@ class AbbreviationModel implements AbbreviationModelInterface
 
         $authored = $this->getProperty($data, 'authored');
         if ($authored) {
-            $entity->setAuthored(new DateTime($authored));
+            $entity->setAuthored(new \DateTime($authored));
         } else {
             $entity->setAuthored(null);
         }
+
         return $entity;
     }
 

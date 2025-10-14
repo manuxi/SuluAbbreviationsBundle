@@ -13,8 +13,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class AbbreviationsSearchSubscriber implements EventSubscriberInterface
 {
-
-    public function __construct(private SearchManagerInterface $searchManager) {}
+    public function __construct(private readonly SearchManagerInterface $searchManager)
+    {
+    }
 
     public static function getSubscribedEvents(): array
     {
@@ -28,10 +29,7 @@ class AbbreviationsSearchSubscriber implements EventSubscriberInterface
 
     public function onPublished(AbbreviationPublishedEvent $event): void
     {
-        $entity = $event->getEntity();
-        if($entity->isPublished()) {
-            $this->searchManager->index($entity);
-        }
+        $this->searchManager->index($event->getEntity());
     }
 
     public function onUnpublished(AbbreviationUnpublishedEvent $event): void
@@ -41,12 +39,7 @@ class AbbreviationsSearchSubscriber implements EventSubscriberInterface
 
     public function onSaved(AbbreviationSavedEvent $event): void
     {
-        $entity = $event->getEntity();
-        if($entity->isPublished()) {
-            $this->searchManager->index($entity);
-        } else {
-            $this->searchManager->deindex($entity);
-        }
+        $this->searchManager->index($event->getEntity());
     }
 
     public function onRemoved(AbbreviationRemovedEvent $event): void

@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace Manuxi\SuluAbbreviationsBundle\Repository;
 
-use Doctrine\Common\Collections\Criteria;
-use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use Sulu\Component\SmartContent\Orm\DataProviderRepositoryInterface;
 use Sulu\Component\SmartContent\Orm\DataProviderRepositoryTrait;
 
@@ -56,6 +55,7 @@ class AbbreviationRepository extends ServiceEntityRepository implements DataProv
     {
         $this->getEntityManager()->persist($entity);
         $this->getEntityManager()->flush();
+
         return $entity;
     }
 
@@ -72,12 +72,14 @@ class AbbreviationRepository extends ServiceEntityRepository implements DataProv
         return $entity;
     }
 
-    public function findAllForSitemap(string $locale, int $limit = null, int $offset = null): array
+    public function findAllForSitemap(string $locale, ?int $limit = null, ?int $offset = null): array
     {
         $queryBuilder = $this->createQueryBuilder('abbreviation')
             ->leftJoin('abbreviation.translations', 'translation')
-            ->where('translation.published = 1')
-            ->andWhere('translation.locale = :locale')->setParameter('locale', $locale)
+            ->where('translation.published = :published')
+            ->setParameter('published', true)
+            ->andWhere('translation.locale = :locale')
+            ->setParameter('locale', $locale)
             ->orderBy('translation.publishedAt', 'DESC')
             ->setMaxResults($limit)
             ->setFirstResult($offset);
@@ -88,6 +90,7 @@ class AbbreviationRepository extends ServiceEntityRepository implements DataProv
         if (!$abbreviations) {
             return [];
         }
+
         return $abbreviations;
     }
 
@@ -96,7 +99,11 @@ class AbbreviationRepository extends ServiceEntityRepository implements DataProv
         $query = $this->createQueryBuilder('abbreviation')
             ->select('count(abbreviation)')
             ->leftJoin('abbreviation.translations', 'translation')
-            ->andWhere('translation.locale = :locale')->setParameter('locale', $locale);
+            ->where('translation.published = :published')
+            ->setParameter('published', true)
+            ->andWhere('translation.locale = :locale')
+            ->setParameter('locale', $locale);
+
         return $query->getQuery()->getSingleScalarResult();
     }
 
@@ -104,13 +111,15 @@ class AbbreviationRepository extends ServiceEntityRepository implements DataProv
      * Returns filtered entities.
      * When pagination is active the result count is pageSize + 1 to determine has next page.
      *
-     * @param array $filters array of filters: tags, tagOperator
-     * @param int $page
-     * @param int $pageSize
-     * @param int $limit
-     * @param string $locale
+     * @param array   $filters  array of filters: tags, tagOperator
+     * @param int     $page
+     * @param int     $pageSize
+     * @param int     $limit
+     * @param string  $locale
      * @param mixed[] $options
+     *
      * @return object[]
+     *
      * @noinspection PhpMissingReturnTypeInspection
      * @noinspection PhpMissingParamTypeInspection
      */
@@ -120,9 +129,10 @@ class AbbreviationRepository extends ServiceEntityRepository implements DataProv
         $pageSize,
         $limit,
         $locale,
-        $options = []
+        $options = [],
     ) {
         $entities = $this->getPublishedAbbreviations($filters, $locale, $page, $pageSize, $limit, $options);
+
         return \array_map(
             function (Abbreviation $entity) use ($locale) {
                 return $entity->setLocale($locale);
@@ -133,59 +143,66 @@ class AbbreviationRepository extends ServiceEntityRepository implements DataProv
 
     protected function appendJoins(QueryBuilder $queryBuilder, $alias, $locale): void
     {
-
     }
 
     /**
-     * @param QueryBuilder $queryBuilder
-     * @param string $alias
-     * @param string $locale
      * @param mixed[] $options
      *
      * @return string[]
      */
     protected function append(QueryBuilder $queryBuilder, string $alias, string $locale, $options = []): array
     {
-        //$queryBuilder->andWhere($alias . '.translation.published = true');
+        // $queryBuilder->andWhere($alias . '.translation.published = true');
+        $queryBuilder->innerJoin($alias.'.translations', 'translation', Join::WITH, 'translation.locale = :locale');
+        $queryBuilder->setParameter('locale', $locale);
+        $queryBuilder->andWhere('translation.published = :published');
+        $queryBuilder->setParameter('published', true);
 
         return [];
     }
 
     public function appendCategoriesRelation(QueryBuilder $queryBuilder, $alias)
     {
-        return $alias . '.category';
-        //$queryBuilder->addSelect($alias.'.category');
+        return $alias.'.category';
+        // $queryBuilder->addSelect($alias.'.category');
     }
 
     protected function appendSortByJoins(QueryBuilder $queryBuilder, string $alias, string $locale): void
     {
-        $queryBuilder->innerJoin($alias . '.translations', 'translation', Join::WITH, 'translation.locale = :locale');
+        $queryBuilder->innerJoin($alias.'.translations', 'translation', Join::WITH, 'translation.locale = :locale');
         $queryBuilder->setParameter('locale', $locale);
     }
 
     public function hasNextPage(array $filters, ?int $page, ?int $pageSize, ?int $limit, string $locale, array $options = []): bool
     {
-        $pageCurrent = (key_exists('page', $options)) ? (int)$options['page'] : 0;
+        $pageCurrent = (key_exists('page', $options)) ? (int) $options['page'] : 0;
         $totalArticles = $this->createQueryBuilder('n')
             ->select('count(n.id)')
             ->leftJoin('n.translations', 'translation')
-            ->where('translation.published = 1')
-            ->andWhere('translation.locale = :locale')->setParameter('locale', $locale)
+            ->where('translation.published = :published')
+            ->setParameter('published', true)
+            ->andWhere('translation.locale = :locale')
+            ->setParameter('locale', $locale)
             ->getQuery()
             ->getSingleScalarResult();
 
-        if ((int)($limit * $pageCurrent) + $limit < (int)$totalArticles) return true; else return false;
-
+        if ((int) ($limit * $pageCurrent) + $limit < (int) $totalArticles) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public function getPublishedAbbreviations(array $filters, string $locale, ?int $page, $pageSize, $limit = null, array $options): array
     {
-        $pageCurrent = (key_exists('page', $options)) ? (int)$options['page'] : 0;
+        $pageCurrent = (key_exists('page', $options)) ? (int) $options['page'] : 0;
 
         $queryBuilder = $this->createQueryBuilder('abbreviation')
             ->leftJoin('abbreviation.translations', 'translation')
-            ->where('translation.published = 1')
-            ->andWhere('translation.locale = :locale')->setParameter('locale', $locale)
+            ->where('translation.published = :published')
+            ->setParameter('published', true)
+            ->andWhere('translation.locale = :locale')
+            ->setParameter('locale', $locale)
             ->orderBy('translation.publishedAt', 'DESC')
             ->setMaxResults($limit)
             ->setFirstResult($pageCurrent * $limit);
@@ -196,6 +213,7 @@ class AbbreviationRepository extends ServiceEntityRepository implements DataProv
         if (!$abbreviation) {
             return [];
         }
+
         return $abbreviation;
     }
 
@@ -214,72 +232,124 @@ class AbbreviationRepository extends ServiceEntityRepository implements DataProv
         $this->prepareCategoriesFilter($queryBuilder, $filters);
     }
 
-    private function prepareTagsFilter(QueryBuilder $queryBuilder, array $filters):void
+    private function prepareTagsFilter(QueryBuilder $queryBuilder, array $filters): void
+    {
+        if (empty($filters['tags'])) {
+            return;
+        }
+
+        $operator = $filters['tagOperator'] ?? 'or';
+
+        if ($operator === 'and') {
+            // AND: Entity must have ALL tags (multiple JOINs necessary)
+            foreach ($filters['tags'] as $i => $tag) {
+                $alias = 'tag' . $i;
+                $queryBuilder
+                    ->innerJoin('excerpt_translation.tags', $alias)
+                    ->andWhere($queryBuilder->expr()->eq($alias . '.id', ':tag' . $i))
+                    ->setParameter('tag' . $i, $tag);
+            }
+        } else {
+            // OR: Entity must at least have one of the tags
+            $queryBuilder
+                ->leftJoin('excerpt_translation.tags', 'tags')
+                ->andWhere($queryBuilder->expr()->in('tags.id', ':tags'))
+                ->setParameter('tags', $filters['tags']);
+        }
+    }
+
+    private function prepareCategoriesFilter(QueryBuilder $queryBuilder, array $filters): void
+    {
+        if (empty($filters['categories'])) {
+            return;
+        }
+
+        $queryBuilder->leftJoin('excerpt_translation.categories', 'categories');
+
+        $operator = $filters['categoryOperator'] ?? 'or';
+
+        if ('and' === $operator) {
+            // AND: Entity must have ALL categories (multiple JOINs necessary)
+            foreach ($filters['categories'] as $i => $category) {
+                $alias = 'category'.$i;
+                $queryBuilder
+                    ->leftJoin('excerpt_translation.categories', $alias)
+                    ->andWhere($alias.'.id = :category'.$i)
+                    ->setParameter('category'.$i, $category);
+            }
+        } else {
+            // OR: Entity must at least have one of the categories
+            $queryBuilder
+                ->andWhere('categories.id IN (:categories)')
+                ->setParameter('categories', $filters['categories']);
+        }
+    }
+
+    private function prepareTagsFilterx(QueryBuilder $queryBuilder, array $filters): void
     {
         if (!empty($filters['tags'])) {
-
             $queryBuilder->leftJoin('excerpt_translation.tags', 'tags');
 
             $i = 0;
-            if ($filters['tagOperator'] === "and") {
-                $andWhere = "";
+            if ('and' === $filters['tagOperator']) {
+                $andWhere = '';
                 foreach ($filters['tags'] as $tag) {
-                    if ($i === 0) {
-                        $andWhere .= "tags = :tag" . $i;
+                    if (0 === $i) {
+                        $andWhere .= 'tags = :tag'.$i;
                     } else {
-                        $andWhere .= " AND tags = :tag" . $i;
+                        $andWhere .= ' AND tags = :tag'.$i;
                     }
-                    $queryBuilder->setParameter("tag" . $i, $tag);
-                    $i++;
+                    $queryBuilder->setParameter('tag'.$i, $tag);
+                    ++$i;
                 }
                 $queryBuilder->andWhere($andWhere);
-            } else if ($filters['tagOperator'] === "or") {
-                $orWhere = "";
+            } elseif ('or' === $filters['tagOperator']) {
+                $orWhere = '';
                 foreach ($filters['tags'] as $tag) {
-                    if ($i === 0) {
-                        $orWhere .= "tags = :tag" . $i;
+                    if (0 === $i) {
+                        $orWhere .= 'tags = :tag'.$i;
                     } else {
-                        $orWhere .= " OR tags = :tag" . $i;
+                        $orWhere .= ' OR tags = :tag'.$i;
                     }
-                    $queryBuilder->setParameter("tag" . $i, $tag);
-                    $i++;
+                    $queryBuilder->setParameter('tag'.$i, $tag);
+                    ++$i;
                 }
                 $queryBuilder->andWhere($orWhere);
             }
         }
     }
 
-    private function prepareCategoriesFilter(QueryBuilder $queryBuilder, array $filters):void
+    private function prepareCategoriesFilterX(QueryBuilder $queryBuilder, array $filters): void
     {
         if (!empty($filters['categories'])) {
-
             $queryBuilder->leftJoin('excerpt_translation.categories', 'categories');
 
             $i = 0;
-            if ($filters['categoryOperator'] === "and") {
-                $andWhere = "";
+            if ('and' === $filters['categoryOperator']) {
+                $andWhere = '';
                 foreach ($filters['categories'] as $category) {
-                    if ($i === 0) {
-                        $andWhere .= "categories = :category" . $i;
+                    if (0 === $i) {
+                        $andWhere .= 'categories = :category'.$i;
                     } else {
-                        $andWhere .= " AND categories = :category" . $i;
+                        $andWhere .= ' AND categories = :category'.$i;
                     }
-                    $queryBuilder->setParameter("category" . $i, $category);
+                    $queryBuilder->setParameter('category'.$i, $category);
+                    ++$i;
                 }
                 $queryBuilder->andWhere($andWhere);
-            } else if ($filters['categoryOperator'] === "or") {
-                $orWhere = "";
+            } elseif ('or' === $filters['categoryOperator']) {
+                $orWhere = '';
                 foreach ($filters['categories'] as $category) {
-                    if ($i === 0) {
-                        $orWhere .= "categories = :category" . $i;
+                    if (0 === $i) {
+                        $orWhere .= 'categories = :category'.$i;
                     } else {
-                        $orWhere .= " OR categories = :category" . $i;
+                        $orWhere .= ' OR categories = :category'.$i;
                     }
-                    $queryBuilder->setParameter("category" . $i, $category);
+                    $queryBuilder->setParameter('category'.$i, $category);
+                    ++$i;
                 }
                 $queryBuilder->andWhere($orWhere);
             }
         }
     }
-
 }

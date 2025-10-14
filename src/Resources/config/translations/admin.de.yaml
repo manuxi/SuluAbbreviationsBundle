@@ -46,13 +46,16 @@ sulu_abbreviations:
         title:
             navi: "Einstellungen"
             general: "Einstellungen für Einzelansicht"
-            breadcrumbs: "Zielseiten für Breadcrumbs"
+            breadcrumbs: "Zwischenseiten (Breadcrumbs)"
         properties:
             toggle_header: "Header anzeigen"
             toggle_hero: "Standard Hero anzeigen"
             toggle_breadcrumbs: "Breadcrumbs anzeigen"
             page_abbreviations: "Übersichtsseite Alle Abkürzungen"
-
+    search:
+        index:
+            abbreviations: "Abkürzungen (Entwurf)"
+            abbreviations_published: "Abkürzungen"
 sulu_activity:
     resource:
         abbreviations: "Abkürzung"

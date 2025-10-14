@@ -13,12 +13,30 @@ use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 class AbbreviationTest extends SuluTestCase
 {
     private Abbreviation $entity;
-    private string $testString = "Lorem ipsum dolor sit amet, ...";
+    private string $testString = 'Lorem ipsum dolor sit amet, ...';
 
     protected function setUp(): void
     {
         $this->entity = new Abbreviation();
         $this->entity->setLocale('de');
+    }
+
+    public function testPublished(): void
+    {
+        $this->assertNull($this->entity->isPublished());
+        $this->assertSame($this->entity, $this->entity->setPublished(true));
+        $this->assertTrue($this->entity->isPublished());
+        $this->assertSame($this->entity, $this->entity->setPublished(false));
+        $this->assertFalse($this->entity->isPublished());
+    }
+
+    public function testPublishedState(): void
+    {
+        $this->assertNull($this->entity->getPublishedState());
+        $this->assertSame($this->entity, $this->entity->setPublished(true));
+        $this->assertEquals(1, $this->entity->getPublishedState());
+        $this->assertSame($this->entity, $this->entity->setPublished(false));
+        $this->assertEquals(0, $this->entity->getPublishedState());
     }
 
     public function testName(): void
@@ -156,6 +174,6 @@ class AbbreviationTest extends SuluTestCase
         $this->assertArrayHasKey('de', $this->entity->getTranslations());
         $this->assertArrayHasKey('en', $this->entity->getTranslations());
         $this->assertSame($this->entity->getDescription(), $this->testString);
-        //No need to test more, it's s already done...
+        // No need to test more, it's s already done...
     }
 }
