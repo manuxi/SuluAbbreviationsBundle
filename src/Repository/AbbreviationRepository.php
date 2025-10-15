@@ -240,14 +240,14 @@ class AbbreviationRepository extends ServiceEntityRepository implements DataProv
 
         $operator = $filters['tagOperator'] ?? 'or';
 
-        if ($operator === 'and') {
+        if ('and' === $operator) {
             // AND: Entity must have ALL tags (multiple JOINs necessary)
             foreach ($filters['tags'] as $i => $tag) {
-                $alias = 'tag' . $i;
+                $alias = 'tag'.$i;
                 $queryBuilder
                     ->innerJoin('excerpt_translation.tags', $alias)
-                    ->andWhere($queryBuilder->expr()->eq($alias . '.id', ':tag' . $i))
-                    ->setParameter('tag' . $i, $tag);
+                    ->andWhere($queryBuilder->expr()->eq($alias.'.id', ':tag'.$i))
+                    ->setParameter('tag'.$i, $tag);
             }
         } else {
             // OR: Entity must at least have one of the tags
@@ -282,74 +282,6 @@ class AbbreviationRepository extends ServiceEntityRepository implements DataProv
             $queryBuilder
                 ->andWhere('categories.id IN (:categories)')
                 ->setParameter('categories', $filters['categories']);
-        }
-    }
-
-    private function prepareTagsFilterx(QueryBuilder $queryBuilder, array $filters): void
-    {
-        if (!empty($filters['tags'])) {
-            $queryBuilder->leftJoin('excerpt_translation.tags', 'tags');
-
-            $i = 0;
-            if ('and' === $filters['tagOperator']) {
-                $andWhere = '';
-                foreach ($filters['tags'] as $tag) {
-                    if (0 === $i) {
-                        $andWhere .= 'tags = :tag'.$i;
-                    } else {
-                        $andWhere .= ' AND tags = :tag'.$i;
-                    }
-                    $queryBuilder->setParameter('tag'.$i, $tag);
-                    ++$i;
-                }
-                $queryBuilder->andWhere($andWhere);
-            } elseif ('or' === $filters['tagOperator']) {
-                $orWhere = '';
-                foreach ($filters['tags'] as $tag) {
-                    if (0 === $i) {
-                        $orWhere .= 'tags = :tag'.$i;
-                    } else {
-                        $orWhere .= ' OR tags = :tag'.$i;
-                    }
-                    $queryBuilder->setParameter('tag'.$i, $tag);
-                    ++$i;
-                }
-                $queryBuilder->andWhere($orWhere);
-            }
-        }
-    }
-
-    private function prepareCategoriesFilterX(QueryBuilder $queryBuilder, array $filters): void
-    {
-        if (!empty($filters['categories'])) {
-            $queryBuilder->leftJoin('excerpt_translation.categories', 'categories');
-
-            $i = 0;
-            if ('and' === $filters['categoryOperator']) {
-                $andWhere = '';
-                foreach ($filters['categories'] as $category) {
-                    if (0 === $i) {
-                        $andWhere .= 'categories = :category'.$i;
-                    } else {
-                        $andWhere .= ' AND categories = :category'.$i;
-                    }
-                    $queryBuilder->setParameter('category'.$i, $category);
-                    ++$i;
-                }
-                $queryBuilder->andWhere($andWhere);
-            } elseif ('or' === $filters['categoryOperator']) {
-                $orWhere = '';
-                foreach ($filters['categories'] as $category) {
-                    if (0 === $i) {
-                        $orWhere .= 'categories = :category'.$i;
-                    } else {
-                        $orWhere .= ' OR categories = :category'.$i;
-                    }
-                    $queryBuilder->setParameter('category'.$i, $category);
-                    ++$i;
-                }
-                $queryBuilder->andWhere($orWhere);
-            }
         }
     }
 }

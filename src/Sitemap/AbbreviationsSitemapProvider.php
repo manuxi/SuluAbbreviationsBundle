@@ -12,26 +12,21 @@ use Sulu\Component\Webspace\Manager\WebspaceManagerInterface;
 
 class AbbreviationsSitemapProvider implements SitemapProviderInterface
 {
-    private AbbreviationRepository $repository;
-    private WebspaceManagerInterface $webspaceManager;
     private array $locales = [];
 
     public function __construct(
-        AbbreviationRepository $repository,
-        WebspaceManagerInterface $webspaceManager
-    ) {
-        $this->repository = $repository;
-        $this->webspaceManager = $webspaceManager;
-    }
+        private readonly AbbreviationRepository $repository,
+        private readonly WebspaceManagerInterface $webspaceManager,
+    ) {}
 
     public function build($page, $scheme, $host)
     {
         $locale = $this->getLocaleByHost($host);
 
         $result = [];
-        foreach ($this->findAbbreviations($locale,self::PAGE_SIZE, ($page - 1) * self::PAGE_SIZE) as $abbr) {
+        foreach ($this->findAbbreviations($locale, self::PAGE_SIZE, ($page - 1) * self::PAGE_SIZE) as $abbr) {
             $result[] = new SitemapUrl(
-                $scheme . '://' . $host . $abbr->getRoutePath(),
+                $scheme.'://'.$host.$abbr->getRoutePath(),
                 $abbr->getLocale(),
                 $abbr->getLocale(),
                 $abbr->getChanged()
@@ -57,22 +52,25 @@ class AbbreviationsSitemapProvider implements SitemapProviderInterface
     public function getMaxPage($scheme, $host)
     {
         $locale = $this->getLocaleByHost($host);
+
         return ceil($this->repository->countForSitemap($locale) / self::PAGE_SIZE);
     }
 
-    private function getLocaleByHost($host) {
-        if(!\array_key_exists($host, $this->locales)) {
+    private function getLocaleByHost($host)
+    {
+        if (!\array_key_exists($host, $this->locales)) {
             $portalInformation = $this->webspaceManager->getPortalInformations();
             foreach ($portalInformation as $hostName => $portal) {
-                if($hostName === $host || $portal->getHost() === $host) {
+                if ($hostName === $host || $portal->getHost() === $host) {
                     $this->locales[$host] = $portal->getLocale();
                 }
             }
         }
+
         return $this->locales[$host];
     }
 
-    private function findAbbreviations(string $locale, int $limit = null, int $offset = null): array
+    private function findAbbreviations(string $locale, ?int $limit = null, ?int $offset = null): array
     {
         return $this->repository->findAllForSitemap($locale, $limit, $offset);
     }
