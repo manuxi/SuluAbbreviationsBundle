@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Manuxi\SuluAbbreviationsBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Manuxi\SuluAbbreviationsBundle\Entity\Interfaces\ExcerptTranslationInterface;
 use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ExcerptTranslationTrait;
 use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationExcerptTranslationRepository;
+use Manuxi\SuluSharedToolsBundle\Entity\Interfaces\ExcerptTranslationInterface;
 
 #[ORM\Entity(repositoryClass: AbbreviationExcerptTranslationRepository::class)]
 #[ORM\Table(name: 'app_abbreviation_excerpt_translation')]

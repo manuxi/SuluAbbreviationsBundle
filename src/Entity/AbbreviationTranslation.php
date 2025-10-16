@@ -6,14 +6,14 @@ namespace Manuxi\SuluAbbreviationsBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Manuxi\SuluAbbreviationsBundle\Entity\Interfaces\AuditableInterface;
-use Manuxi\SuluAbbreviationsBundle\Entity\Traits\AuditableTrait;
-use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ImageTrait;
-use Manuxi\SuluAbbreviationsBundle\Entity\Traits\LinkTrait;
-use Manuxi\SuluAbbreviationsBundle\Entity\Traits\PublishedTrait;
-use Manuxi\SuluAbbreviationsBundle\Entity\Traits\RouteTrait;
-use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ShowAuthorTrait;
-use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ShowDateTrait;
+use Manuxi\SuluSharedToolsBundle\Entity\Interfaces\AuditableInterface;
+use Manuxi\SuluSharedToolsBundle\Entity\Traits\AuditableTrait;
+use Manuxi\SuluSharedToolsBundle\Entity\Traits\ImageTrait;
+use Manuxi\SuluSharedToolsBundle\Entity\Traits\LinkTrait;
+use Manuxi\SuluSharedToolsBundle\Entity\Traits\PublishedTrait;
+use Manuxi\SuluSharedToolsBundle\Entity\Traits\RoutePathTrait;
+use Manuxi\SuluSharedToolsBundle\Entity\Traits\ShowAuthorTrait;
+use Manuxi\SuluSharedToolsBundle\Entity\Traits\ShowDateTrait;
 use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationTranslationRepository;
 
 #[ORM\Entity(repositoryClass: AbbreviationTranslationRepository::class)]
@@ -24,7 +24,7 @@ class AbbreviationTranslation implements AuditableInterface
     use ImageTrait;
     use LinkTrait;
     use PublishedTrait;
-    use RouteTrait;
+    use RoutePathTrait;
     use ShowAuthorTrait;
     use ShowDateTrait;
 

@@ -6,8 +6,8 @@ namespace Manuxi\SuluAbbreviationsBundle\Entity\Models;
 
 use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationSeo;
 use Manuxi\SuluAbbreviationsBundle\Entity\Interfaces\AbbreviationSeoModelInterface;
-use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ArrayPropertyTrait;
 use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationSeoRepository;
+use Manuxi\SuluSharedToolsBundle\Entity\Traits\ArrayPropertyTrait;
 use Symfony\Component\HttpFoundation\Request;
 
 class AbbreviationSeoModel implements AbbreviationSeoModelInterface
@@ -17,7 +17,7 @@ class AbbreviationSeoModel implements AbbreviationSeoModelInterface
     private AbbreviationSeoRepository $abbreviationSeoRepository;
 
     public function __construct(
-        AbbreviationSeoRepository $abbreviationSeoRepository
+        AbbreviationSeoRepository $abbreviationSeoRepository,
     ) {
         $this->abbreviationSeoRepository = $abbreviationSeoRepository;
     }
@@ -25,6 +25,7 @@ class AbbreviationSeoModel implements AbbreviationSeoModelInterface
     public function updateAbbreviationSeo(AbbreviationSeo $abbreviationSeo, Request $request): AbbreviationSeo
     {
         $abbreviationSeo = $this->mapDataToAbbreviationSeo($abbreviationSeo, $request->request->all()['ext']['seo']);
+
         return $this->abbreviationSeoRepository->save($abbreviationSeo);
     }
 
@@ -62,6 +63,7 @@ class AbbreviationSeoModel implements AbbreviationSeoModelInterface
         if ($hideInSitemap) {
             $entity->setHideInSitemap($hideInSitemap);
         }
+
         return $entity;
     }
 }

@@ -9,11 +9,11 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
 use JMS\Serializer\Annotation as Serializer;
-use Manuxi\SuluAbbreviationsBundle\Entity\Interfaces\ExcerptInterface;
-use Manuxi\SuluAbbreviationsBundle\Entity\Interfaces\ExcerptTranslatableInterface;
-use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ExcerptTrait;
-use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ExcerptTranslatableTrait;
 use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationExcerptRepository;
+use Manuxi\SuluSharedToolsBundle\Entity\Interfaces\ExcerptInterface;
+use Manuxi\SuluSharedToolsBundle\Entity\Interfaces\ExcerptTranslatableInterface;
+use Manuxi\SuluSharedToolsBundle\Entity\Traits\ExcerptTrait;
+use Manuxi\SuluSharedToolsBundle\Entity\Traits\ExcerptTranslatableTrait;
 
 #[ORM\Entity(repositoryClass: AbbreviationExcerptRepository::class)]
 #[ORM\Table(name: 'app_abbreviation_excerpt')]
@@ -24,7 +24,7 @@ class AbbreviationExcerpt implements ExcerptInterface, ExcerptTranslatableInterf
 
     #[Serializer\Exclude]
     #[ORM\OneToOne(inversedBy: 'abbreviationExcerpt', targetEntity: Abbreviation::class, cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(name: 'abbreviation_id', referencedColumnName: "id", nullable: false)]
+    #[JoinColumn(name: 'abbreviation_id', referencedColumnName: 'id', nullable: false)]
     private ?Abbreviation $abbreviation = null;
 
     #[Serializer\Exclude]
@@ -44,6 +44,7 @@ class AbbreviationExcerpt implements ExcerptInterface, ExcerptTranslatableInterf
     public function setAbbreviation(Abbreviation $abbreviation): self
     {
         $this->abbreviation = $abbreviation;
+
         return $this;
     }
 
@@ -71,5 +72,4 @@ class AbbreviationExcerpt implements ExcerptInterface, ExcerptTranslatableInterf
 
         return $translation;
     }
-
 }

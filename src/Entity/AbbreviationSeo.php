@@ -9,11 +9,11 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
 use JMS\Serializer\Annotation as Serializer;
-use Manuxi\SuluAbbreviationsBundle\Entity\Interfaces\SeoInterface;
-use Manuxi\SuluAbbreviationsBundle\Entity\Interfaces\SeoTranslatableInterface;
-use Manuxi\SuluAbbreviationsBundle\Entity\Traits\SeoTrait;
-use Manuxi\SuluAbbreviationsBundle\Entity\Traits\SeoTranslatableTrait;
 use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationSeoRepository;
+use Manuxi\SuluSharedToolsBundle\Entity\Interfaces\SeoInterface;
+use Manuxi\SuluSharedToolsBundle\Entity\Interfaces\SeoTranslatableInterface;
+use Manuxi\SuluSharedToolsBundle\Entity\Traits\SeoTrait;
+use Manuxi\SuluSharedToolsBundle\Entity\Traits\SeoTranslatableTrait;
 
 #[ORM\Entity(repositoryClass: AbbreviationSeoRepository::class)]
 #[ORM\Table(name: 'app_abbreviation_seo')]
@@ -24,7 +24,7 @@ class AbbreviationSeo implements SeoInterface, SeoTranslatableInterface
 
     #[Serializer\Exclude]
     #[ORM\OneToOne(inversedBy: 'abbreviationSeo', targetEntity: Abbreviation::class, cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(name: 'abbreviation_id', referencedColumnName: "id", nullable: false)]
+    #[JoinColumn(name: 'abbreviation_id', referencedColumnName: 'id', nullable: false)]
     private ?Abbreviation $abbreviation = null;
 
     #[Serializer\Exclude]
@@ -44,6 +44,7 @@ class AbbreviationSeo implements SeoInterface, SeoTranslatableInterface
     public function setAbbreviation(Abbreviation $abbreviation): self
     {
         $this->abbreviation = $abbreviation;
+
         return $this;
     }
 

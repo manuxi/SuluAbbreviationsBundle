@@ -13,12 +13,12 @@ use Manuxi\SuluAbbreviationsBundle\Domain\Event\AbbreviationRemovedEvent;
 use Manuxi\SuluAbbreviationsBundle\Domain\Event\AbbreviationUnpublishedEvent;
 use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use Manuxi\SuluAbbreviationsBundle\Entity\Interfaces\AbbreviationModelInterface;
-use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ArrayPropertyTrait;
 use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationRepository;
 use Manuxi\SuluAbbreviationsBundle\Search\Event\AbbreviationPublishedEvent as SearchPublishedEvent;
 use Manuxi\SuluAbbreviationsBundle\Search\Event\AbbreviationRemovedEvent as SearchRemovedEvent;
 use Manuxi\SuluAbbreviationsBundle\Search\Event\AbbreviationSavedEvent as SearchSavedEvent;
 use Manuxi\SuluAbbreviationsBundle\Search\Event\AbbreviationUnpublishedEvent as SearchUnpublishedEvent;
+use Manuxi\SuluSharedToolsBundle\Entity\Traits\ArrayPropertyTrait;
 use Sulu\Bundle\ActivityBundle\Application\Collector\DomainEventCollectorInterface;
 use Sulu\Bundle\ContactBundle\Entity\ContactRepository;
 use Sulu\Bundle\MediaBundle\Entity\MediaRepositoryInterface;
@@ -40,7 +40,7 @@ class AbbreviationModel implements AbbreviationModelInterface
         private readonly RouteRepositoryInterface $routeRepository,
         private readonly EntityManagerInterface $entityManager,
         private readonly DomainEventCollectorInterface $domainEventCollector,
-        private readonly EventDispatcherInterface      $dispatcher,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
     }
 
@@ -168,7 +168,6 @@ class AbbreviationModel implements AbbreviationModelInterface
         $this->dispatcher->dispatch(new SearchSavedEvent($copy));
 
         return $copy;
-
     }
 
     public function copyLanguage(int $id, Request $request, string $srcLocale, array $destLocales): Abbreviation

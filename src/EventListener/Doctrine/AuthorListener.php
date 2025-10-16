@@ -6,7 +6,7 @@ namespace Manuxi\SuluAbbreviationsBundle\EventListener\Doctrine;
 
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\Persistence\Event\LoadClassMetadataEventArgs;
-use Manuxi\SuluAbbreviationsBundle\Entity\Interfaces\AuthorInterface;
+use Manuxi\SuluSharedToolsBundle\Entity\Interfaces\AuthorInterface;
 use Sulu\Bundle\ContactBundle\Entity\ContactInterface;
 use Sulu\Component\Security\Authentication\UserInterface;
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
@@ -35,7 +35,7 @@ class AuthorListener
         $metadata = $abbreviation->getClassMetadata();
         $reflection = $metadata->getReflectionClass();
 
-        if (null !== $reflection && $reflection->implementsInterface('Manuxi\SuluAbbreviationsBundle\Entity\Interfaces\AuthorInterface')) {
+        if (null !== $reflection && $reflection->implementsInterface('Manuxi\SuluSharedToolsBundle\Entity\Interfaces\AuthorInterface')) {
             if (!$metadata->hasAssociation(self::AUTHOR_PROPERTY_NAME)) {
                 $metadata->mapManyToOne([
                     'fieldName' => self::AUTHOR_PROPERTY_NAME,

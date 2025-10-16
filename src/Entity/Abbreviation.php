@@ -9,14 +9,14 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
-use Manuxi\SuluAbbreviationsBundle\Entity\Interfaces\AuditableTranslatableInterface;
-use Manuxi\SuluAbbreviationsBundle\Entity\Traits\AuditableTranslatableTrait;
-use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ImageTranslatableTrait;
-use Manuxi\SuluAbbreviationsBundle\Entity\Traits\LinkTranslatableTrait;
-use Manuxi\SuluAbbreviationsBundle\Entity\Traits\PublishedTranslatableTrait;
-use Manuxi\SuluAbbreviationsBundle\Entity\Traits\RouteTranslatableTrait;
-use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ShowAuthorTranslatableTrait;
-use Manuxi\SuluAbbreviationsBundle\Entity\Traits\ShowDateTranslatableTrait;
+use Manuxi\SuluSharedToolsBundle\Entity\Interfaces\AuditableTranslatableInterface;
+use Manuxi\SuluSharedToolsBundle\Entity\Traits\AuditableTranslatableTrait;
+use Manuxi\SuluSharedToolsBundle\Entity\Traits\ImageTranslatableTrait;
+use Manuxi\SuluSharedToolsBundle\Entity\Traits\LinkTranslatableTrait;
+use Manuxi\SuluSharedToolsBundle\Entity\Traits\PublishedTranslatableTrait;
+use Manuxi\SuluSharedToolsBundle\Entity\Traits\RoutePathTranslatableTrait;
+use Manuxi\SuluSharedToolsBundle\Entity\Traits\ShowAuthorTranslatableTrait;
+use Manuxi\SuluSharedToolsBundle\Entity\Traits\ShowDateTranslatableTrait;
 use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationRepository;
 
 #[ORM\Entity(repositoryClass: AbbreviationRepository::class)]
@@ -27,7 +27,7 @@ class Abbreviation implements AuditableTranslatableInterface
     use ImageTranslatableTrait;
     use LinkTranslatableTrait;
     use PublishedTranslatableTrait;
-    use RouteTranslatableTrait;
+    use RoutePathTranslatableTrait;
     use ShowAuthorTranslatableTrait;
     use ShowDateTranslatableTrait;
 

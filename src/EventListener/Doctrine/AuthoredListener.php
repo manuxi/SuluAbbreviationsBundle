@@ -7,7 +7,7 @@ namespace Manuxi\SuluAbbreviationsBundle\EventListener\Doctrine;
 use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Doctrine\Persistence\Event\LoadClassMetadataEventArgs;
-use Manuxi\SuluAbbreviationsBundle\Entity\Interfaces\AuthoredInterface;
+use Manuxi\SuluSharedToolsBundle\Entity\Interfaces\AuthoredInterface;
 
 class AuthoredListener
 {
@@ -24,7 +24,7 @@ class AuthoredListener
         $metadata = $abbreviation->getClassMetadata();
         $reflection = $metadata->getReflectionClass();
 
-        if (null !== $reflection && $reflection->implementsInterface('Manuxi\SuluAbbreviationsBundle\Entity\Interfaces\AuthoredInterface')) {
+        if (null !== $reflection && $reflection->implementsInterface('Manuxi\SuluSharedToolsBundle\Entity\Interfaces\AuthoredInterface')) {
             if (!$metadata->hasField(self::AUTHORED_PROPERTY_NAME)) {
                 $metadata->mapField([
                     'fieldName' => self::AUTHORED_PROPERTY_NAME,
