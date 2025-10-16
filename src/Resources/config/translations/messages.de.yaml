@@ -1,3 +1,10 @@
 sulu_abbreviations:
     abbreviation: "Abkuerzung"
     abbreviations: "Abkuerzungen"
+search:
+    index:
+        abbreviations: "Abkürzungen"
+        abbreviations_published: "Abkürzungen"
+    icon:
+        abbreviations: "tags"
+        abbreviations_published: "tags"

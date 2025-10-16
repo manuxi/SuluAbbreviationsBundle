@@ -46,18 +46,18 @@ return [
 Please add the following to your `routes_admin.yaml`:
 ```yaml
 SuluAbbreviationsBundle:
-    resource: '@SuluAbbreviationsBundle/Resources/config/routes_admin.yml'
+    resource: '@SuluAbbreviationsBundle/Resources/config/routes_admin.yaml'
 ```
 Don't forget fo add the index to your sulu_search.yaml:
 
-add "abbreviations"!
+add "abbreviations_published"!
 
-"abbreviations" is the index of published, "abbreviations_draft" the index of unpublished elements.
+"abbreviations_published" is the index of published, "abbreviations" the index of unpublished elements. Both indexes are searchable in admin.
 ```yaml
 sulu_search:
     website:
         indexes:
-            - abbreviations
+            - abbreviations_published
             - ...
 ``` 
 Last but not least the schema of the database needs to be updated.  
@@ -108,7 +108,11 @@ Example of the corresponding twig template for the abbreviations list:
 {% endfor %}
 ```
 
+## 🧶 Configuration
+This bundle contains settings for controlling the following tasks:
+- Settings for single view - Toggle for header, default hero snippet and breadcrumbs
+- Intermediate pages for breadcrumbs: this can be used to configure the intermediate pages for the breadcrumbs
+
 ## 👩‍🍳 Contributing
 For the sake of simplicity this extension was kept small.
 Please feel comfortable submitting issues or pull requests. As always I'd be glad to get your feedback to improve the extension :).
->>>>>>> 9a0f74c1de53f730bf1857b0d6b617dc4b47ab03

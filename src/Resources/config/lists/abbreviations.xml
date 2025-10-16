@@ -59,13 +59,7 @@
             <joins ref="translation"/>
         </property>
 
-        <property name="published" visibility="yes" translation="sulu_abbreviations.published" type="bool">
-            <field-name>published</field-name>
-            <entity-name>%sulu.model.abbreviation_translation.class%</entity-name>
-            <joins ref="translation"/>
-        </property>
-
-        <property name="publishedState" visibility="no" translation="sulu_abbreviations.published_state" type="int">
+        <property name="publishedState" translation="sulu_abbreviations.published" visibility="yes" type="bool">
             <field-name>publishedState</field-name>
             <entity-name>%sulu.model.abbreviation_translation.class%</entity-name>
             <joins ref="translation"/>

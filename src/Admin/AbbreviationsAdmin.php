@@ -27,25 +27,18 @@ class AbbreviationsAdmin extends Admin
     public const EDIT_FORM_DETAILS_VIEW = 'sulu_abbreviations.abbreviations.edit_form.details';
     public const SECURITY_CONTEXT = 'sulu.modules.abbreviation';
 
-    //seo,excerpt, etc
+    // seo,excerpt, etc
     public const EDIT_FORM_VIEW_SEO = 'sulu_abbreviations.edit_form.seo';
     public const EDIT_FORM_VIEW_EXCERPT = 'sulu_abbreviations.edit_form.excerpt';
     public const EDIT_FORM_VIEW_SETTINGS = 'sulu_abbreviations.edit_form.settings';
 
-    private ViewBuilderFactoryInterface $viewBuilderFactory;
-    private SecurityCheckerInterface $securityChecker;
-    private WebspaceManagerInterface $webspaceManager;
-
     private ?array $types = null;
 
     public function __construct(
-        ViewBuilderFactoryInterface $viewBuilderFactory,
-        SecurityCheckerInterface $securityChecker,
-        WebspaceManagerInterface $webspaceManager
+        private readonly ViewBuilderFactoryInterface $viewBuilderFactory,
+        private readonly SecurityCheckerInterface $securityChecker,
+        private readonly WebspaceManagerInterface $webspaceManager,
     ) {
-        $this->viewBuilderFactory = $viewBuilderFactory;
-        $this->securityChecker    = $securityChecker;
-        $this->webspaceManager    = $webspaceManager;
     }
 
     public function configureNavigationItems(NavigationItemCollection $navigationItemCollection): void
@@ -53,7 +46,7 @@ class AbbreviationsAdmin extends Admin
         if ($this->securityChecker->hasPermission(Abbreviation::SECURITY_CONTEXT, PermissionTypes::EDIT)) {
             $rootNavigationItem = new NavigationItem(static::NAV_ITEM);
             $rootNavigationItem->setIcon('su-tag-pen');
-            $rootNavigationItem->setPosition(30);
+            $rootNavigationItem->setPosition(31);
             $rootNavigationItem->setView(static::LIST_VIEW);
 
             // Configure a NavigationItem with a View
@@ -137,7 +130,7 @@ class AbbreviationsAdmin extends Admin
                 ->addLocales($locales);
             $viewCollection->add($editFormView);
 
-            //publish/unpublish toolbar actions
+            // publish/unpublish toolbar actions
             $formToolbarActions = [
                 new ToolbarAction('sulu_admin.save'),
                 new ToolbarAction('sulu_admin.delete'),
@@ -159,9 +152,9 @@ class AbbreviationsAdmin extends Admin
                 ->setParent(static::EDIT_FORM_VIEW);
             $viewCollection->add($editDetailsFormView);
 
-            //seo,excerpt, etc
+            // seo,excerpt, etc
             $formToolbarActionsWithoutType = [];
-            $previewCondition              = 'nodeType == 1';
+            $previewCondition = 'nodeType == 1';
 
             if ($this->securityChecker->hasPermission(Abbreviation::SECURITY_CONTEXT, PermissionTypes::ADD)) {
                 $listToolbarActions[] = new ToolbarAction('sulu_admin.add');
