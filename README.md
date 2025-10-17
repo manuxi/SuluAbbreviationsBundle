@@ -1,10 +1,9 @@
 # SuluAbbreviationsBundle!
 ![php workflow](https://github.com/manuxi/SuluAbbreviationsBundle/actions/workflows/php.yml/badge.svg)
 ![symfony workflow](https://github.com/manuxi/SuluAbbreviationsBundle/actions/workflows/symfony.yml/badge.svg)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-<a href="https://github.com/manuxi/SuluAbbreviationsBundle/tags" target="_blank">
-<img src="https://img.shields.io/github/v/tag/manuxi/SuluAbbreviationsBundle" alt="GitHub license">
-</a>
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/manuxi/SuluAbbreviationsBundle/LICENSE)
+![GitHub Tag](https://img.shields.io/github/v/tag/manuxi/SuluAbbreviationsBundle)
+![Supports Sulu 2.6 or later](https://img.shields.io/badge/%20Sulu->=2.6-0088cc?color=00b2df)
 
 I made this bundle to have the possibility to manage abbreviations in my projects.
 
