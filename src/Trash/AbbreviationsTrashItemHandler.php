@@ -8,8 +8,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Manuxi\SuluAbbreviationsBundle\Admin\AbbreviationsAdmin;
 use Manuxi\SuluAbbreviationsBundle\Domain\Event\AbbreviationRestoredEvent;
 use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
-use Manuxi\SuluAbbreviationsBundle\Search\Event\AbbreviationRemovedEvent;
-use Manuxi\SuluAbbreviationsBundle\Search\Event\AbbreviationSavedEvent;
+use Manuxi\SuluSharedToolsBundle\Search\Event\PersistedEvent as SearchPersistedEvent;
+use Manuxi\SuluSharedToolsBundle\Search\Event\RemovedEvent as SearchRemovedEvent;
 use Sulu\Bundle\ActivityBundle\Application\Collector\DomainEventCollectorInterface;
 use Sulu\Bundle\ContactBundle\Entity\ContactInterface;
 use Sulu\Bundle\MediaBundle\Entity\MediaInterface;
@@ -26,12 +26,13 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 class AbbreviationsTrashItemHandler implements StoreTrashItemHandlerInterface, RestoreTrashItemHandlerInterface, RestoreConfigurationProviderInterface
 {
     public function __construct(
-        private readonly TrashItemRepositoryInterface   $trashItemRepository,
-        private readonly EntityManagerInterface         $entityManager,
+        private readonly TrashItemRepositoryInterface $trashItemRepository,
+        private readonly EntityManagerInterface $entityManager,
         private readonly DoctrineRestoreHelperInterface $doctrineRestoreHelper,
         private readonly DomainEventCollectorInterface $domainEventCollector,
         private readonly EventDispatcherInterface $dispatcher,
-    ) {}
+    ) {
+    }
 
     public static function getResourceKey(): string
     {
@@ -63,7 +64,7 @@ class AbbreviationsTrashItemHandler implements StoreTrashItemHandlerInterface, R
 
         $restoreType = isset($options['locale']) ? 'translation' : null;
 
-        $this->dispatcher->dispatch(new AbbreviationRemovedEvent($entity));
+        $this->dispatcher->dispatch(new SearchRemovedEvent($entity));
 
         return $this->trashItemRepository->create(
             Abbreviation::RESOURCE_KEY,
@@ -117,7 +118,7 @@ class AbbreviationsTrashItemHandler implements StoreTrashItemHandlerInterface, R
         $this->createRoute($this->entityManager, $abbreviationId, $data['locale'], $abbreviation->getRoutePath(), Abbreviation::class);
         $this->entityManager->flush();
 
-        $this->dispatcher->dispatch(new AbbreviationSavedEvent($abbreviation));
+        $this->dispatcher->dispatch(new SearchPersistedEvent($abbreviation));
 
         return $abbreviation;
     }
