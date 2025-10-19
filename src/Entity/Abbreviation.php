@@ -10,6 +10,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Manuxi\SuluSharedToolsBundle\Entity\Interfaces\AuditableTranslatableInterface;
+use Manuxi\SuluSharedToolsBundle\Entity\Interfaces\SearchableInterface;
 use Manuxi\SuluSharedToolsBundle\Entity\Traits\AuditableTranslatableTrait;
 use Manuxi\SuluSharedToolsBundle\Entity\Traits\ImageTranslatableTrait;
 use Manuxi\SuluSharedToolsBundle\Entity\Traits\LinkTranslatableTrait;
@@ -21,7 +22,7 @@ use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationRepository;
 
 #[ORM\Entity(repositoryClass: AbbreviationRepository::class)]
 #[ORM\Table(name: 'app_abbreviation')]
-class Abbreviation implements AuditableTranslatableInterface
+class Abbreviation implements AuditableTranslatableInterface, SearchableInterface
 {
     use AuditableTranslatableTrait;
     use ImageTranslatableTrait;

@@ -14,10 +14,10 @@ use Manuxi\SuluAbbreviationsBundle\Domain\Event\AbbreviationUnpublishedEvent;
 use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use Manuxi\SuluAbbreviationsBundle\Entity\Interfaces\AbbreviationModelInterface;
 use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationRepository;
-use Manuxi\SuluAbbreviationsBundle\Search\Event\AbbreviationPublishedEvent as SearchPublishedEvent;
-use Manuxi\SuluAbbreviationsBundle\Search\Event\AbbreviationRemovedEvent as SearchRemovedEvent;
-use Manuxi\SuluAbbreviationsBundle\Search\Event\AbbreviationSavedEvent as SearchSavedEvent;
-use Manuxi\SuluAbbreviationsBundle\Search\Event\AbbreviationUnpublishedEvent as SearchUnpublishedEvent;
+use Manuxi\SuluSharedToolsBundle\Search\Event\PersistedEvent as SearchPersistedEvent;
+use Manuxi\SuluSharedToolsBundle\Search\Event\PreUpdatedEvent as SearchPreUpdatedEvent;
+use Manuxi\SuluSharedToolsBundle\Search\Event\RemovedEvent as SearchRemovedEvent;
+use Manuxi\SuluSharedToolsBundle\Search\Event\UpdatedEvent as SearchUpdatedEvent;
 use Manuxi\SuluSharedToolsBundle\Entity\Traits\ArrayPropertyTrait;
 use Sulu\Bundle\ActivityBundle\Application\Collector\DomainEventCollectorInterface;
 use Sulu\Bundle\ContactBundle\Entity\ContactRepository;
@@ -84,7 +84,7 @@ class AbbreviationModel implements AbbreviationModelInterface
         // explicit flush to save routes persisted by updateRoutesForEntity()
         $this->entityManager->flush();
 
-        $this->dispatcher->dispatch(new SearchSavedEvent($entity));
+        $this->dispatcher->dispatch(new SearchPersistedEvent($entity));
 
         return $entity;
     }
@@ -95,7 +95,7 @@ class AbbreviationModel implements AbbreviationModelInterface
     public function update(int $id, Request $request): Abbreviation
     {
         $entity = $this->findByIdAndLocale($id, $request);
-        $this->dispatcher->dispatch(new SearchUnpublishedEvent($entity));
+        $this->dispatcher->dispatch(new SearchPreUpdatedEvent($entity));
 
         $entity = $this->mapDataToEntity($entity, $request->request->all());
         $entity = $this->mapSettingsToEntity($entity, $request->request->all());
@@ -109,7 +109,7 @@ class AbbreviationModel implements AbbreviationModelInterface
         $this->updateRoutesForEntity($entity);
         $this->entityManager->flush();
 
-        $this->dispatcher->dispatch(new SearchSavedEvent($entity));
+        $this->dispatcher->dispatch(new SearchUpdatedEvent($entity));
 
         return $entity;
     }
@@ -120,7 +120,7 @@ class AbbreviationModel implements AbbreviationModelInterface
     public function publish(int $id, Request $request): Abbreviation
     {
         $entity = $this->findByIdAndLocale($id, $request);
-        $this->dispatcher->dispatch(new SearchUnpublishedEvent($entity));
+        $this->dispatcher->dispatch(new SearchPreUpdatedEvent($entity));
 
         $entity->setPublished(true);
         $entity = $this->abbreviationRepository->save($entity);
@@ -129,7 +129,7 @@ class AbbreviationModel implements AbbreviationModelInterface
             new AbbreviationPublishedEvent($entity, $request->request->all())
         );
 
-        $this->dispatcher->dispatch(new SearchPublishedEvent($entity));
+        $this->dispatcher->dispatch(new SearchUpdatedEvent($entity));
 
         return $entity;
     }
@@ -140,7 +140,7 @@ class AbbreviationModel implements AbbreviationModelInterface
     public function unpublish(int $id, Request $request): Abbreviation
     {
         $entity = $this->findByIdAndLocale($id, $request);
-        $this->dispatcher->dispatch(new SearchUnpublishedEvent($entity));
+        $this->dispatcher->dispatch(new SearchPreUpdatedEvent($entity));
 
         $entity->setPublished(false);
         $entity = $this->abbreviationRepository->save($entity);
@@ -149,7 +149,7 @@ class AbbreviationModel implements AbbreviationModelInterface
             new AbbreviationUnpublishedEvent($entity, $request->request->all())
         );
 
-        $this->dispatcher->dispatch(new SearchPublishedEvent($entity));
+        $this->dispatcher->dispatch(new SearchUpdatedEvent($entity));
 
         return $entity;
     }
@@ -165,7 +165,7 @@ class AbbreviationModel implements AbbreviationModelInterface
 
         $copy = $entity->copy($copy);
         $copy = $this->abbreviationRepository->save($copy);
-        $this->dispatcher->dispatch(new SearchSavedEvent($copy));
+        $this->dispatcher->dispatch(new SearchPersistedEvent($copy));
 
         return $copy;
     }
@@ -187,7 +187,7 @@ class AbbreviationModel implements AbbreviationModelInterface
         );
 
         $entity = $this->abbreviationRepository->save($entity);
-        $this->dispatcher->dispatch(new SearchSavedEvent($entity));
+        $this->dispatcher->dispatch(new SearchPersistedEvent($entity));
 
         return $entity;
     }
