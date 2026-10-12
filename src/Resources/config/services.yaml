@@ -143,6 +143,18 @@ services:
         tags:
             - { name: sulu_reference.refresher }
 
+    # HTTP cache
+    Manuxi\SuluAbbreviationsBundle\EventSubscriber\AbbreviationCacheInvalidationSubscriber:
+        arguments:
+            - '@?sulu_http_cache.cache_manager'
+        tags:
+            - { name: kernel.event_listener, event: workflow.content_workflow.completed.publish, method: onPublish }
+            - { name: kernel.event_listener, event: workflow.content_workflow.completed.unpublish, method: onUnpublish }
+            - { name: doctrine.event_listener, event: postFlush }
+            - { name: kernel.event_listener, event: Manuxi\SuluAbbreviationsBundle\Domain\Event\AbbreviationRemovedEvent, method: onDomainEvent }
+            - { name: kernel.event_listener, event: Manuxi\SuluAbbreviationsBundle\Domain\Event\AbbreviationTranslationRemovedEvent, method: onDomainEvent }
+            - { name: kernel.event_listener, event: Manuxi\SuluAbbreviationsBundle\Domain\Event\AbbreviationRestoredEvent, method: onDomainEvent }
+
     # Content types
     Manuxi\SuluAbbreviationsBundle\Content\Type\AbbreviationsSelection:
         arguments:
@@ -199,7 +211,7 @@ services:
             - Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation
 
     sulu_abbreviations.data_provider:
-        class: Sulu\Bundle\ContentBundle\Content\Infrastructure\Sulu\SmartContent\Provider\ContentDataProvider
+        class: Manuxi\SuluAbbreviationsBundle\Content\AbbreviationsDataProvider
         arguments:
             - '@sulu_abbreviations.data_provider_repository'
             - '@sulu_core.array_serializer'
@@ -262,6 +274,7 @@ services:
             - '@Manuxi\SuluAbbreviationsBundle\Resolver\AbbreviationResolver'
             - '@request_stack'
             - '%sulu_abbreviations.twig.auto_abbr%'
+            - '@sulu_abbreviations.reference_store'
         tags:
             - { name: twig.extension }
 

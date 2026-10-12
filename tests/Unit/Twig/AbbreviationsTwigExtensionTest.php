@@ -10,6 +10,7 @@ use Manuxi\SuluAbbreviationsBundle\Twig\AbbreviationsTwigExtension;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
+use Sulu\Bundle\WebsiteBundle\ReferenceStore\ReferenceStoreInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -89,6 +90,23 @@ class AbbreviationsTwigExtensionTest extends TestCase
         $this->resolver->resolveMany(['a', 'b'], 'de')->willReturn([['name' => 'A'], ['name' => 'B']]);
 
         $this->assertSame([['name' => 'A'], ['name' => 'B']], $this->createExtension()->getAbbreviations(5, 'de'));
+    }
+
+    public function testGetAbbreviationsMarksTheResponseAsList(): void
+    {
+        $referenceStore = $this->prophesize(ReferenceStoreInterface::class);
+        $referenceStore->add('list')->shouldBeCalledOnce();
+        $this->repository->findPublishedIds('en', 100)->willReturn([]);
+        $this->resolver->resolveMany([], 'en')->willReturn([]);
+
+        $extension = new AbbreviationsTwigExtension(
+            $this->repository->reveal(),
+            $this->resolver->reveal(),
+            $this->requestStack,
+            false,
+            $referenceStore->reveal()
+        );
+        $extension->getAbbreviations();
     }
 
     public function testGetAbbreviationsUsesPublishedOnlyWithDefaultLimit(): void

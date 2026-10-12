@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Manuxi\SuluAbbreviationsBundle\Twig;
 
+use Manuxi\SuluAbbreviationsBundle\EventSubscriber\AbbreviationCacheInvalidationSubscriber;
 use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationRepository;
 use Manuxi\SuluAbbreviationsBundle\Resolver\AbbreviationResolver;
+use Sulu\Bundle\WebsiteBundle\ReferenceStore\ReferenceStoreInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
@@ -25,6 +27,7 @@ class AbbreviationsTwigExtension extends AbstractExtension
         private readonly AbbreviationResolver $resolver,
         private readonly RequestStack $requestStack,
         private readonly bool $autoAbbr = false,
+        private readonly ?ReferenceStoreInterface $referenceStore = null,
     ) {
     }
 
@@ -68,6 +71,8 @@ class AbbreviationsTwigExtension extends AbstractExtension
     {
         $locale = $this->resolveLocale($locale);
         $ids    = $this->abbreviationRepository->findPublishedIds($locale, $limit);
+
+        $this->referenceStore?->add(AbbreviationCacheInvalidationSubscriber::LIST_REFERENCE);
 
         return $this->resolver->resolveMany($ids, $locale);
     }

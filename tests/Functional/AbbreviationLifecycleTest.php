@@ -6,12 +6,15 @@ namespace Manuxi\SuluAbbreviationsBundle\Tests\Functional;
 
 use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationDimensionContent;
+use Manuxi\SuluAbbreviationsBundle\EventSubscriber\AbbreviationCacheInvalidationSubscriber;
 use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationRepository;
 use Manuxi\SuluAbbreviationsBundle\Resolver\AbbreviationResolver;
 use Manuxi\SuluAbbreviationsBundle\Translation\AbbreviationTranslationRemover;
 use Sulu\Bundle\ContentBundle\Content\Application\ContentManager\ContentManagerInterface;
 use Sulu\Bundle\ContentBundle\Content\Domain\Model\DimensionContentInterface;
 use Sulu\Bundle\ContentBundle\Content\Domain\Model\WorkflowInterface;
+use Sulu\Bundle\HttpCacheBundle\Cache\CacheManagerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class AbbreviationLifecycleTest extends AbbreviationKernelTestCase
 {
@@ -135,6 +138,66 @@ class AbbreviationLifecycleTest extends AbbreviationKernelTestCase
         $this->assertNull($this->getResolver()->resolve($abbreviation->getId(), 'de'));
         $this->assertSame([$abbreviation->getId()], $this->getRepository()->findPublishedIds('en'));
         $this->assertSame([], $this->getRepository()->findPublishedIds('de'));
+    }
+
+    public function testPublishAndUnpublishInvalidateTheHttpCacheAfterTheFlush(): void
+    {
+        $cacheManager = new class implements CacheManagerInterface {
+            /** @var string[] */
+            public array $invalidated = [];
+
+            /**
+             * @param array<string, string> $headers
+             */
+            public function invalidatePath(string $path, array $headers = []): void
+            {
+            }
+
+            public function invalidateTag(string $tag): void
+            {
+            }
+
+            public function invalidateDomain(string $domain): void
+            {
+            }
+
+            public function clear(): void
+            {
+            }
+
+            public function invalidateReference(string $alias, string $id): void
+            {
+                $this->invalidated[] = $alias . ':' . $id;
+            }
+
+            public function supportsInvalidate(): bool
+            {
+                return true;
+            }
+
+            public function supportsTags(): bool
+            {
+                return true;
+            }
+
+            public function supportsClear(): bool
+            {
+                return true;
+            }
+        };
+        $subscriber = new AbbreviationCacheInvalidationSubscriber($cacheManager);
+        $dispatcher = $this->getService('event_dispatcher');
+        \assert($dispatcher instanceof EventDispatcherInterface);
+        $dispatcher->addListener('workflow.content_workflow.completed.publish', $subscriber->onPublish(...));
+        $this->getEntityManager()->getEventManager()->addEventListener('postFlush', $subscriber);
+
+        $abbreviation = $this->createAbbreviation('HTML', 'HyperText Markup Language');
+        $this->contentManager->applyTransition($abbreviation, ['locale' => 'en'], WorkflowInterface::WORKFLOW_TRANSITION_PUBLISH);
+        $this->assertSame([], $cacheManager->invalidated);
+
+        $this->getEntityManager()->flush();
+
+        $this->assertSame(['abbreviations:' . $abbreviation->getId(), 'abbreviations:list'], $cacheManager->invalidated);
     }
 
     public function testRemoveCascadesToDimensionContents(): void
