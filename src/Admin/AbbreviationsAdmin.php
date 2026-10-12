@@ -25,7 +25,6 @@ class AbbreviationsAdmin extends Admin
     public const ADD_FORM_DETAILS_VIEW  = 'sulu_abbreviations.abbreviations.add_form.details';
     public const EDIT_FORM_VIEW         = 'sulu_abbreviations.abbreviations.edit_form';
     public const EDIT_FORM_DETAILS_VIEW = 'sulu_abbreviations.abbreviations.edit_form.details';
-    public const SECURITY_CONTEXT       = 'sulu.modules.abbreviation';
 
     // seo,excerpt, etc
     public const EDIT_FORM_VIEW_SEO      = 'sulu_abbreviations.edit_form.seo';

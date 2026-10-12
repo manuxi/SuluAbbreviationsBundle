@@ -15,6 +15,10 @@ All notable changes to this project are documented in this file.
 - PHPStan (level 6) with `phpstan.neon.dist` and `phpstan-baseline.neon`.
 - Composer scripts `phpstan`, `cs` and `cs-fix`.
 
+### Fixed
+- `AbbreviationRepository` and `AbbreviationsRouteDefaultsProvider` were registered twice (the route defaults provider was added twice to the route defaults chain); each is now one service, `sulu_abbreviations.repository.abbreviation` and `AbbreviationsRouteDefaultsProvider` are aliases.
+
 ### Removed
+- Unused constant `AbbreviationsAdmin::SECURITY_CONTEXT` (`sulu.modules.abbreviation`); use `Abbreviation::SECURITY_CONTEXT`.
 - Workflows `php.yml` and `symfony.yml` (broken `.env.test` copy step and `composer.lock` cache key).
 - Dev dependencies `symfony/phpunit-bridge` and `phpspec/prophecy` (replaced by `phpspec/prophecy-phpunit`).
