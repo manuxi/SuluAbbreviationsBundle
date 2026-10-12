@@ -17,8 +17,11 @@ All notable changes to this project are documented in this file.
 
 ### Fixed
 - `AbbreviationRepository` and `AbbreviationsRouteDefaultsProvider` were registered twice (the route defaults provider was added twice to the route defaults chain); each is now one service, `sulu_abbreviations.repository.abbreviation` and `AbbreviationsRouteDefaultsProvider` are aliases.
+- Selection content types: the backend registered `abbreviations_selection` twice while the admin field types are `abbreviation_selection` / `single_abbreviation_selection`. The content type aliases now match the field types. `abbreviation_selection` returns only abbreviations published in the current locale, keeps the selection order and sets the locale; `single_abbreviation_selection` sets the locale and returns `null` for unpublished entries.
+- Wrong translation key `sulu_abbreviations.abbreviations_selection_label` in the selection field type options.
 
 ### Removed
+- `Content\AbbreviationsSelectionContentType` (duplicate of `Content\Type\AbbreviationsSelection`). Templates must use the property type `abbreviation_selection`.
 - Unused constant `AbbreviationsAdmin::SECURITY_CONTEXT` (`sulu.modules.abbreviation`); use `Abbreviation::SECURITY_CONTEXT`.
 - Workflows `php.yml` and `symfony.yml` (broken `.env.test` copy step and `composer.lock` cache key).
 - Dev dependencies `symfony/phpunit-bridge` and `phpspec/prophecy` (replaced by `phpspec/prophecy-phpunit`).

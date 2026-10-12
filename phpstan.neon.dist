@@ -7,3 +7,8 @@ parameters:
         - src
         - tests
     tmpDir: var/cache/phpstan
+    ignoreErrors:
+        -
+            message: '#^Call to an undefined method Prophecy\\Prophecy\\ObjectProphecy#'
+            path: tests
+            reportUnmatched: false

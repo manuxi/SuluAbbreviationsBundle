@@ -57,6 +57,21 @@ class SuluAbbreviationsExtensionTest extends TestCase
         $this->assertTrue($container->hasAlias(AbbreviationsRouteDefaultsProvider::class));
     }
 
+    public function testContentTypeAliasesAreUnique(): void
+    {
+        $container = $this->loadContainer();
+
+        $aliases = [];
+        foreach ($container->findTaggedServiceIds('sulu.content.type') as $tags) {
+            foreach ($tags as $attributes) {
+                $aliases[] = $attributes['alias'];
+            }
+        }
+
+        sort($aliases);
+        $this->assertSame(['abbreviation_selection', 'single_abbreviation_selection'], $aliases);
+    }
+
     public function testAutomationServicesAreOnlyLoadedWithAutomationBundle(): void
     {
         $this->assertFalse($this->loadContainer()->hasDefinition('sulu_abbreviations.automation.publish_handler'));

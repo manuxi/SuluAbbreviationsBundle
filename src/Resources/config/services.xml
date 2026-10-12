@@ -62,13 +62,7 @@
         <service id="sulu_abbreviations.abbreviations_selection" class="Manuxi\SuluAbbreviationsBundle\Content\Type\AbbreviationsSelection">
             <argument type="service" id="doctrine.orm.default_entity_manager"/>
 
-            <tag name="sulu.content.type" alias="abbreviations_selection"/>
-        </service>
-
-        <service id="Manuxi\SuluAbbreviationsBundle\Content\AbbreviationsSelectionContentType">
-            <argument type="service" id="sulu_abbreviations.repository.abbreviation"/>
-
-            <tag name="sulu.content.type" alias="abbreviations_selection"/>
+            <tag name="sulu.content.type" alias="abbreviation_selection"/>
         </service>
 
         <service id="sulu_abbreviations.abbreviations_data_provider" class="Manuxi\SuluAbbreviationsBundle\Content\AbbreviationsDataProvider">

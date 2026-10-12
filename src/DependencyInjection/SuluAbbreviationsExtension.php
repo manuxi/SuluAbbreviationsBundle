@@ -142,7 +142,7 @@ class SuluAbbreviationsExtension extends Extension implements PrependExtensionIn
                                             'name',
                                         ],
                                         'icon'          => 'su-tag-pen',
-                                        'label'         => 'sulu_abbreviations.abbreviations_selection_label',
+                                        'label'         => 'sulu_abbreviations.abbreviation_selection_label',
                                         'overlay_title' => 'sulu_abbreviations.select_abbreviation',
                                     ],
                                 ],
