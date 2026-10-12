@@ -283,3 +283,29 @@ services:
             - '@doctrine.orm.entity_manager'
         tags:
             - { name: twig.extension }
+
+    # Migration
+    Manuxi\SuluAbbreviationsBundle\Migration\LegacyDataMigrator:
+        arguments:
+            - '@doctrine.dbal.default_connection'
+            - '@doctrine.orm.entity_manager'
+            - '@sulu.repository.route'
+
+    Manuxi\SuluAbbreviationsBundle\Command\MigrateToContentCommand:
+        arguments:
+            - '@Manuxi\SuluAbbreviationsBundle\Migration\LegacyDataMigrator'
+        tags:
+            - { name: console.command }
+
+    Manuxi\SuluAbbreviationsBundle\Migration\PageReferenceMigrator:
+        arguments:
+            - '@doctrine.dbal.default_connection'
+            - '@sulu_page.structure.factory'
+            - '@doctrine_phpcr.session'
+            - '@doctrine_phpcr.live_session'
+
+    Manuxi\SuluAbbreviationsBundle\Command\MigratePageReferencesCommand:
+        arguments:
+            - '@Manuxi\SuluAbbreviationsBundle\Migration\PageReferenceMigrator'
+        tags:
+            - { name: console.command }
