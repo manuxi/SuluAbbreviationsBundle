@@ -6,6 +6,7 @@ namespace Manuxi\SuluAbbreviationsBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationTranslationRepository;
 use Manuxi\SuluSharedToolsBundle\Entity\Interfaces\AuditableInterface;
 use Manuxi\SuluSharedToolsBundle\Entity\Traits\AuditableTrait;
 use Manuxi\SuluSharedToolsBundle\Entity\Traits\ImageTrait;
@@ -14,7 +15,6 @@ use Manuxi\SuluSharedToolsBundle\Entity\Traits\PublishedTrait;
 use Manuxi\SuluSharedToolsBundle\Entity\Traits\RoutePathTrait;
 use Manuxi\SuluSharedToolsBundle\Entity\Traits\ShowAuthorTrait;
 use Manuxi\SuluSharedToolsBundle\Entity\Traits\ShowDateTrait;
-use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationTranslationRepository;
 
 #[ORM\Entity(repositoryClass: AbbreviationTranslationRepository::class)]
 #[ORM\Table(name: 'app_abbreviation_translation')]
@@ -52,12 +52,35 @@ class AbbreviationTranslation implements AuditableInterface
     public function __construct(Abbreviation $abbreviation, string $locale)
     {
         $this->abbreviation = $abbreviation;
-        $this->locale = $locale;
+        $this->locale       = $locale;
     }
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    /**
+     * Returns an unpublished, not yet persisted copy for the given abbreviation. The route path gets the suffix "-copy".
+     */
+    public function copyTo(Abbreviation $abbreviation): self
+    {
+        $copy               = clone $this;
+        $copy->id           = null;
+        $copy->abbreviation = $abbreviation;
+        // Reset timestamps so the timestampable subscriber sets them on persist
+        $copy->created      = null; // @phpstan-ignore assign.propertyType
+        $copy->changed      = null; // @phpstan-ignore assign.propertyType
+        $copy->creator      = null;
+        $copy->changer      = null;
+        $copy->setPublished(false);
+        $copy->setPublishedAt(null);
+
+        if ('' !== $this->getRoutePath()) {
+            $copy->setRoutePath($this->getRoutePath() . '-copy');
+        }
+
+        return $copy;
     }
 
     public function getAbbreviation(): Abbreviation

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Manuxi\SuluAbbreviationsBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\InverseJoinColumn;
@@ -54,6 +55,24 @@ class AbbreviationExcerptTranslation extends AbstractExcerptTranslation implemen
         $this->abbreviationExcerpt = $abbreviationExcerpt;
         $this->setLocale($locale);
         $this->initExcerptTranslationTrait();
+    }
+
+    /**
+     * Returns a not yet persisted copy for the given excerpt entity. Related categories, tags and media are shared.
+     */
+    public function copyTo(AbbreviationExcerpt $abbreviationExcerpt): self
+    {
+        $copy                      = clone $this;
+        $copy->id                  = null;
+        $copy->abbreviationExcerpt = $abbreviationExcerpt;
+
+        foreach (['categories', 'tags', 'icons', 'images', 'segments'] as $property) {
+            if (null !== $copy->{$property}) {
+                $copy->{$property} = new ArrayCollection($copy->{$property}->toArray());
+            }
+        }
+
+        return $copy;
     }
 
     public function getExcerpt(): AbbreviationExcerpt

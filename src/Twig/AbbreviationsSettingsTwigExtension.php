@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Manuxi\SuluAbbreviationsBundle\Twig;
 
 use Doctrine\ORM\EntityManagerInterface;
-
 use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationsSettings;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
@@ -13,7 +14,7 @@ class AbbreviationsSettingsTwigExtension extends AbstractExtension
     private EntityManagerInterface $entityManager;
 
     public function __construct(
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
     ) {
         $this->entityManager = $entityManager;
     }

@@ -16,7 +16,7 @@ abstract class AbstractAbbreviationEvent extends DomainEvent
     {
         parent::__construct();
         $this->abbreviation = $abbreviation;
-        $this->payload = $payload;
+        $this->payload      = $payload;
     }
 
     public function getAbbreviation(): Abbreviation
@@ -36,7 +36,7 @@ abstract class AbstractAbbreviationEvent extends DomainEvent
 
     public function getResourceId(): string
     {
-        return (string)$this->abbreviation->getId();
+        return (string) $this->abbreviation->getId();
     }
 
     public function getResourceTitle(): ?string

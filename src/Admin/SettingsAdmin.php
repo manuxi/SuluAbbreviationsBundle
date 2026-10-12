@@ -16,25 +16,25 @@ use Sulu\Component\Security\Authorization\SecurityCheckerInterface;
 
 class SettingsAdmin extends Admin
 {
-    public const TAB_VIEW = 'sulu_abbreviations.config';
+    public const TAB_VIEW  = 'sulu_abbreviations.config';
     public const FORM_VIEW = 'sulu_abbreviations.config.form';
-    public const NAV_ITEM = 'sulu_abbreviations.config.title.navi';
+    public const NAV_ITEM  = 'sulu_abbreviations.config.title.navi';
 
     private ViewBuilderFactoryInterface $viewBuilderFactory;
     private SecurityCheckerInterface $securityChecker;
 
     public function __construct(
         ViewBuilderFactoryInterface $viewBuilderFactory,
-        SecurityCheckerInterface $securityChecker
+        SecurityCheckerInterface $securityChecker,
     ) {
         $this->viewBuilderFactory = $viewBuilderFactory;
-        $this->securityChecker = $securityChecker;
+        $this->securityChecker    = $securityChecker;
     }
 
     public function configureNavigationItems(NavigationItemCollection $navigationItemCollection): void
     {
         if ($this->securityChecker->hasPermission(AbbreviationsSettings::SECURITY_CONTEXT, PermissionTypes::EDIT)) {
-            $module = $navigationItemCollection->get(AbbreviationsAdmin::NAV_ITEM);
+            $module   = $navigationItemCollection->get(AbbreviationsAdmin::NAV_ITEM);
             $settings = new NavigationItem(static::NAV_ITEM);
             $settings->setPosition(20);
             $settings->setView(static::TAB_VIEW);
@@ -47,7 +47,7 @@ class SettingsAdmin extends Admin
     {
         if ($this->securityChecker->hasPermission(AbbreviationsSettings::SECURITY_CONTEXT, PermissionTypes::EDIT)) {
             $viewCollection->add(
-            // sulu will only load the existing entity if the path of the form includes an id attribute
+                // sulu will only load the existing entity if the path of the form includes an id attribute
                 $this->viewBuilderFactory->createResourceTabViewBuilder(static::TAB_VIEW, '/abbreviations-settings/:id')
                     ->setResourceKey(AbbreviationsSettings::RESOURCE_KEY)
                     ->setAttributeDefault('id', '-')

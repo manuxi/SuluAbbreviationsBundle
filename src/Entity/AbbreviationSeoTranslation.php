@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Manuxi\SuluAbbreviationsBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationSeoTranslationRepository;
 use Manuxi\SuluSharedToolsBundle\Entity\Interfaces\SeoTranslationInterface;
 use Manuxi\SuluSharedToolsBundle\Entity\Traits\SeoTranslationTrait;
-use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationSeoTranslationRepository;
 
 #[ORM\Entity(repositoryClass: AbbreviationSeoTranslationRepository::class)]
 #[ORM\Table(name: 'app_abbreviation_seo_translation')]
@@ -25,9 +25,20 @@ class AbbreviationSeoTranslation implements SeoTranslationInterface
         $this->setLocale($locale);
     }
 
+    /**
+     * Returns a not yet persisted copy for the given seo entity.
+     */
+    public function copyTo(AbbreviationSeo $abbreviationSeo): self
+    {
+        $copy = clone $this;
+        unset($copy->id);
+        $copy->abbreviationSeo = $abbreviationSeo;
+
+        return $copy;
+    }
+
     public function getSeo(): AbbreviationSeo
     {
         return $this->abbreviationSeo;
     }
-
 }

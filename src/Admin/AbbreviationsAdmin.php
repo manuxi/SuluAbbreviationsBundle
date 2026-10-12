@@ -20,19 +20,16 @@ class AbbreviationsAdmin extends Admin
 {
     public const NAV_ITEM = 'sulu_abbreviations.abbreviations';
 
-    public const LIST_VIEW = 'sulu_abbreviations.abbreviations.list';
-    public const ADD_FORM_VIEW = 'sulu_abbreviations.abbreviations.add_form';
-    public const ADD_FORM_DETAILS_VIEW = 'sulu_abbreviations.abbreviations.add_form.details';
-    public const EDIT_FORM_VIEW = 'sulu_abbreviations.abbreviations.edit_form';
+    public const LIST_VIEW              = 'sulu_abbreviations.abbreviations.list';
+    public const ADD_FORM_VIEW          = 'sulu_abbreviations.abbreviations.add_form';
+    public const ADD_FORM_DETAILS_VIEW  = 'sulu_abbreviations.abbreviations.add_form.details';
+    public const EDIT_FORM_VIEW         = 'sulu_abbreviations.abbreviations.edit_form';
     public const EDIT_FORM_DETAILS_VIEW = 'sulu_abbreviations.abbreviations.edit_form.details';
-    public const SECURITY_CONTEXT = 'sulu.modules.abbreviation';
 
     // seo,excerpt, etc
-    public const EDIT_FORM_VIEW_SEO = 'sulu_abbreviations.edit_form.seo';
-    public const EDIT_FORM_VIEW_EXCERPT = 'sulu_abbreviations.edit_form.excerpt';
+    public const EDIT_FORM_VIEW_SEO      = 'sulu_abbreviations.edit_form.seo';
+    public const EDIT_FORM_VIEW_EXCERPT  = 'sulu_abbreviations.edit_form.excerpt';
     public const EDIT_FORM_VIEW_SETTINGS = 'sulu_abbreviations.edit_form.settings';
-
-    private ?array $types = null;
 
     public function __construct(
         private readonly ViewBuilderFactoryInterface $viewBuilderFactory,
@@ -66,26 +63,35 @@ class AbbreviationsAdmin extends Admin
             return;
         }
 
-        $formToolbarActions = [];
-        $listToolbarActions = [];
-
         $locales = $this->webspaceManager->getAllLocales();
 
-        if ($this->securityChecker->hasPermission(Abbreviation::SECURITY_CONTEXT, PermissionTypes::ADD)) {
+        $listToolbarActions = [];
+        if ($this->hasPermission(PermissionTypes::ADD)) {
             $listToolbarActions[] = new ToolbarAction('sulu_admin.add');
         }
-
-        if ($this->securityChecker->hasPermission(Abbreviation::SECURITY_CONTEXT, PermissionTypes::EDIT)) {
-            $formToolbarActions[] = new ToolbarAction('sulu_admin.save');
-        }
-
-        if ($this->securityChecker->hasPermission(Abbreviation::SECURITY_CONTEXT, PermissionTypes::DELETE)) {
-            $formToolbarActions[] = new ToolbarAction('sulu_admin.delete');
+        if ($this->hasPermission(PermissionTypes::DELETE)) {
             $listToolbarActions[] = new ToolbarAction('sulu_admin.delete');
         }
-
-        if ($this->securityChecker->hasPermission(Abbreviation::SECURITY_CONTEXT, PermissionTypes::VIEW)) {
+        if ($this->hasPermission(PermissionTypes::VIEW)) {
             $listToolbarActions[] = new ToolbarAction('sulu_admin.export');
+        }
+
+        $saveToolbarActions = [new ToolbarAction('sulu_admin.save')];
+
+        $editToolbarActions = $saveToolbarActions;
+        if ($this->hasPermission(PermissionTypes::ADD)) {
+            $editToolbarActions[] = new ToolbarAction('sulu_admin.copy');
+        }
+        if ($this->hasPermission(PermissionTypes::DELETE)) {
+            $editToolbarActions[] = new ToolbarAction('sulu_admin.delete');
+        }
+        if ($this->hasPermission(PermissionTypes::LIVE)) {
+            $editToolbarActions[] = new TogglerToolbarAction(
+                'sulu_abbreviations.published',
+                'published',
+                'publish',
+                'unpublish'
+            );
         }
 
         if ($this->securityChecker->hasPermission(Abbreviation::SECURITY_CONTEXT, PermissionTypes::EDIT)) {
@@ -117,7 +123,7 @@ class AbbreviationsAdmin extends Admin
                 ->setFormKey(Abbreviation::FORM_KEY)
                 ->setTabTitle('sulu_admin.details')
                 ->setEditView(static::EDIT_FORM_VIEW)
-                ->addToolbarActions($formToolbarActions)
+                ->addToolbarActions($saveToolbarActions)
                 ->setParent(static::ADD_FORM_VIEW);
             $viewCollection->add($addDetailsFormView);
 
@@ -130,37 +136,17 @@ class AbbreviationsAdmin extends Admin
                 ->addLocales($locales);
             $viewCollection->add($editFormView);
 
-            // publish/unpublish toolbar actions
-            $formToolbarActions = [
-                new ToolbarAction('sulu_admin.save'),
-                new ToolbarAction('sulu_admin.delete'),
-                new TogglerToolbarAction(
-                    'sulu_abbreviations.published',
-                    'published',
-                    'publish',
-                    'unpublish'
-                ),
-            ];
-
             $editDetailsFormView = $this->viewBuilderFactory
                 ->createPreviewFormViewBuilder(static::EDIT_FORM_DETAILS_VIEW, '/details')
                 ->setPreviewCondition('id != null')
                 ->setResourceKey(Abbreviation::RESOURCE_KEY)
                 ->setFormKey(Abbreviation::FORM_KEY)
                 ->setTabTitle('sulu_admin.details')
-                ->addToolbarActions($formToolbarActions)
+                ->addToolbarActions($editToolbarActions)
                 ->setParent(static::EDIT_FORM_VIEW);
             $viewCollection->add($editDetailsFormView);
 
-            // seo,excerpt, etc
-            $formToolbarActionsWithoutType = [];
-            $previewCondition = 'nodeType == 1';
-
-            if ($this->securityChecker->hasPermission(Abbreviation::SECURITY_CONTEXT, PermissionTypes::ADD)) {
-                $listToolbarActions[] = new ToolbarAction('sulu_admin.add');
-            }
-
-            $formToolbarActionsWithoutType[] = new ToolbarAction('sulu_admin.save');
+            $previewCondition = 'id != null';
 
             $viewCollection->add(
                 $this->viewBuilderFactory
@@ -170,7 +156,7 @@ class AbbreviationsAdmin extends Admin
                     ->setFormKey('page_seo')
                     ->setTabTitle('sulu_page.seo')
 //                    ->setTabCondition('nodeType == 1 && shadowOn == false')
-                    ->addToolbarActions($formToolbarActionsWithoutType)
+                    ->addToolbarActions($saveToolbarActions)
 //                    ->addRouterAttributesToFormRequest($routerAttributesToFormRequest)
                     ->setPreviewCondition($previewCondition)
                     ->setTitleVisible(true)
@@ -185,7 +171,7 @@ class AbbreviationsAdmin extends Admin
                     ->setFormKey('page_excerpt')
                     ->setTabTitle('sulu_page.excerpt')
 //                    ->setTabCondition('(nodeType == 1 || nodeType == 4) && shadowOn == false')
-                    ->addToolbarActions($formToolbarActionsWithoutType)
+                    ->addToolbarActions($saveToolbarActions)
 //                    ->addRouterAttributesToFormRequest($routerAttributesToFormRequest)
 //                    ->addRouterAttributesToFormMetadata($routerAttributesToFormMetadata)
                     ->setPreviewCondition($previewCondition)
@@ -201,13 +187,18 @@ class AbbreviationsAdmin extends Admin
                     ->setResourceKey(Abbreviation::RESOURCE_KEY)
                     ->setFormKey('abbreviation_settings')
                     ->setTabTitle('sulu_page.settings')
-                    ->addToolbarActions($formToolbarActionsWithoutType)
+                    ->addToolbarActions($saveToolbarActions)
                     ->setPreviewCondition($previewCondition)
                     ->setTitleVisible(true)
                     ->setTabOrder(4096)
                     ->setParent(static::EDIT_FORM_VIEW)
             );
         }
+    }
+
+    private function hasPermission(string $permission): bool
+    {
+        return $this->securityChecker->hasPermission(Abbreviation::SECURITY_CONTEXT, $permission);
     }
 
     /**

@@ -49,6 +49,21 @@ class AbbreviationExcerpt implements ExcerptInterface, ExcerptTranslatableInterf
     }
 
     /**
+     * Returns a not yet persisted copy including all translations for the given abbreviation.
+     */
+    public function copyTo(Abbreviation $abbreviation): self
+    {
+        $copy = new self();
+        $copy->setAbbreviation($abbreviation);
+
+        foreach ($this->translations as $locale => $translation) {
+            $copy->translations->set($locale, $translation->copyTo($copy));
+        }
+
+        return $copy;
+    }
+
+    /**
      * @return AbbreviationExcerptTranslation[]
      */
     public function getTranslations(): array

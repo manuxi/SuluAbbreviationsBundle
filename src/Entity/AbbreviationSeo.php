@@ -49,6 +49,24 @@ class AbbreviationSeo implements SeoInterface, SeoTranslatableInterface
     }
 
     /**
+     * Returns a not yet persisted copy including all translations for the given abbreviation.
+     */
+    public function copyTo(Abbreviation $abbreviation): self
+    {
+        $copy = new self();
+        $copy->setAbbreviation($abbreviation);
+        $copy->setHideInSitemap($this->getHideInSitemap());
+        $copy->setNoFollow($this->getNoFollow());
+        $copy->setNoIndex($this->getNoIndex());
+
+        foreach ($this->translations as $locale => $translation) {
+            $copy->translations->set($locale, $translation->copyTo($copy));
+        }
+
+        return $copy;
+    }
+
+    /**
      * @return AbbreviationSeoTranslation[]
      */
     public function getTranslations(): array

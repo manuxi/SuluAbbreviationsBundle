@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace Manuxi\SuluAbbreviationsBundle\Repository;
 
-use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationSeo;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\OptimisticLockException;
-use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\ManagerRegistry;
+use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationSeo;
 
 /**
  * @method AbbreviationSeo|null find($id, $lockMode = null, $lockVersion = null)
@@ -16,11 +14,10 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method AbbreviationSeo[]    findAll()
  * @method AbbreviationSeo[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  *
- * @extends ServiceEntityRepository<Event>
+ * @extends ServiceEntityRepository<AbbreviationSeo>
  */
 class AbbreviationSeoRepository extends ServiceEntityRepository
 {
-
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, AbbreviationSeo::class);
@@ -64,5 +61,4 @@ class AbbreviationSeoRepository extends ServiceEntityRepository
 
         return $abbreviationSeo;
     }
-
 }

@@ -17,7 +17,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-
 /**
  * @RouteResource("abbreviations-settings")
  */
@@ -30,9 +29,9 @@ class SettingsController extends AbstractRestController implements ClassResource
         EntityManagerInterface $entityManager,
         ViewHandlerInterface $viewHandler,
         DomainEventCollectorInterface $domainEventCollector,
-        ?TokenStorageInterface $tokenStorage = null
+        ?TokenStorageInterface $tokenStorage = null,
     ) {
-        $this->entityManager = $entityManager;
+        $this->entityManager        = $entityManager;
         $this->domainEventCollector = $domainEventCollector;
 
         parent::__construct($viewHandler, $tokenStorage);
@@ -53,12 +52,10 @@ class SettingsController extends AbstractRestController implements ClassResource
             $this->entityManager->persist($entity);
         }
 
-        $this->domainEventCollector->collect(
-            new ModifiedEvent($entity, $request->request->all())
-        );
-
         $data = $request->toArray();
         $this->mapDataToEntity($data, $entity);
+
+        $this->domainEventCollector->collect(new ModifiedEvent($entity, $data));
         $this->entityManager->flush();
 
         return $this->handleView($this->view($this->getDataForEntity($entity)));
@@ -67,8 +64,8 @@ class SettingsController extends AbstractRestController implements ClassResource
     protected function getDataForEntity(AbbreviationsSettings $entity): array
     {
         return [
-            'toggleHeader' => $entity->getToggleHeader(),
-            'toggleHero' => $entity->getToggleHero(),
+            'toggleHeader'      => $entity->getToggleHeader(),
+            'toggleHero'        => $entity->getToggleHero(),
             'toggleBreadcrumbs' => $entity->getToggleBreadcrumbs(),
             'pageAbbreviations' => $entity->getPageAbbreviations(),
         ];
@@ -76,10 +73,10 @@ class SettingsController extends AbstractRestController implements ClassResource
 
     protected function mapDataToEntity(array $data, AbbreviationsSettings $entity): void
     {
-        $entity->setToggleHeader($data['toggleHeader']);
-        $entity->setToggleHero($data['toggleHero']);
-        $entity->setToggleBreadcrumbs($data['toggleBreadcrumbs']);
-        $entity->setPageAbbreviations($data['pageAbbreviations']);
+        $entity->setToggleHeader(isset($data['toggleHeader']) ? (bool) $data['toggleHeader'] : null);
+        $entity->setToggleHero(isset($data['toggleHero']) ? (bool) $data['toggleHero'] : null);
+        $entity->setToggleBreadcrumbs(isset($data['toggleBreadcrumbs']) ? (bool) $data['toggleBreadcrumbs'] : null);
+        $entity->setPageAbbreviations(isset($data['pageAbbreviations']) ? (string) $data['pageAbbreviations'] : null);
     }
 
     public function getSecurityContext(): string

@@ -30,7 +30,7 @@ class AbbreviationsController extends AbstractController
         WebspaceManagerInterface $webspaceManager,
         TranslatorInterface $translator,
         TemplateAttributeResolverInterface $templateAttributeResolver,
-        RouteRepositoryInterface $routeRepository
+        RouteRepositoryInterface $routeRepository,
     ) {
         parent::__construct($requestStack, $mediaManager);
 
@@ -42,11 +42,6 @@ class AbbreviationsController extends AbstractController
     }
 
     /**
-     * @param Abbreviation $abbreviation
-     * @param string $view
-     * @param bool $preview
-     * @param bool $partial
-     * @return Response
      * @throws \Exception
      */
     public function indexAction(Abbreviation $abbreviation, string $view = '@SuluAbbreviations/abbreviation', bool $preview = false, bool $partial = false): Response
@@ -55,11 +50,11 @@ class AbbreviationsController extends AbstractController
 
         $parameters = $this->templateAttributeResolver->resolve([
             'abbreviation'   => $abbreviation,
-            'content' => [
+            'content'        => [
                 'title' => $this->translator->trans('sulu_abbreviations.abbreviations'),
                 'name'  => $abbreviation->getName(),
             ],
-/*            'path'          => $abbreviation->getRoutePath(),*/
+            /*            'path'          => $abbreviation->getRoutePath(), */
             'extension'     => $this->extractExtension($abbreviation),
             'localizations' => $this->getLocalizationsArrayForEntity($abbreviation),
             'created'       => $abbreviation->getCreated(),
@@ -71,12 +66,12 @@ class AbbreviationsController extends AbstractController
     /**
      * With the help of this method the corresponding localisations for the
      * current abbreviations are found e.g. to be linked in the language switcher.
-     * @param Abbreviation $abbreviation
+     *
      * @return array<string, array>
      */
     protected function getLocalizationsArrayForEntity(Abbreviation $abbreviation): array
     {
-        $routes = $this->routeRepository->findAllByEntity(Abbreviation::class, (string)$abbreviation->getId());
+        $routes = $this->routeRepository->findAllByEntity(Abbreviation::class, (string) $abbreviation->getId());
 
         $localizations = [];
         foreach ($routes as $route) {
@@ -112,5 +107,4 @@ class AbbreviationsController extends AbstractController
             ]
         );
     }
-
 }

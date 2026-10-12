@@ -25,7 +25,7 @@ class AbbreviationsDataProvider extends BaseDataProvider
     {
         parent::__construct($repository, $serializer);
         $this->entityManager = $entityManager;
-        $this->requestStack = $requestStack;
+        $this->requestStack  = $requestStack;
     }
 
     public function getConfiguration(): ProviderConfigurationInterface
@@ -53,10 +53,10 @@ class AbbreviationsDataProvider extends BaseDataProvider
         $page = 1,
         $pageSize = null,
     ) {
-        $locale = $options['locale'];
-        $request = $this->requestStack->getCurrentRequest();
+        $locale          = $options['locale'];
+        $request         = $this->requestStack->getCurrentRequest();
         $options['page'] = $request->get('p');
-        $abbreviations = $this->entityManager->getRepository(Abbreviation::class)->findByFilters($filters, $page, $pageSize, $limit, $locale, $options);
+        $abbreviations   = $this->entityManager->getRepository(Abbreviation::class)->findByFilters($filters, $page, $pageSize, $limit, $locale, $options);
 
         return new DataProviderResult($abbreviations, $this->entityManager->getRepository(Abbreviation::class)->hasNextPage($filters, $page, $pageSize, $limit, $locale, $options));
     }
@@ -66,7 +66,7 @@ class AbbreviationsDataProvider extends BaseDataProvider
      */
     protected function decorateDataItems(array $data): array
     {
-        return \array_map(
+        return array_map(
             static function ($item) {
                 return new AbbreviationDataItem($item);
             },

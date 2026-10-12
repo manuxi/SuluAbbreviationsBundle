@@ -9,13 +9,14 @@ use Sulu\Bundle\ActivityBundle\Domain\Event\DomainEvent;
 
 abstract class AbstractEvent extends DomainEvent
 {
-    private AbbreviationsSettings $entity;
-    private array $payload = [];
-
-    public function __construct(AbbreviationsSettings $entity)
-    {
+    /**
+     * @param array<string, mixed> $payload
+     */
+    public function __construct(
+        private readonly AbbreviationsSettings $entity,
+        private readonly array $payload = [],
+    ) {
         parent::__construct();
-        $this->entity = $entity;
     }
 
     public function getEvent(): AbbreviationsSettings
@@ -23,6 +24,9 @@ abstract class AbstractEvent extends DomainEvent
         return $this->entity;
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function getEventPayload(): ?array
     {
         return $this->payload;
@@ -35,12 +39,12 @@ abstract class AbstractEvent extends DomainEvent
 
     public function getResourceId(): string
     {
-        return (string)$this->entity->getId();
+        return (string) $this->entity->getId();
     }
 
     public function getResourceTitle(): ?string
     {
-        return "Abbreviations Settings";
+        return 'Abbreviations Settings';
     }
 
     public function getResourceSecurityContext(): ?string

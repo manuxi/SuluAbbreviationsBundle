@@ -16,7 +16,7 @@ class Kernel extends SuluTestKernel
     public function registerBundles(): array
     {
         /** @var BundleInterface[] $bundles */
-        $bundles = parent::registerBundles();
+        $bundles   = parent::registerBundles();
         $bundles[] = new SuluAbbreviationsBundle();
 
         return $bundles;

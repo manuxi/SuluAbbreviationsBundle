@@ -8,10 +8,14 @@ use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationExcerpt;
 use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationSeo;
 use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationTranslation;
-use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
+use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
+use Sulu\Bundle\CategoryBundle\Entity\CategoryInterface;
 
-class AbbreviationTest extends SuluTestCase
+class AbbreviationTest extends TestCase
 {
+    use ProphecyTrait;
+
     private Abbreviation $entity;
     private string $testString = 'Lorem ipsum dolor sit amet, ...';
 
@@ -34,9 +38,9 @@ class AbbreviationTest extends SuluTestCase
     {
         $this->assertNull($this->entity->getPublishedState());
         $this->assertSame($this->entity, $this->entity->setPublished(true));
-        $this->assertEquals(1, $this->entity->getPublishedState());
+        $this->assertSame(1, $this->entity->getPublishedState());
         $this->assertSame($this->entity, $this->entity->setPublished(false));
-        $this->assertEquals(0, $this->entity->getPublishedState());
+        $this->assertSame(0, $this->entity->getPublishedState());
     }
 
     public function testName(): void
@@ -175,5 +179,59 @@ class AbbreviationTest extends SuluTestCase
         $this->assertArrayHasKey('en', $this->entity->getTranslations());
         $this->assertSame($this->entity->getDescription(), $this->testString);
         // No need to test more, it's s already done...
+    }
+
+    public function testCopy(): void
+    {
+        $category = $this->prophesize(CategoryInterface::class)->reveal();
+
+        $this->entity->setName('API')->setExplanation('Application Programming Interface')->setPublished(true);
+        $this->entity->setRoutePath('/abkuerzungen/api');
+        $this->entity->getSeo()->setTitle('SEO title');
+        $this->entity->getSeo()->setNoIndex(true);
+        $this->entity->getExcerpt()->setTitle('Excerpt title');
+        $this->entity->getExcerpt()->addCategory($category);
+
+        $this->entity->setLocale('en');
+        $this->entity->setName('API (en)')->setPublished(true);
+
+        $copy = $this->entity->copy();
+
+        $this->assertNotSame($this->entity, $copy);
+        $this->assertNull($copy->getId());
+        $this->assertSame('en', $copy->getLocale());
+        $this->assertSame(['de', 'en'], $copy->getAvailableLocales());
+
+        $this->assertSame('API (en)', $copy->getName());
+        $this->assertFalse($copy->isPublished());
+        $this->assertSame('', $copy->getRoutePath());
+
+        $copy->setLocale('de');
+        $this->assertSame('API', $copy->getName());
+        $this->assertSame('Application Programming Interface', $copy->getExplanation());
+        $this->assertFalse($copy->isPublished());
+        $this->assertSame('/abkuerzungen/api-copy', $copy->getRoutePath());
+        $this->assertNull($copy->getTranslations()['de']->getId());
+        $this->assertSame($copy, $copy->getTranslations()['de']->getAbbreviation());
+
+        $this->assertNotSame($this->entity->getSeo(), $copy->getSeo());
+        $this->assertSame($copy, $copy->getSeo()->getAbbreviation());
+        $this->assertSame('SEO title', $copy->getSeo()->getTitle());
+        $this->assertTrue($copy->getSeo()->getNoIndex());
+        $this->assertSame($copy->getSeo(), $copy->getSeo()->getTranslations()['de']->getSeo());
+
+        $this->assertNotSame($this->entity->getExcerpt(), $copy->getExcerpt());
+        $this->assertSame($copy, $copy->getExcerpt()->getAbbreviation());
+        $this->assertSame('Excerpt title', $copy->getExcerpt()->getTitle());
+        $this->assertSame($copy->getExcerpt(), $copy->getExcerpt()->getTranslations()['de']->getExcerpt());
+
+        $originalCategories = $this->entity->getExcerpt()->getTranslations()['de']->getCategories();
+        $copiedCategories   = $copy->getExcerpt()->getTranslations()['de']->getCategories();
+        $this->assertNotSame($originalCategories, $copiedCategories);
+        $this->assertSame([$category], $copiedCategories?->toArray());
+
+        $this->entity->setLocale('de');
+        $this->assertSame('/abkuerzungen/api', $this->entity->getRoutePath());
+        $this->assertTrue($this->entity->isPublished());
     }
 }

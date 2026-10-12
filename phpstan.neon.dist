@@ -1,0 +1,14 @@
+includes:
+    - phpstan-baseline.neon
+
+parameters:
+    level: 6
+    paths:
+        - src
+        - tests
+    tmpDir: var/cache/phpstan
+    ignoreErrors:
+        -
+            message: '#^Call to an undefined method Prophecy\\Prophecy\\ObjectProphecy#'
+            path: tests
+            reportUnmatched: false

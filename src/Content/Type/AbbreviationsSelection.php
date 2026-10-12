@@ -4,47 +4,54 @@ declare(strict_types=1);
 
 namespace Manuxi\SuluAbbreviationsBundle\Content\Type;
 
-use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use Doctrine\ORM\EntityManagerInterface;
+use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use Sulu\Component\Content\Compat\PropertyInterface;
 use Sulu\Component\Content\SimpleContentType;
 
 class AbbreviationsSelection extends SimpleContentType
 {
-    protected EntityManagerInterface $entityManager;
-
-    public function __construct(EntityManagerInterface $entityManager)
-    {
-        $this->entityManager = $entityManager;
-
+    public function __construct(
+        protected EntityManagerInterface $entityManager,
+    ) {
         parent::__construct('abbreviation_selection', []);
     }
 
     /**
-     * @param PropertyInterface $property
+     * Returns the published abbreviations of the current locale in the order of the selection.
+     *
      * @return Abbreviation[]
      */
     public function getContentData(PropertyInterface $property): array
     {
         $ids = $property->getValue();
 
-        if (empty($ids)) {
+        if (empty($ids) || !\is_array($ids)) {
             return [];
         }
 
-        $abbreviation = $this->entityManager->getRepository(Abbreviation::class)->findBy(['id' => $ids]);
+        $ids    = array_values(array_map('intval', $ids));
+        $locale = $property->getStructure()->getLanguageCode();
 
-        $idPositions = \array_flip($ids);
-        \usort($abbreviation, static function (Abbreviation $a, Abbreviation $b) use ($idPositions) {
-            return $idPositions[$a->getId()] - $idPositions[$b->getId()];
-        });
+        /** @var Abbreviation[] $abbreviations */
+        $abbreviations = $this->entityManager->getRepository(Abbreviation::class)->findBy(['id' => $ids]);
 
-        return $abbreviation;
+        $abbreviations = array_values(array_filter(
+            $abbreviations,
+            static fn (Abbreviation $abbreviation): bool => true === $abbreviation->setLocale($locale)->isPublished()
+        ));
+
+        $idPositions = array_flip($ids);
+        usort(
+            $abbreviations,
+            static fn (Abbreviation $a, Abbreviation $b): int => $idPositions[$a->getId()] <=> $idPositions[$b->getId()]
+        );
+
+        return $abbreviations;
     }
 
     /**
-     * @param PropertyInterface $property
-     * @return array
+     * @return array{ids: mixed}
      */
     public function getViewData(PropertyInterface $property): array
     {

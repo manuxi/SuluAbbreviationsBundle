@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Manuxi\SuluAbbreviationsBundle\Repository;
 
-use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationExcerptTranslation;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationExcerptTranslation;
 
 /**
  * @method AbbreviationExcerptTranslation|null find($id, $lockMode = null, $lockVersion = null)
@@ -14,7 +14,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method AbbreviationExcerptTranslation[]    findAll()
  * @method AbbreviationExcerptTranslation[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  *
- * @extends ServiceEntityRepository<AbbreviationTranslation>
+ * @extends ServiceEntityRepository<AbbreviationExcerptTranslation>
  */
 class AbbreviationExcerptTranslationRepository extends ServiceEntityRepository
 {

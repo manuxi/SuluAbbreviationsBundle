@@ -20,4 +20,6 @@ interface AbbreviationModelInterface
     public function publish(int $id, Request $request): Abbreviation;
 
     public function unpublish(int $id, Request $request): Abbreviation;
+
+    public function copy(int $id, Request $request): Abbreviation;
 }

@@ -50,7 +50,7 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
 
     public function cgetAction(Request $request): Response
     {
-        $locale = $request->query->get('locale');
+        $locale             = $request->query->get('locale');
         $listRepresentation = $this->doctrineListRepresentationFactory->createDoctrineListRepresentation(
             Abbreviation::RESOURCE_KEY,
             [],
@@ -75,6 +75,13 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
      */
     public function postAction(Request $request): Response
     {
+        // The copy toolbar action of the Sulu admin posts to the collection route
+        if ('copy' === $request->query->get('action')) {
+            $entity = $this->abbreviationModel->copy((int) $this->getRequestParameter($request, 'id', true), $request);
+
+            return $this->handleView($this->view($entity, 201));
+        }
+
         $entity = $this->abbreviationModel->create($request);
 
         return $this->handleView($this->view($entity, 201));
@@ -92,17 +99,19 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
         try {
             switch ($action) {
                 case 'publish':
+                    $this->checkLivePermission($request);
                     $entity = $this->abbreviationModel->publish($id, $request);
                     break;
                 case 'unpublish':
+                    $this->checkLivePermission($request);
                     $entity = $this->abbreviationModel->unpublish($id, $request);
                     break;
                 case 'copy':
                     $entity = $this->abbreviationModel->copy($id, $request);
                     break;
                 case 'copy-locale':
-                    $locale = $this->getRequestParameter($request, 'locale', true);
-                    $srcLocale = $this->getRequestParameter($request, 'src', false, $locale);
+                    $locale      = $this->getRequestParameter($request, 'locale', true);
+                    $srcLocale   = $this->getRequestParameter($request, 'src', false, $locale);
                     $destLocales = $this->getRequestParameter($request, 'dest', true);
                     $destLocales = explode(',', $destLocales);
 
@@ -116,7 +125,7 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
                     $entity = $this->abbreviationModel->copyLanguage($id, $request, $srcLocale, $destLocales);
                     break;
                 default:
-                    throw new BadRequestHttpException(sprintf('Unknown action "%s".', $action));
+                    throw new BadRequestHttpException(\sprintf('Unknown action "%s".', $action));
             }
         } catch (RestException $exc) {
             $view = $this->view($exc->toArray(), 400);
@@ -152,6 +161,14 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
         $this->abbreviationModel->delete($entity);
 
         return $this->handleView($this->view(null, 204));
+    }
+
+    private function checkLivePermission(Request $request): void
+    {
+        $this->securityChecker->checkPermission(
+            new SecurityCondition($this->getSecurityContext(), $request->query->get('locale')),
+            PermissionTypes::LIVE
+        );
     }
 
     public function getSecurityContext(): string

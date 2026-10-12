@@ -31,24 +31,23 @@ class DoctrineListRepresentationFactory
         FieldDescriptorFactoryInterface $fieldDescriptorFactory,
         WebspaceManagerInterface $webspaceManager,
         AbbreviationTranslationRepository $abbreviationTranslationRepository,
-        MediaManagerInterface $mediaManager
+        MediaManagerInterface $mediaManager,
     ) {
-        $this->restHelper = $restHelper;
-        $this->listRestHelper = $listRestHelper;
-        $this->listBuilderFactory = $listBuilderFactory;
-        $this->fieldDescriptorFactory = $fieldDescriptorFactory;
-        $this->webspaceManager = $webspaceManager;
+        $this->restHelper                        = $restHelper;
+        $this->listRestHelper                    = $listRestHelper;
+        $this->listBuilderFactory                = $listBuilderFactory;
+        $this->fieldDescriptorFactory            = $fieldDescriptorFactory;
+        $this->webspaceManager                   = $webspaceManager;
         $this->abbreviationTranslationRepository = $abbreviationTranslationRepository;
-        $this->mediaManager = $mediaManager;
+        $this->mediaManager                      = $mediaManager;
     }
 
     public function createDoctrineListRepresentation(
         string $resourceKey,
         array $filters = [],
         array $parameters = [],
-        array  $includedFields = []
-    ): PaginatedRepresentation
-    {
+        array $includedFields = [],
+    ): PaginatedRepresentation {
         /** @var DoctrineFieldDescriptor[] $fieldDescriptors */
         $fieldDescriptors = $this->fieldDescriptorFactory->getFieldDescriptors($resourceKey);
 
@@ -74,7 +73,7 @@ class DoctrineListRepresentationFactory
         if (null !== $requestedIds) {
             $idPositions = array_flip($requestedIds);
 
-            usort($list, function ($a, $b) use ($idPositions) {
+            usort($list, static function ($a, $b) use ($idPositions) {
                 return $idPositions[$a['id']] - $idPositions[$b['id']];
             });
         }
@@ -93,12 +92,10 @@ class DoctrineListRepresentationFactory
 
     /**
      * @param mixed[]
-     * @param string|null $locale
-     * @return array
      */
     private function addImagesToListElements(array $listeElements, ?string $locale): array
     {
-        $ids = array_filter(array_column($listeElements, 'image'));
+        $ids    = array_filter(array_column($listeElements, 'image'));
         $images = $this->mediaManager->getFormatUrls($ids, $locale);
         foreach ($listeElements as $key => $element) {
             if (\array_key_exists('image', $element)
@@ -112,25 +109,26 @@ class DoctrineListRepresentationFactory
         return $listeElements;
     }
 
-    private function addGhostLocaleToListElements(array $listeElements, ?string $currentLocale): array {
+    private function addGhostLocaleToListElements(array $listeElements, ?string $currentLocale): array
+    {
         $availableLocales = $locales = $this->webspaceManager->getAllLocales();
-        $localesCount = count($availableLocales);
-        if (($key = array_search($currentLocale, $locales)) !== false) {
+        $localesCount     = \count($availableLocales);
+        if (($key = array_search($currentLocale, $locales, true)) !== false) {
             unset($locales[$key]);
         }
 
         $ids = array_filter(array_column($listeElements, 'id'));
 
-        foreach($locales as $locale) {
+        foreach ($locales as $locale) {
             $missingLocales = $this->abbreviationTranslationRepository->findMissingLocaleByIds($ids, $locale, $localesCount);
-            foreach($missingLocales as $missingLocale) {
+            foreach ($missingLocales as $missingLocale) {
                 foreach ($listeElements as $key => $element) {
-                    if ($element['id'] === (int)$missingLocale['abbreviation'] && !array_key_exists('ghostLocale', $element)) {
+                    if ($element['id'] === (int) $missingLocale['abbreviation'] && !\array_key_exists('ghostLocale', $element)) {
                         $listeElements[$key]['ghostLocale'] = $locale;
-//                        $listeElements[$key]['localizationState'] = [
-//                            'state' => 'ghost',
-//                            'locale' => $locale
-//                        ];
+                        //                        $listeElements[$key]['localizationState'] = [
+                        //                            'state' => 'ghost',
+                        //                            'locale' => $locale
+                        //                        ];
                     }
                 }
             }

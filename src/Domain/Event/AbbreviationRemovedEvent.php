@@ -15,7 +15,7 @@ class AbbreviationRemovedEvent extends DomainEvent
     public function __construct(int $id, string $title)
     {
         parent::__construct();
-        $this->id = $id;
+        $this->id    = $id;
         $this->title = $title;
     }
 
@@ -31,7 +31,7 @@ class AbbreviationRemovedEvent extends DomainEvent
 
     public function getResourceId(): string
     {
-        return (string)$this->id;
+        return (string) $this->id;
     }
 
     public function getResourceTitle(): ?string

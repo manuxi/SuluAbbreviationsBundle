@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationRepository;
 use Manuxi\SuluSharedToolsBundle\Entity\Interfaces\AuditableTranslatableInterface;
 use Manuxi\SuluSharedToolsBundle\Entity\Interfaces\SearchableInterface;
 use Manuxi\SuluSharedToolsBundle\Entity\Traits\AuditableTranslatableTrait;
@@ -18,7 +19,6 @@ use Manuxi\SuluSharedToolsBundle\Entity\Traits\PublishedTranslatableTrait;
 use Manuxi\SuluSharedToolsBundle\Entity\Traits\RoutePathTranslatableTrait;
 use Manuxi\SuluSharedToolsBundle\Entity\Traits\ShowAuthorTranslatableTrait;
 use Manuxi\SuluSharedToolsBundle\Entity\Traits\ShowDateTranslatableTrait;
-use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationRepository;
 
 #[ORM\Entity(repositoryClass: AbbreviationRepository::class)]
 #[ORM\Table(name: 'app_abbreviation')]
@@ -32,9 +32,9 @@ class Abbreviation implements AuditableTranslatableInterface, SearchableInterfac
     use ShowAuthorTranslatableTrait;
     use ShowDateTranslatableTrait;
 
-    public const RESOURCE_KEY = 'abbreviations';
-    public const FORM_KEY = 'abbreviation_details';
-    public const LIST_KEY = 'abbreviations';
+    public const RESOURCE_KEY     = 'abbreviations';
+    public const FORM_KEY         = 'abbreviation_details';
+    public const LIST_KEY         = 'abbreviations';
     public const SECURITY_CONTEXT = 'sulu.abbreviations.abbreviations';
 
     #[ORM\Id]
@@ -185,17 +185,27 @@ class Abbreviation implements AuditableTranslatableInterface, SearchableInterfac
     #[Serializer\VirtualProperty(name: 'availableLocales')]
     public function getAvailableLocales(): array
     {
-        return \array_values($this->translations->getKeys());
+        return array_values($this->translations->getKeys());
     }
 
     /**
-     * @todo implement opject cloning/copy
-     *
-     * @return $this|null
+     * Returns a not yet persisted copy with all translations, seo and excerpt data.
+     * The copy is unpublished in all locales and its route paths get the suffix "-copy".
      */
-    public function copy(): ?static
+    public function copy(): self
     {
-        return null;
+        $copy = new self();
+
+        foreach ($this->translations as $locale => $translation) {
+            $copy->translations->set($locale, $translation->copyTo($copy));
+        }
+
+        $copy->abbreviationSeo     = $this->getSeo()->copyTo($copy);
+        $copy->abbreviationExcerpt = $this->getExcerpt()->copyTo($copy);
+        $copy->ext                 = [];
+        $copy->setLocale($this->locale);
+
+        return $copy;
     }
 
     public function copyToLocale(string $locale): self

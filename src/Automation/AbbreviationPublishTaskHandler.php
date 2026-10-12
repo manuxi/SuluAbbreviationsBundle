@@ -31,9 +31,9 @@ class AbbreviationPublishTaskHandler implements AutomationTaskHandlerInterface
         if (!\is_array($workload)) {
             return;
         }
-        $class = $workload['class'];
+        $class      = $workload['class'];
         $repository = $this->entityManager->getRepository($class);
-        $entity = $repository->findById((int) $workload['id'], $workload['locale']);
+        $entity     = $repository->findById((int) $workload['id'], $workload['locale']);
         if (null === $entity) {
             return;
         }
@@ -59,11 +59,11 @@ class AbbreviationPublishTaskHandler implements AutomationTaskHandlerInterface
 
     public function supports(string $entityClass): bool
     {
-        return Abbreviation::class === $entityClass || \is_subclass_of($entityClass, Abbreviation::class);
+        return Abbreviation::class === $entityClass || is_subclass_of($entityClass, Abbreviation::class);
     }
 
     public function getConfiguration(): TaskHandlerConfiguration
     {
-        return TaskHandlerConfiguration::create($this->translator->trans('sulu_abbreviation.publish', [], 'admin'));
+        return TaskHandlerConfiguration::create($this->translator->trans('sulu_abbreviations.publish', [], 'admin'));
     }
 }

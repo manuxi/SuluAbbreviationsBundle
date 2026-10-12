@@ -35,20 +35,14 @@
         </service>
 
         <!-- Repositories -->
-        <service id="sulu_abbreviations.repository.abbreviation" class="Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationRepository" public="true" lazy="true">
-            <argument type="service" id="doctrine"/>
-            <tag name="doctrine.repository_service"/>
-        </service>
-
-        <service id="sulu_abbreviations.repository.abbreviation_translation" class="Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationTranslationRepository" lazy="true">
-            <argument type="service" id="doctrine"/>
-        </service>
-
-        <!-- needed for massive search/automation bundle? -->
-        <!-- Otherwise: "Make sure the service exists and is tagged with 'doctrine.repository_service'" -->
         <service id="Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationRepository" public="true" lazy="true">
             <argument type="service" id="doctrine"/>
             <tag name="doctrine.repository_service"/>
+        </service>
+        <service id="sulu_abbreviations.repository.abbreviation" alias="Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationRepository" public="true"/>
+
+        <service id="sulu_abbreviations.repository.abbreviation_translation" class="Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationTranslationRepository" lazy="true">
+            <argument type="service" id="doctrine"/>
         </service>
 
         <service id="sulu_abbreviation.repository.abbreviation_seo" class="Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationSeoRepository" public="true" lazy="true">
@@ -68,19 +62,7 @@
         <service id="sulu_abbreviations.abbreviations_selection" class="Manuxi\SuluAbbreviationsBundle\Content\Type\AbbreviationsSelection">
             <argument type="service" id="doctrine.orm.default_entity_manager"/>
 
-            <tag name="sulu.content.type" alias="abbreviations_selection"/>
-        </service>
-
-        <service id="Manuxi\SuluAbbreviationsBundle\Content\AbbreviationsSelectionContentType">
-            <argument type="service" id="sulu_abbreviations.repository.abbreviation"/>
-
-            <tag name="sulu.content.type" alias="abbreviations_selection"/>
-        </service>
-
-        <service id="Manuxi\SuluAbbreviationsBundle\Routing\AbbreviationsRouteDefaultsProvider">
-            <argument type="service" id="sulu_abbreviations.repository.abbreviation"/>
-
-            <tag name="sulu_route.defaults_provider"/>
+            <tag name="sulu.content.type" alias="abbreviation_selection"/>
         </service>
 
         <service id="sulu_abbreviations.abbreviations_data_provider" class="Manuxi\SuluAbbreviationsBundle\Content\AbbreviationsDataProvider">
@@ -92,17 +74,16 @@
             <tag name="sulu.smart_content.data_provider" alias="abbreviations"/>
         </service>
 
-        <service id="sulu_abbreviations.webspace_selector"
-                 class="Manuxi\SuluAbbreviationsBundle\Admin\Helper\WebspaceSelector"
-                 public="true">
-            <argument type="service" id="sulu_core.webspace.webspace_manager"/>
-        </service>
-
         <!-- MODELS -->
-        <service id="sulu_abbreviations.model.abbreviation" class="Manuxi\SuluAbbreviationsBundle\Entity\Models\AbbreviationModel">
-            <argument type="service" id="sulu_abbreviations.repository.abbreviation"/>
+        <service id="sulu_abbreviations.data_mapper" class="Manuxi\SuluAbbreviationsBundle\Mapper\AbbreviationDataMapper">
             <argument type="service" id="sulu.repository.media"/>
             <argument type="service" id="sulu.repository.contact"/>
+        </service>
+        <service id="Manuxi\SuluAbbreviationsBundle\Mapper\AbbreviationDataMapper" alias="sulu_abbreviations.data_mapper"/>
+
+        <service id="sulu_abbreviations.model.abbreviation" class="Manuxi\SuluAbbreviationsBundle\Entity\Models\AbbreviationModel">
+            <argument type="service" id="sulu_abbreviations.repository.abbreviation"/>
+            <argument type="service" id="sulu_abbreviations.data_mapper"/>
             <argument type="service" id="sulu_route.manager.route_manager"/>
             <argument type="service" id="sulu.repository.route"/>
             <argument type="service" id="doctrine.orm.entity_manager" />
@@ -123,6 +104,7 @@
 
         <service id="sulu_abbreviations.object_provider" public="true" class="Manuxi\SuluAbbreviationsBundle\Preview\AbbreviationsObjectProvider">
             <argument type="service" id="sulu_abbreviations.repository.abbreviation"/>
+            <argument type="service" id="sulu_abbreviations.data_mapper"/>
             <tag name="sulu_preview.object_provider" provider-key="abbreviations"/>
         </service>
 
@@ -130,6 +112,7 @@
             <argument type="service" id="sulu_abbreviations.repository.abbreviation"/>
             <tag name="sulu_route.defaults_provider"/>
         </service>
+        <service id="Manuxi\SuluAbbreviationsBundle\Routing\AbbreviationsRouteDefaultsProvider" alias="sulu_abbreviations.routing_provider"/>
 
         <!--Link-->
         <service id="sulu_abbreviations.abbreviation_link_provider" class="Manuxi\SuluAbbreviationsBundle\Link\AbbreviationLinkProvider">
@@ -142,6 +125,7 @@
         <service id="sulu_abbreviations.sitemap_provider" public="true" class="Manuxi\SuluAbbreviationsBundle\Sitemap\AbbreviationsSitemapProvider">
             <argument type="service" id="sulu_abbreviations.repository.abbreviation"/>
             <argument type="service" id="sulu_core.webspace.webspace_manager"/>
+            <argument>%kernel.environment%</argument>
             <tag name="sulu.sitemap.provider"/>
         </service>
 
@@ -161,6 +145,7 @@
         <!--Twig-->
         <service id="sulu_abbreviations.default.twig_extension" class="Manuxi\SuluAbbreviationsBundle\Twig\AbbreviationsTwigExtension">
             <argument type="service" id="sulu_abbreviations.repository.abbreviation"/>
+            <argument type="service" id="request_stack"/>
             <tag name="twig.extension"/>
         </service>
         <service id="sulu_abbreviations.settings.twig_extension" class="Manuxi\SuluAbbreviationsBundle\Twig\AbbreviationsSettingsTwigExtension">
