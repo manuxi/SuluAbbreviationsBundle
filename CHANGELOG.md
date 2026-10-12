@@ -11,6 +11,7 @@ All notable changes to this project are documented in this file.
 - `.php-cs-fixer.php` enforces `declare(strict_types=1)` explicitly (newer `@Symfony:risky` rule sets would remove it); code base reformatted.
 
 ### Added
+- `Mapper\AbbreviationDataMapper` (service `sulu_abbreviations.data_mapper`): maps admin form data onto an abbreviation; used by `AbbreviationModel` and the preview. `AbbreviationModel` receives the mapper instead of the media and contact repositories.
 - GitHub Actions workflow `ci.yml`: PHP 8.2/8.3/8.4 matrix with `composer validate`, php-cs-fixer (dry run), PHPStan and PHPUnit.
 - PHPStan (level 6) with `phpstan.neon.dist` and `phpstan-baseline.neon`.
 - Composer scripts `phpstan`, `cs` and `cs-fix`.
@@ -27,6 +28,7 @@ All notable changes to this project are documented in this file.
 - Sitemap: `AbbreviationsSitemapProvider` could access an undefined array index for unknown hosts, used only one locale per host, ignored URL prefixes (e.g. `/de`) and reported the locale of the entity default instead of the queried locale. It now creates entries for every localization of the host (falling back to the default localization of the portal), builds URLs via `WebspaceManager::findUrlByResourceLocator()`, uses typed return values and computes `getMaxPage()` as an integer. `AbbreviationRepository::countForSitemap()` returns `int`. The service receives `%kernel.environment%` as third argument.
 - Settings tab of an abbreviation contained page-only fields (`shadowOn` schema, webspace settings) that were never mapped. The preview of the SEO, excerpt and settings tabs used the page condition `nodeType == 1` and never rendered; it now uses `id != null`.
 - The edit form always showed the delete action and the publish toggler because its toolbar was overwritten after the permission checks. Delete now requires the `DELETE` permission, the publish toggler the `LIVE` permission; the add form only offers save.
+- Preview crashed: `AbbreviationsObjectProvider::getSecurityContext()` accessed an undefined `documentInspector`, `setContext()` called the non-existing `setStructureType()` and `setValues()` was empty. The provider now returns `Abbreviation::SECURITY_CONTEXT`, maps the form data via `AbbreviationDataMapper` and initializes lazy translation collections before serializing.
 
 ### Removed
 - `Content\AbbreviationsSelectionContentType` (duplicate of `Content\Type\AbbreviationsSelection`). Templates must use the property type `abbreviation_selection`.

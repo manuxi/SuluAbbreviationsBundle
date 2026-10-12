@@ -75,10 +75,15 @@
         </service>
 
         <!-- MODELS -->
-        <service id="sulu_abbreviations.model.abbreviation" class="Manuxi\SuluAbbreviationsBundle\Entity\Models\AbbreviationModel">
-            <argument type="service" id="sulu_abbreviations.repository.abbreviation"/>
+        <service id="sulu_abbreviations.data_mapper" class="Manuxi\SuluAbbreviationsBundle\Mapper\AbbreviationDataMapper">
             <argument type="service" id="sulu.repository.media"/>
             <argument type="service" id="sulu.repository.contact"/>
+        </service>
+        <service id="Manuxi\SuluAbbreviationsBundle\Mapper\AbbreviationDataMapper" alias="sulu_abbreviations.data_mapper"/>
+
+        <service id="sulu_abbreviations.model.abbreviation" class="Manuxi\SuluAbbreviationsBundle\Entity\Models\AbbreviationModel">
+            <argument type="service" id="sulu_abbreviations.repository.abbreviation"/>
+            <argument type="service" id="sulu_abbreviations.data_mapper"/>
             <argument type="service" id="sulu_route.manager.route_manager"/>
             <argument type="service" id="sulu.repository.route"/>
             <argument type="service" id="doctrine.orm.entity_manager" />
@@ -99,6 +104,7 @@
 
         <service id="sulu_abbreviations.object_provider" public="true" class="Manuxi\SuluAbbreviationsBundle\Preview\AbbreviationsObjectProvider">
             <argument type="service" id="sulu_abbreviations.repository.abbreviation"/>
+            <argument type="service" id="sulu_abbreviations.data_mapper"/>
             <tag name="sulu_preview.object_provider" provider-key="abbreviations"/>
         </service>
 
