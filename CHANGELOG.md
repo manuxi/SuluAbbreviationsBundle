@@ -22,6 +22,7 @@ All notable changes to this project are documented in this file.
 - Settings view could not load or save: the admin resource was registered as `abbreviations-settings` while the views use `AbbreviationsSettings::RESOURCE_KEY` (`abbreviations_settings`). The resource is now registered as `abbreviations_settings` (detail route `sulu_abbreviations.get_abbreviations-settings`, URL `/admin/api/abbreviations-settings` unchanged).
 - The settings payload passed to `Settings\ModifiedEvent` was silently dropped (the constructor accepted only the entity). `Settings\AbstractEvent` now accepts and returns the payload; missing keys in the PUT body no longer raise warnings.
 - Translations moved from `src/Resources/config/translations/` to `src/Resources/translations/`, where Symfony discovers them automatically. The extension no longer prepends `framework.translator.paths` and no longer overrides the host application's `framework.default_locale` with `en`.
+- Automation task handlers translated the non-existing keys `sulu_abbreviation.publish` / `sulu_abbreviation.unpublish`; they now use `sulu_abbreviations.publish` / `sulu_abbreviations.unpublish`. A unit test checks that every key passed to `trans()` exists in the de/en translation files.
 
 ### Removed
 - `Content\AbbreviationsSelectionContentType` (duplicate of `Content\Type\AbbreviationsSelection`). Templates must use the property type `abbreviation_selection`.

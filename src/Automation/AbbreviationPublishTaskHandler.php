@@ -64,6 +64,6 @@ class AbbreviationPublishTaskHandler implements AutomationTaskHandlerInterface
 
     public function getConfiguration(): TaskHandlerConfiguration
     {
-        return TaskHandlerConfiguration::create($this->translator->trans('sulu_abbreviation.publish', [], 'admin'));
+        return TaskHandlerConfiguration::create($this->translator->trans('sulu_abbreviations.publish', [], 'admin'));
     }
 }
