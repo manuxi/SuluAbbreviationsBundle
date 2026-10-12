@@ -9,24 +9,6 @@ parameters:
 		-
 			message: '#^If condition is always true\.$#'
 			identifier: if.alwaysTrue
-			count: 2
-			path: src/Admin/AbbreviationsAdmin.php
-
-		-
-			message: '#^Property Manuxi\\SuluAbbreviationsBundle\\Admin\\AbbreviationsAdmin\:\:\$types \(array\|null\) is never assigned array so it can be removed from the property type\.$#'
-			identifier: property.unusedType
-			count: 1
-			path: src/Admin/AbbreviationsAdmin.php
-
-		-
-			message: '#^Property Manuxi\\SuluAbbreviationsBundle\\Admin\\AbbreviationsAdmin\:\:\$types is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: src/Admin/AbbreviationsAdmin.php
-
-		-
-			message: '#^Property Manuxi\\SuluAbbreviationsBundle\\Admin\\AbbreviationsAdmin\:\:\$types type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
 			count: 1
 			path: src/Admin/AbbreviationsAdmin.php
 
