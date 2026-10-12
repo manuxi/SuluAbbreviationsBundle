@@ -153,7 +153,7 @@ class AbbreviationsAdmin extends Admin
 
             // seo,excerpt, etc
             $formToolbarActionsWithoutType = [];
-            $previewCondition              = 'nodeType == 1';
+            $previewCondition              = 'id != null';
 
             if ($this->securityChecker->hasPermission(Abbreviation::SECURITY_CONTEXT, PermissionTypes::ADD)) {
                 $listToolbarActions[] = new ToolbarAction('sulu_admin.add');

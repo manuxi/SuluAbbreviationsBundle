@@ -74,12 +74,6 @@
             <tag name="sulu.smart_content.data_provider" alias="abbreviations"/>
         </service>
 
-        <service id="sulu_abbreviations.webspace_selector"
-                 class="Manuxi\SuluAbbreviationsBundle\Admin\Helper\WebspaceSelector"
-                 public="true">
-            <argument type="service" id="sulu_core.webspace.webspace_manager"/>
-        </service>
-
         <!-- MODELS -->
         <service id="sulu_abbreviations.model.abbreviation" class="Manuxi\SuluAbbreviationsBundle\Entity\Models\AbbreviationModel">
             <argument type="service" id="sulu_abbreviations.repository.abbreviation"/>

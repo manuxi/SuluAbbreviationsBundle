@@ -25,9 +25,11 @@ All notable changes to this project are documented in this file.
 - Automation task handlers translated the non-existing keys `sulu_abbreviation.publish` / `sulu_abbreviation.unpublish`; they now use `sulu_abbreviations.publish` / `sulu_abbreviations.unpublish`. A unit test checks that every key passed to `trans()` exists in the de/en translation files.
 - Twig: `sulu_get_abbreviations()` requested page 0 and defaulted to the locale `en`; it now requests page 1 and uses the locale of the current request when no locale is passed. `sulu_resolve_abbreviation()` also uses the request locale by default and returns `null` for abbreviations that are not published in that locale.
 - Sitemap: `AbbreviationsSitemapProvider` could access an undefined array index for unknown hosts, used only one locale per host, ignored URL prefixes (e.g. `/de`) and reported the locale of the entity default instead of the queried locale. It now creates entries for every localization of the host (falling back to the default localization of the portal), builds URLs via `WebspaceManager::findUrlByResourceLocator()`, uses typed return values and computes `getMaxPage()` as an integer. `AbbreviationRepository::countForSitemap()` returns `int`. The service receives `%kernel.environment%` as third argument.
+- Settings tab of an abbreviation contained page-only fields (`shadowOn` schema, webspace settings) that were never mapped. The preview of the SEO, excerpt and settings tabs used the page condition `nodeType == 1` and never rendered; it now uses `id != null`.
 
 ### Removed
 - `Content\AbbreviationsSelectionContentType` (duplicate of `Content\Type\AbbreviationsSelection`). Templates must use the property type `abbreviation_selection`.
+- `Admin\Helper\WebspaceSelector` (service `sulu_abbreviations.webspace_selector`) and the unused webspace/shadow translation keys.
 - Unused constant `AbbreviationsAdmin::SECURITY_CONTEXT` (`sulu.modules.abbreviation`); use `Abbreviation::SECURITY_CONTEXT`.
 - Workflows `php.yml` and `symfony.yml` (broken `.env.test` copy step and `composer.lock` cache key).
 - Dev dependencies `symfony/phpunit-bridge` and `phpspec/prophecy` (replaced by `phpspec/prophecy-phpunit`).
