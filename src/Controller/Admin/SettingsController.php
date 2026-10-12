@@ -52,12 +52,10 @@ class SettingsController extends AbstractRestController implements ClassResource
             $this->entityManager->persist($entity);
         }
 
-        $this->domainEventCollector->collect(
-            new ModifiedEvent($entity, $request->request->all())
-        );
-
         $data = $request->toArray();
         $this->mapDataToEntity($data, $entity);
+
+        $this->domainEventCollector->collect(new ModifiedEvent($entity, $data));
         $this->entityManager->flush();
 
         return $this->handleView($this->view($this->getDataForEntity($entity)));
@@ -75,10 +73,10 @@ class SettingsController extends AbstractRestController implements ClassResource
 
     protected function mapDataToEntity(array $data, AbbreviationsSettings $entity): void
     {
-        $entity->setToggleHeader($data['toggleHeader']);
-        $entity->setToggleHero($data['toggleHero']);
-        $entity->setToggleBreadcrumbs($data['toggleBreadcrumbs']);
-        $entity->setPageAbbreviations($data['pageAbbreviations']);
+        $entity->setToggleHeader(isset($data['toggleHeader']) ? (bool) $data['toggleHeader'] : null);
+        $entity->setToggleHero(isset($data['toggleHero']) ? (bool) $data['toggleHero'] : null);
+        $entity->setToggleBreadcrumbs(isset($data['toggleBreadcrumbs']) ? (bool) $data['toggleBreadcrumbs'] : null);
+        $entity->setPageAbbreviations(isset($data['pageAbbreviations']) ? (string) $data['pageAbbreviations'] : null);
     }
 
     public function getSecurityContext(): string

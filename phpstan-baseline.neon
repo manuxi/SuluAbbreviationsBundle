@@ -145,12 +145,6 @@ parameters:
 			path: src/Content/AbbreviationsDataProvider.php
 
 		-
-			message: '#^Class Manuxi\\SuluAbbreviationsBundle\\Domain\\Event\\Settings\\ModifiedEvent constructor invoked with 2 parameters, 1 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: src/Controller/Admin/SettingsController.php
-
-		-
 			message: '#^Method Manuxi\\SuluAbbreviationsBundle\\Controller\\Admin\\SettingsController\:\:getDataForEntity\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -197,12 +191,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Domain/Event/AbstractAbbreviationEvent.php
-
-		-
-			message: '#^Property Manuxi\\SuluAbbreviationsBundle\\Domain\\Event\\Settings\\AbstractEvent\:\:\$payload type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Domain/Event/Settings/AbstractEvent.php
 
 		-
 			message: '#^Method Manuxi\\SuluAbbreviationsBundle\\Entity\\Abbreviation\:\:addExt\(\) has parameter \$value with no type specified\.$#'
