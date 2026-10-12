@@ -289,12 +289,6 @@ parameters:
 			path: src/Entity/Models/AbbreviationSeoModel.php
 
 		-
-			message: '#^Parameter \#1 \$id of class Sulu\\Bundle\\MarkupBundle\\Markup\\Link\\LinkItem constructor expects string, int\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Link/AbbreviationLinkProvider.php
-
-		-
 			message: '#^Class Manuxi\\SuluAbbreviationsBundle\\Repository\\AbbreviationExcerptRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -587,18 +581,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Repository/AbbreviationTranslationRepository.php
-
-		-
-			message: '#^Parameter \#1 \$entityId of method Sulu\\Bundle\\RouteBundle\\Entity\\Route\:\:setEntityId\(\) expects string, int given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Trash/AbbreviationsTrashItemHandler.php
-
-		-
-			message: '#^Parameter \#1 \$history of method Sulu\\Bundle\\RouteBundle\\Entity\\Route\:\:setHistory\(\) expects bool, int given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Trash/AbbreviationsTrashItemHandler.php
 
 		-
 			message: '#^Property Manuxi\\SuluAbbreviationsBundle\\Tests\\Unit\\Entity\\AbbreviationTranslationTest\:\:\$abbreviation with generic class Prophecy\\Prophecy\\ObjectProphecy does not specify its types\: T$#'

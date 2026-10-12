@@ -32,6 +32,8 @@ All notable changes to this project are documented in this file.
 - Preview crashed: `AbbreviationsObjectProvider::getSecurityContext()` accessed an undefined `documentInspector`, `setContext()` called the non-existing `setStructureType()` and `setValues()` was empty. The provider now returns `Abbreviation::SECURITY_CONTEXT`, maps the form data via `AbbreviationDataMapper` and initializes lazy translation collections before serializing.
 - The `copy` action failed with a `TypeError` because `Abbreviation::copy()` returned `null`. `Abbreviation::copy()` now returns a new, not yet persisted abbreviation with copies of all translations, SEO and excerpt data (categories, tags and media are shared). The copy is unpublished in all locales and the route paths get the suffix `-copy`; `AbbreviationModel::copy()` creates the routes of all locales (conflicts are resolved by the route manager) and collects an `AbbreviationCreatedEvent`.
 - `POST /admin/api/abbreviations/{id}?action=publish|unpublish` only required the `ADD` permission (derived from the HTTP method). Both actions now require the `LIVE` permission for the requested locale.
+- Trash restore created the route with an integer entity id and an integer history flag (`Route::setEntityId()` expects a string, `setHistory()` a bool) and put the JSON-decoded `ext` arrays back into the entity instead of the SEO/excerpt objects.
+- `AbbreviationLinkProvider` passes the id and title as strings and the published state as bool to `LinkItem`.
 
 ### Removed
 - `Content\AbbreviationsSelectionContentType` (duplicate of `Content\Type\AbbreviationsSelection`). Templates must use the property type `abbreviation_selection`.

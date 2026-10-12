@@ -90,7 +90,6 @@ class AbbreviationsTrashItemHandler implements StoreTrashItemHandlerInterface, R
         $abbreviation->setExplanation($data['explanation']);
         $abbreviation->setDescription($data['description']);
         $abbreviation->setRoutePath($data['slug']);
-        $abbreviation->setExt($data['ext']);
         $abbreviation->setPublished($data['published']);
         $abbreviation->setPublishedAt($data['publishedAt'] ? new \DateTime($data['publishedAt']['date']) : null);
         $abbreviation->setShowAuthor($data['showAuthor']);
@@ -129,8 +128,8 @@ class AbbreviationsTrashItemHandler implements StoreTrashItemHandlerInterface, R
         $route->setPath($slug);
         $route->setLocale($locale);
         $route->setEntityClass($class);
-        $route->setEntityId($id);
-        $route->setHistory(0);
+        $route->setEntityId((string) $id);
+        $route->setHistory(false);
         $route->setCreated(new \DateTime());
         $route->setChanged(new \DateTime());
         $manager->persist($route);
