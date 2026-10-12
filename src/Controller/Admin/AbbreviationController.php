@@ -16,6 +16,7 @@ use Manuxi\SuluAbbreviationsBundle\Domain\Event\AbbreviationUnpublishedEvent;
 use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationDimensionContent;
 use Manuxi\SuluAbbreviationsBundle\Route\AbbreviationRouteRemover;
+use Manuxi\SuluAbbreviationsBundle\Translation\AbbreviationTranslationRemover;
 use Sulu\Bundle\ActivityBundle\Application\Collector\DomainEventCollectorInterface;
 use Sulu\Bundle\ContentBundle\Content\Application\ContentIndexer\ContentIndexerInterface;
 use Sulu\Bundle\ContentBundle\Content\Application\ContentManager\ContentManagerInterface;
@@ -57,6 +58,7 @@ class AbbreviationController extends AbstractRestController implements SecuredCo
         private readonly TrashManagerInterface $trashManager,
         private readonly SecurityCheckerInterface $securityChecker,
         private readonly AbbreviationRouteRemover $routeRemover,
+        private readonly AbbreviationTranslationRemover $translationRemover,
     ) {
         parent::__construct($viewHandler, $tokenStorage);
     }
@@ -235,12 +237,30 @@ class AbbreviationController extends AbstractRestController implements SecuredCo
     public function deleteAction(Request $request, string $id): Response
     {
         $abbreviation = $this->findAbbreviation($id);
-        $locale       = $request->query->get('locale');
-        $title        = $this->resolveTitle($abbreviation, \is_string($locale) ? $locale : null);
+        $locale       = $this->getLocale($request);
+
+        if ($request->query->getBoolean('deleteLocale')) {
+            if (null === $locale) {
+                throw new MissingParameterException(self::class, 'locale');
+            }
+
+            $this->securityChecker->checkPermission(
+                new SecurityCondition(Abbreviation::SECURITY_CONTEXT, $locale),
+                PermissionTypes::EDIT
+            );
+
+            if ($this->translationRemover->remove($abbreviation, $locale)) {
+                $this->entityManager->flush();
+
+                return new Response('', 204);
+            }
+        }
+
+        $title = $this->resolveTitle($abbreviation, $locale);
 
         $this->trashManager->store(Abbreviation::RESOURCE_KEY, $abbreviation);
 
-        $this->domainEventCollector->collect(new AbbreviationRemovedEvent($abbreviation->getId(), $title, \is_string($locale) ? $locale : null));
+        $this->domainEventCollector->collect(new AbbreviationRemovedEvent($abbreviation->getId(), $title, $locale));
 
         $this->routeRemover->remove($abbreviation);
         $this->entityManager->remove($abbreviation);

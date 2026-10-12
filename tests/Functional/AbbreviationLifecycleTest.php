@@ -8,6 +8,7 @@ use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationDimensionContent;
 use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationRepository;
 use Manuxi\SuluAbbreviationsBundle\Resolver\AbbreviationResolver;
+use Manuxi\SuluAbbreviationsBundle\Translation\AbbreviationTranslationRemover;
 use Sulu\Bundle\ContentBundle\Content\Application\ContentManager\ContentManagerInterface;
 use Sulu\Bundle\ContentBundle\Content\Domain\Model\DimensionContentInterface;
 use Sulu\Bundle\ContentBundle\Content\Domain\Model\WorkflowInterface;
@@ -104,6 +105,36 @@ class AbbreviationLifecycleTest extends AbbreviationKernelTestCase
         $resolved = $this->getResolver()->resolveMany($this->getRepository()->findPublishedIds('en'), 'en');
         $this->assertSame(['AJAX', 'REST', 'XML'], array_column($resolved, 'name'));
         $this->assertCount(2, $this->getRepository()->findPublishedIds('en', 2));
+    }
+
+    public function testDeletingOneTranslationKeepsTheOtherLocale(): void
+    {
+        $abbreviation = $this->createAbbreviation('HTML', 'HyperText Markup Language');
+        $this->publish($abbreviation, 'en');
+        $this->contentManager->persist($abbreviation, [
+            'template'    => Abbreviation::DEFAULT_TEMPLATE,
+            'name'        => 'HTML (de)',
+            'explanation' => 'Auszeichnungssprache',
+            'url'         => null,
+        ], ['locale' => 'de']);
+        $this->getEntityManager()->flush();
+        $this->publish($abbreviation, 'de');
+
+        $remover = $this->getService(AbbreviationTranslationRemover::class);
+        \assert($remover instanceof AbbreviationTranslationRemover);
+        $this->assertEqualsCanonicalizing(['en', 'de'], $remover->getAvailableLocales($abbreviation));
+
+        $this->assertTrue($remover->remove($abbreviation, 'de'));
+        $this->getEntityManager()->flush();
+        $this->getEntityManager()->clear();
+
+        $reloaded = $this->getRepository()->findById($abbreviation->getId());
+        $this->assertInstanceOf(Abbreviation::class, $reloaded);
+        $this->assertSame(['en'], $remover->getAvailableLocales($reloaded));
+        $this->assertNotNull($this->getResolver()->resolve($abbreviation->getId(), 'en'));
+        $this->assertNull($this->getResolver()->resolve($abbreviation->getId(), 'de'));
+        $this->assertSame([$abbreviation->getId()], $this->getRepository()->findPublishedIds('en'));
+        $this->assertSame([], $this->getRepository()->findPublishedIds('de'));
     }
 
     public function testRemoveCascadesToDimensionContents(): void

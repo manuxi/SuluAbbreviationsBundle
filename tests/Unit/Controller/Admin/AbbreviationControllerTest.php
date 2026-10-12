@@ -18,6 +18,7 @@ use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationDimensionContent;
 use Manuxi\SuluAbbreviationsBundle\Route\AbbreviationRouteRemover;
 use Manuxi\SuluAbbreviationsBundle\Tests\Unit\Support\ArrayViewHandler;
+use Manuxi\SuluAbbreviationsBundle\Translation\AbbreviationTranslationRemover;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -80,6 +81,9 @@ class AbbreviationControllerTest extends TestCase
     /** @var ObjectProphecy<AbbreviationRouteRemover> */
     private ObjectProphecy $routeRemover;
 
+    /** @var ObjectProphecy<AbbreviationTranslationRemover> */
+    private ObjectProphecy $translationRemover;
+
     private ArrayViewHandler $viewHandler;
 
     private AbbreviationController $controller;
@@ -97,6 +101,7 @@ class AbbreviationControllerTest extends TestCase
         $this->trashManager           = $this->prophesize(TrashManagerInterface::class);
         $this->securityChecker        = $this->prophesize(SecurityCheckerInterface::class);
         $this->routeRemover           = $this->prophesize(AbbreviationRouteRemover::class);
+        $this->translationRemover     = $this->prophesize(AbbreviationTranslationRemover::class);
         $this->viewHandler            = new ArrayViewHandler();
 
         $this->entityManager->getRepository(Abbreviation::class)->willReturn($this->repository->reveal());
@@ -130,7 +135,8 @@ class AbbreviationControllerTest extends TestCase
             $this->eventCollector->reveal(),
             $this->trashManager->reveal(),
             $this->securityChecker->reveal(),
-            $this->routeRemover->reveal()
+            $this->routeRemover->reveal(),
+            $this->translationRemover->reveal()
         );
     }
 
@@ -431,6 +437,64 @@ class AbbreviationControllerTest extends TestCase
         $this->eventCollector->collect(Argument::that(
             static fn ($event): bool => $event instanceof AbbreviationRemovedEvent && 'HTML' === $event->getResourceTitle()
         ))->shouldHaveBeenCalledOnce();
+    }
+
+    public function testDeleteLocaleOnlyRemovesTheTranslation(): void
+    {
+        $abbreviation = new Abbreviation();
+        $this->repository->find($abbreviation->getId())->willReturn($abbreviation);
+        $this->translationRemover->remove($abbreviation, 'de')->willReturn(true);
+
+        $response = $this->controller->deleteAction(new Request(['locale' => 'de', 'deleteLocale' => 'true']), $abbreviation->getId());
+
+        $this->assertSame(204, $response->getStatusCode());
+        $this->securityChecker
+            ->checkPermission(Argument::that(static fn (SecurityCondition $c): bool => 'de' === $c->getLocale()), PermissionTypes::EDIT)
+            ->shouldHaveBeenCalled();
+        $this->translationRemover->remove($abbreviation, 'de')->shouldHaveBeenCalledOnce();
+        $this->trashManager->store(Argument::cetera())->shouldNotHaveBeenCalled();
+        $this->entityManager->remove(Argument::any())->shouldNotHaveBeenCalled();
+        $this->entityManager->flush()->shouldHaveBeenCalled();
+    }
+
+    public function testDeleteLocaleOfTheLastLocaleDeletesTheAbbreviation(): void
+    {
+        $abbreviation = new Abbreviation();
+        $abbreviation->addDimensionContent($this->createContent($abbreviation, 'HTML'));
+        $this->repository->find($abbreviation->getId())->willReturn($abbreviation);
+        $this->translationRemover->remove($abbreviation, 'en')->willReturn(false);
+
+        $response = $this->controller->deleteAction(new Request(['locale' => 'en', 'deleteLocale' => '1']), $abbreviation->getId());
+
+        $this->assertSame(204, $response->getStatusCode());
+        $this->trashManager->store(Abbreviation::RESOURCE_KEY, $abbreviation)->shouldHaveBeenCalledOnce();
+        $this->entityManager->remove($abbreviation)->shouldHaveBeenCalledOnce();
+        $this->contentIndexer->deindex(Abbreviation::RESOURCE_KEY, $abbreviation->getId())->shouldHaveBeenCalledOnce();
+    }
+
+    public function testDeleteLocaleRequiresLocale(): void
+    {
+        $abbreviation = new Abbreviation();
+        $this->repository->find($abbreviation->getId())->willReturn($abbreviation);
+
+        $this->expectException(\Sulu\Component\Rest\Exception\MissingParameterException::class);
+
+        $this->controller->deleteAction(new Request(['deleteLocale' => 'true']), $abbreviation->getId());
+    }
+
+    public function testDeleteLocaleRequiresEditPermissionForTheLocale(): void
+    {
+        $abbreviation = new Abbreviation();
+        $this->repository->find($abbreviation->getId())->willReturn($abbreviation);
+        $this->securityChecker->checkPermission(Argument::any(), PermissionTypes::EDIT)->willThrow(new AccessDeniedException());
+
+        $this->expectException(AccessDeniedException::class);
+
+        try {
+            $this->controller->deleteAction(new Request(['locale' => 'de', 'deleteLocale' => 'true']), $abbreviation->getId());
+        } finally {
+            $this->translationRemover->remove(Argument::cetera())->shouldNotHaveBeenCalled();
+        }
     }
 
     public function testDeleteThrowsNotFound(): void

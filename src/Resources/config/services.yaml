@@ -42,6 +42,7 @@ services:
             - '@sulu_trash.trash_manager'
             - '@sulu_security.security_checker'
             - '@Manuxi\SuluAbbreviationsBundle\Route\AbbreviationRouteRemover'
+            - '@Manuxi\SuluAbbreviationsBundle\Translation\AbbreviationTranslationRemover'
         tags:
             - { name: controller.service_arguments }
             - { name: sulu.context, context: admin }
@@ -66,6 +67,13 @@ services:
         arguments:
             - '@sulu.repository.route'
             - '@doctrine.orm.entity_manager'
+
+    Manuxi\SuluAbbreviationsBundle\Translation\AbbreviationTranslationRemover:
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '@sulu_content.content_indexer'
+            - '@Manuxi\SuluAbbreviationsBundle\Route\AbbreviationRouteRemover'
+            - '@sulu_activity.domain_event_collector'
 
     Manuxi\SuluAbbreviationsBundle\Resolver\AbbreviationResolver:
         arguments:

@@ -30,6 +30,8 @@ All notable changes to this project are documented in this file.
 - Domain events `AbbreviationDraftRemovedEvent`, `AbbreviationTranslationRemovedEvent`, `AbbreviationVersionRestoredEvent`, `AbbreviationCopiedLanguageEvent` (now with the correct event type).
 - Configuration `sulu_abbreviations.versioning.max_versions` and `sulu_abbreviations.twig.auto_abbr`.
 - Twig filter `abbr` (only registered with `sulu_abbreviations.twig.auto_abbr: true`) wraps known abbreviations in `<abbr title="...">`.
+- Delete a single translation: `Translation\\AbbreviationTranslationRemover` removes draft and live content of one locale, its routes and search documents and fires `AbbreviationTranslationRemovedEvent`; `DELETE /admin/api/abbreviations/{id}?locale=xx&deleteLocale=true` (requires the `EDIT` permission for the locale). Deleting the last remaining locale deletes the whole abbreviation (stored in the trash).
+- Delete toolbar action is a dropdown with "delete" and "delete translation"; the edit dropdown contains "copy to locale" (only with more than one locale), "remove draft" and "unpublish".
 - Functional tests with an in-memory SQLite kernel (`tests/Functional`).
 
 ### Changed
