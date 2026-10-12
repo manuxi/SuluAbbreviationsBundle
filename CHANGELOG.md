@@ -16,6 +16,7 @@ All notable changes to this project are documented in this file.
 - GitHub Actions workflow `ci.yml`: PHP 8.2/8.3/8.4 matrix with `composer validate`, php-cs-fixer (dry run), PHPStan and PHPUnit.
 - PHPStan (level 6) with `phpstan.neon.dist` and `phpstan-baseline.neon`.
 - Composer scripts `phpstan`, `cs` and `cs-fix`.
+- `README.de.md` (German README); both READMEs document the selection field types, the Twig functions and the upgrade to 1.9.
 
 ### Fixed
 - `AbbreviationRepository` and `AbbreviationsRouteDefaultsProvider` were registered twice (the route defaults provider was added twice to the route defaults chain); each is now one service, `sulu_abbreviations.repository.abbreviation` and `AbbreviationsRouteDefaultsProvider` are aliases.

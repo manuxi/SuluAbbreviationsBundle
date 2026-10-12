@@ -1,9 +1,11 @@
 # SuluAbbreviationsBundle!
-![php workflow](https://github.com/manuxi/SuluAbbreviationsBundle/actions/workflows/php.yml/badge.svg)
-![symfony workflow](https://github.com/manuxi/SuluAbbreviationsBundle/actions/workflows/symfony.yml/badge.svg)
+![CI](https://github.com/manuxi/SuluAbbreviationsBundle/actions/workflows/ci.yml/badge.svg?branch=2.x)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/manuxi/SuluAbbreviationsBundle/LICENSE)
 ![GitHub Tag](https://img.shields.io/github/v/tag/manuxi/SuluAbbreviationsBundle)
-![Supports Sulu 2.6 or later](https://img.shields.io/badge/%20Sulu->=2.6-0088cc?color=00b2df)
+![Supports Sulu 2.6](https://img.shields.io/badge/%20Sulu-2.6-0088cc?color=00b2df)
+![PHP 8.2+](https://img.shields.io/badge/PHP-%3E%3D8.2-777bb4)
+
+[Deutsche Version](README.de.md)
 
 I made this bundle to have the possibility to manage abbreviations in my projects.
 
@@ -93,6 +95,17 @@ Use smart_content property type to show a list of abbreviations, e.g.:
     </params>
 </property>
 ```
+Use the field types `abbreviation_selection` (multiple) or `single_abbreviation_selection` (single) to select abbreviations in a template.
+Only abbreviations published in the current locale are returned, in the order of the selection:
+```xml
+<property name="abbreviations" type="abbreviation_selection">
+    <meta>
+        <title lang="en">Abbreviations</title>
+        <title lang="de">Abkürzungen</title>
+    </meta>
+</property>
+```
+
 Example of the corresponding twig template for the abbreviations list:
 ```html
 {% for abbreviation in abbreviations %}
@@ -107,10 +120,24 @@ Example of the corresponding twig template for the abbreviations list:
 {% endfor %}
 ```
 
+### Twig functions
+- `sulu_resolve_abbreviation(id, locale = null)`: returns the abbreviation if it is published in the given locale, otherwise `null`.
+- `sulu_get_abbreviations(limit = 100, locale = null)`: returns the published abbreviations of the given locale.
+
+Without a locale the locale of the current request is used.
+
 ## 🧶 Configuration
 This bundle contains settings for controlling the following tasks:
 - Settings for single view - Toggle for header, default hero snippet and breadcrumbs
 - Intermediate pages for breadcrumbs: this can be used to configure the intermediate pages for the breadcrumbs
+
+## ⬆️ Upgrade to 1.9
+- Requires PHP 8.2 and Sulu 2.6.
+- Templates must use the property type `abbreviation_selection` (the former backend alias `abbreviations_selection` was removed).
+- Translations moved to `src/Resources/translations/`. The bundle no longer sets `framework.default_locale` of your application.
+- Publishing and unpublishing require the `live` permission.
+
+See [CHANGELOG.md](CHANGELOG.md) for all changes.
 
 ## 👩‍🍳 Contributing
 For the sake of simplicity this extension was kept small.
