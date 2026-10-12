@@ -8,10 +8,13 @@ use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationExcerpt;
 use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationSeo;
 use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationTranslation;
-use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
+use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
-class AbbreviationTest extends SuluTestCase
+class AbbreviationTest extends TestCase
 {
+    use ProphecyTrait;
+
     private Abbreviation $entity;
     private string $testString = 'Lorem ipsum dolor sit amet, ...';
 
@@ -34,9 +37,9 @@ class AbbreviationTest extends SuluTestCase
     {
         $this->assertNull($this->entity->getPublishedState());
         $this->assertSame($this->entity, $this->entity->setPublished(true));
-        $this->assertEquals(1, $this->entity->getPublishedState());
+        $this->assertSame(1, $this->entity->getPublishedState());
         $this->assertSame($this->entity, $this->entity->setPublished(false));
-        $this->assertEquals(0, $this->entity->getPublishedState());
+        $this->assertSame(0, $this->entity->getPublishedState());
     }
 
     public function testName(): void

@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace Manuxi\SuluAbbreviationsBundle\Tests\Unit\Entity;
 
-use DateTime;
 use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationTranslation;
+use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
-use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 
-class AbbreviationTranslationTest extends SuluTestCase
+class AbbreviationTranslationTest extends TestCase
 {
+    use ProphecyTrait;
+
     private ObjectProphecy $abbreviation;
     private AbbreviationTranslation $translation;
-    private string $testString = "Lorem ipsum dolor sit amet, ...";
+    private string $testString = 'Lorem ipsum dolor sit amet, ...';
 
     public static function tearDownAfterClass(): void
     {
@@ -24,7 +26,7 @@ class AbbreviationTranslationTest extends SuluTestCase
     protected function setUp(): void
     {
         $this->abbreviation       = $this->prophesize(Abbreviation::class);
-        $this->translation = new AbbreviationTranslation($this->abbreviation->reveal(), 'de');
+        $this->translation        = new AbbreviationTranslation($this->abbreviation->reveal(), 'de');
     }
 
     public function testAbbreviation(): void
@@ -72,7 +74,7 @@ class AbbreviationTranslationTest extends SuluTestCase
         $this->assertNull($this->translation->getPublishedAt());
         $this->assertSame($this->translation, $this->translation->setPublished(true));
         $this->assertNotNull($this->translation->getPublishedAt());
-        $this->assertSame(DateTime::class, get_class($this->translation->getPublishedAt()));
+        $this->assertSame(\DateTime::class, \get_class($this->translation->getPublishedAt()));
         $this->assertSame($this->translation, $this->translation->setPublished(false));
         $this->assertNull($this->translation->getPublishedAt());
     }
@@ -84,5 +86,4 @@ class AbbreviationTranslationTest extends SuluTestCase
         $this->assertSame($this->translation, $this->translation->setRoutePath($testRoutePath));
         $this->assertSame($testRoutePath, $this->translation->getRoutePath());
     }
-
 }

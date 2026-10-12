@@ -4,23 +4,26 @@ declare(strict_types=1);
 
 namespace Manuxi\SuluAbbreviationsBundle\Tests\Unit\Content\Type;
 
-use Manuxi\SuluAbbreviationsBundle\Content\Type\AbbreviationsSelection;
-use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectRepository;
+use Manuxi\SuluAbbreviationsBundle\Content\Type\AbbreviationsSelection;
+use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Sulu\Component\Content\Compat\PropertyInterface;
 
 class AbbreviationSelectionTest extends TestCase
 {
+    use ProphecyTrait;
+
     private AbbreviationsSelection $abbreviationSelection;
     private ObjectProphecy $abbreviationRepository;
 
     protected function setUp(): void
     {
         $this->abbreviationRepository = $this->prophesize(ObjectRepository::class);
-        $entityManager         = $this->prophesize(EntityManagerInterface::class);
+        $entityManager                = $this->prophesize(EntityManagerInterface::class);
         $entityManager->getRepository(Abbreviation::class)->willReturn($this->abbreviationRepository->reveal());
 
         $this->abbreviationSelection = new AbbreviationsSelection($entityManager->reveal());
