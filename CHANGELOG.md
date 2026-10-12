@@ -2,7 +2,7 @@
 
 All notable changes to this project are documented in this file.
 
-## [Unreleased] - 1.9.0
+## [1.9.0] - 2026-10-12
 
 ### Changed
 - Require PHP `^8.2`, Sulu `^2.6` and Symfony `^6.4 | ^7.0`.
