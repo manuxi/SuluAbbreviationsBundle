@@ -11,6 +11,7 @@ All notable changes to this project are documented in this file.
 - `.php-cs-fixer.php` enforces `declare(strict_types=1)` explicitly (newer `@Symfony:risky` rule sets would remove it); code base reformatted.
 
 ### Added
+- Copy toolbar action (`sulu_admin.copy`, requires the `ADD` permission) in the edit form; `POST /admin/api/abbreviations?action=copy&id={id}` is handled by `AbbreviationsController::postAction()`.
 - `Mapper\AbbreviationDataMapper` (service `sulu_abbreviations.data_mapper`): maps admin form data onto an abbreviation; used by `AbbreviationModel` and the preview. `AbbreviationModel` receives the mapper instead of the media and contact repositories.
 - GitHub Actions workflow `ci.yml`: PHP 8.2/8.3/8.4 matrix with `composer validate`, php-cs-fixer (dry run), PHPStan and PHPUnit.
 - PHPStan (level 6) with `phpstan.neon.dist` and `phpstan-baseline.neon`.
@@ -29,6 +30,7 @@ All notable changes to this project are documented in this file.
 - Settings tab of an abbreviation contained page-only fields (`shadowOn` schema, webspace settings) that were never mapped. The preview of the SEO, excerpt and settings tabs used the page condition `nodeType == 1` and never rendered; it now uses `id != null`.
 - The edit form always showed the delete action and the publish toggler because its toolbar was overwritten after the permission checks. Delete now requires the `DELETE` permission, the publish toggler the `LIVE` permission; the add form only offers save.
 - Preview crashed: `AbbreviationsObjectProvider::getSecurityContext()` accessed an undefined `documentInspector`, `setContext()` called the non-existing `setStructureType()` and `setValues()` was empty. The provider now returns `Abbreviation::SECURITY_CONTEXT`, maps the form data via `AbbreviationDataMapper` and initializes lazy translation collections before serializing.
+- The `copy` action failed with a `TypeError` because `Abbreviation::copy()` returned `null`. `Abbreviation::copy()` now returns a new, not yet persisted abbreviation with copies of all translations, SEO and excerpt data (categories, tags and media are shared). The copy is unpublished in all locales and the route paths get the suffix `-copy`; `AbbreviationModel::copy()` creates the routes of all locales (conflicts are resolved by the route manager) and collects an `AbbreviationCreatedEvent`.
 
 ### Removed
 - `Content\AbbreviationsSelectionContentType` (duplicate of `Content\Type\AbbreviationsSelection`). Templates must use the property type `abbreviation_selection`.

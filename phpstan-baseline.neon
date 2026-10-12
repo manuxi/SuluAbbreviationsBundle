@@ -271,12 +271,6 @@ parameters:
 			path: src/Entity/Models/AbbreviationExcerptModel.php
 
 		-
-			message: '#^Method Manuxi\\SuluAbbreviationsBundle\\Entity\\Abbreviation\:\:copy\(\) invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: src/Entity/Models/AbbreviationModel.php
-
-		-
 			message: '#^Method Manuxi\\SuluAbbreviationsBundle\\Entity\\Models\\AbbreviationModel\:\:copyLanguage\(\) has parameter \$destLocales with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1

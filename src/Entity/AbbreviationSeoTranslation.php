@@ -25,6 +25,18 @@ class AbbreviationSeoTranslation implements SeoTranslationInterface
         $this->setLocale($locale);
     }
 
+    /**
+     * Returns a not yet persisted copy for the given seo entity.
+     */
+    public function copyTo(AbbreviationSeo $abbreviationSeo): self
+    {
+        $copy = clone $this;
+        unset($copy->id);
+        $copy->abbreviationSeo = $abbreviationSeo;
+
+        return $copy;
+    }
+
     public function getSeo(): AbbreviationSeo
     {
         return $this->abbreviationSeo;

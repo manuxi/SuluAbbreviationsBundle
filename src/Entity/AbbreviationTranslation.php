@@ -60,6 +60,29 @@ class AbbreviationTranslation implements AuditableInterface
         return $this->id;
     }
 
+    /**
+     * Returns an unpublished, not yet persisted copy for the given abbreviation. The route path gets the suffix "-copy".
+     */
+    public function copyTo(Abbreviation $abbreviation): self
+    {
+        $copy               = clone $this;
+        $copy->id           = null;
+        $copy->abbreviation = $abbreviation;
+        // Reset timestamps so the timestampable subscriber sets them on persist
+        $copy->created      = null; // @phpstan-ignore assign.propertyType
+        $copy->changed      = null; // @phpstan-ignore assign.propertyType
+        $copy->creator      = null;
+        $copy->changer      = null;
+        $copy->setPublished(false);
+        $copy->setPublishedAt(null);
+
+        if ('' !== $this->getRoutePath()) {
+            $copy->setRoutePath($this->getRoutePath() . '-copy');
+        }
+
+        return $copy;
+    }
+
     public function getAbbreviation(): Abbreviation
     {
         return $this->abbreviation;

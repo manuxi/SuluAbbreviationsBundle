@@ -75,6 +75,13 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
      */
     public function postAction(Request $request): Response
     {
+        // The copy toolbar action of the Sulu admin posts to the collection route
+        if ('copy' === $request->query->get('action')) {
+            $entity = $this->abbreviationModel->copy((int) $this->getRequestParameter($request, 'id', true), $request);
+
+            return $this->handleView($this->view($entity, 201));
+        }
+
         $entity = $this->abbreviationModel->create($request);
 
         return $this->handleView($this->view($entity, 201));

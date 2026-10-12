@@ -149,17 +149,36 @@ class AbbreviationModel implements AbbreviationModelInterface
         return $entity;
     }
 
+    /**
+     * Creates an unpublished copy of the abbreviation including all locales and creates its routes.
+     *
+     * @throws EntityNotFoundException
+     */
     public function copy(int $id, Request $request): Abbreviation
     {
-        $locale = $this->getLocaleFromRequest($request);
-
         $entity = $this->findById($id);
-        $entity->setLocale($locale);
+        $copy   = $this->abbreviationRepository->save($entity->copy());
 
-        $copy = $this->abbreviationRepository->create($locale);
+        foreach ($copy->getAvailableLocales() as $locale) {
+            $copy->setLocale($locale);
+            if ('' === $copy->getRoutePath()) {
+                continue;
+            }
 
-        $copy = $entity->copy($copy);
-        $copy = $this->abbreviationRepository->save($copy);
+            $route = $this->routeManager->createOrUpdateByAttributes(
+                Abbreviation::class,
+                (string) $copy->getId(),
+                $locale,
+                $copy->getRoutePath()
+            );
+            $copy->setRoutePath($route->getPath());
+        }
+
+        $copy->setLocale((string) ($this->getLocaleFromRequest($request) ?? $entity->getLocale()));
+
+        $this->domainEventCollector->collect(new AbbreviationCreatedEvent($copy, ['copiedFrom' => $id]));
+        $this->entityManager->flush();
+
         $this->dispatcher->dispatch(new SearchPersistedEvent($copy));
 
         return $copy;

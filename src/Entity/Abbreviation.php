@@ -189,13 +189,23 @@ class Abbreviation implements AuditableTranslatableInterface, SearchableInterfac
     }
 
     /**
-     * @todo implement opject cloning/copy
-     *
-     * @return $this|null
+     * Returns a not yet persisted copy with all translations, seo and excerpt data.
+     * The copy is unpublished in all locales and its route paths get the suffix "-copy".
      */
-    public function copy(): ?static
+    public function copy(): self
     {
-        return null;
+        $copy = new self();
+
+        foreach ($this->translations as $locale => $translation) {
+            $copy->translations->set($locale, $translation->copyTo($copy));
+        }
+
+        $copy->abbreviationSeo     = $this->getSeo()->copyTo($copy);
+        $copy->abbreviationExcerpt = $this->getExcerpt()->copyTo($copy);
+        $copy->ext                 = [];
+        $copy->setLocale($this->locale);
+
+        return $copy;
     }
 
     public function copyToLocale(string $locale): self

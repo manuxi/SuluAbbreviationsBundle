@@ -79,6 +79,9 @@ class AbbreviationsAdmin extends Admin
         $saveToolbarActions = [new ToolbarAction('sulu_admin.save')];
 
         $editToolbarActions = $saveToolbarActions;
+        if ($this->hasPermission(PermissionTypes::ADD)) {
+            $editToolbarActions[] = new ToolbarAction('sulu_admin.copy');
+        }
         if ($this->hasPermission(PermissionTypes::DELETE)) {
             $editToolbarActions[] = new ToolbarAction('sulu_admin.delete');
         }

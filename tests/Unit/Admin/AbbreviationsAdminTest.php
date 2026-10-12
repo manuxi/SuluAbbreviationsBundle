@@ -86,7 +86,7 @@ class AbbreviationsAdminTest extends TestCase
         ]);
 
         $this->assertSame(
-            ['sulu_admin.save', 'sulu_admin.delete', 'sulu_admin.toggler'],
+            ['sulu_admin.save', 'sulu_admin.copy', 'sulu_admin.delete', 'sulu_admin.toggler'],
             $this->getToolbarActionTypes($viewCollection, AbbreviationsAdmin::EDIT_FORM_DETAILS_VIEW)
         );
         $this->assertSame(
