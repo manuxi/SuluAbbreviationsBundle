@@ -6,6 +6,7 @@ namespace Manuxi\SuluAbbreviationsBundle\DependencyInjection;
 
 use Manuxi\SuluAbbreviationsBundle\Admin\AbbreviationsAdmin;
 use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
+use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationsSettings;
 use Sulu\Bundle\PersistenceBundle\DependencyInjection\PersistenceExtensionTrait;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -117,7 +118,7 @@ class SuluAbbreviationsExtension extends Extension implements PrependExtensionIn
                                 'detail' => 'sulu_abbreviations.get_abbreviation',
                             ],
                         ],
-                        'abbreviations-settings' => [
+                        AbbreviationsSettings::RESOURCE_KEY => [
                             'routes' => [
                                 'detail' => 'sulu_abbreviations.get_abbreviations-settings',
                             ],

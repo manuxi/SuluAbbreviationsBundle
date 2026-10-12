@@ -19,6 +19,7 @@ All notable changes to this project are documented in this file.
 - `AbbreviationRepository` and `AbbreviationsRouteDefaultsProvider` were registered twice (the route defaults provider was added twice to the route defaults chain); each is now one service, `sulu_abbreviations.repository.abbreviation` and `AbbreviationsRouteDefaultsProvider` are aliases.
 - Selection content types: the backend registered `abbreviations_selection` twice while the admin field types are `abbreviation_selection` / `single_abbreviation_selection`. The content type aliases now match the field types. `abbreviation_selection` returns only abbreviations published in the current locale, keeps the selection order and sets the locale; `single_abbreviation_selection` sets the locale and returns `null` for unpublished entries.
 - Wrong translation key `sulu_abbreviations.abbreviations_selection_label` in the selection field type options.
+- Settings view could not load or save: the admin resource was registered as `abbreviations-settings` while the views use `AbbreviationsSettings::RESOURCE_KEY` (`abbreviations_settings`). The resource is now registered as `abbreviations_settings` (detail route `sulu_abbreviations.get_abbreviations-settings`, URL `/admin/api/abbreviations-settings` unchanged).
 
 ### Removed
 - `Content\AbbreviationsSelectionContentType` (duplicate of `Content\Type\AbbreviationsSelection`). Templates must use the property type `abbreviation_selection`.
