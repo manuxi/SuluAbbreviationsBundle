@@ -15,6 +15,7 @@ use Manuxi\SuluAbbreviationsBundle\Domain\Event\AbbreviationRemovedEvent;
 use Manuxi\SuluAbbreviationsBundle\Domain\Event\AbbreviationUnpublishedEvent;
 use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationDimensionContent;
+use Manuxi\SuluAbbreviationsBundle\Reference\AbbreviationReferenceUpdater;
 use Manuxi\SuluAbbreviationsBundle\Route\AbbreviationRouteRemover;
 use Manuxi\SuluAbbreviationsBundle\Translation\AbbreviationTranslationRemover;
 use Sulu\Bundle\ActivityBundle\Application\Collector\DomainEventCollectorInterface;
@@ -59,6 +60,7 @@ class AbbreviationController extends AbstractRestController implements SecuredCo
         private readonly SecurityCheckerInterface $securityChecker,
         private readonly AbbreviationRouteRemover $routeRemover,
         private readonly AbbreviationTranslationRemover $translationRemover,
+        private readonly AbbreviationReferenceUpdater $referenceUpdater,
     ) {
         parent::__construct($viewHandler, $tokenStorage);
     }
@@ -111,6 +113,7 @@ class AbbreviationController extends AbstractRestController implements SecuredCo
 
         $this->entityManager->persist($abbreviation);
         $this->entityManager->flush();
+        $this->updateReferences($dimensionContent);
 
         $this->domainEventCollector->collect(new AbbreviationCreatedEvent(
             $abbreviation->getId(),
@@ -216,6 +219,7 @@ class AbbreviationController extends AbstractRestController implements SecuredCo
             );
         }
 
+        $this->updateReferences($dimensionContent);
         $this->domainEventCollector->collect(new AbbreviationModifiedEvent(
             $abbreviation->getId(),
             $this->getTitle($dimensionContent),
@@ -263,6 +267,7 @@ class AbbreviationController extends AbstractRestController implements SecuredCo
         $this->domainEventCollector->collect(new AbbreviationRemovedEvent($abbreviation->getId(), $title, $locale));
 
         $this->routeRemover->remove($abbreviation);
+        $this->referenceUpdater->remove($abbreviation);
         $this->entityManager->remove($abbreviation);
         $this->entityManager->flush();
 
@@ -363,6 +368,7 @@ class AbbreviationController extends AbstractRestController implements SecuredCo
             );
 
             $this->contentIndexer->indexDimensionContent($copied);
+            $this->updateReferences($copied);
             $this->domainEventCollector->collect(new AbbreviationCopiedLanguageEvent(
                 $abbreviation->getId(),
                 $this->getTitle($copied),
@@ -374,6 +380,16 @@ class AbbreviationController extends AbstractRestController implements SecuredCo
         $this->entityManager->flush();
 
         return $this->contentManager->resolve($abbreviation, ['locale' => \is_string($locale) ? $locale : $source]);
+    }
+
+    /**
+     * @param DimensionContentInterface<Abbreviation> $dimensionContent
+     */
+    private function updateReferences(DimensionContentInterface $dimensionContent): void
+    {
+        if ($dimensionContent instanceof AbbreviationDimensionContent) {
+            $this->referenceUpdater->update($dimensionContent);
+        }
     }
 
     private function findAbbreviation(string $id): Abbreviation

@@ -11,6 +11,7 @@ use Manuxi\SuluAbbreviationsBundle\Domain\Event\AbbreviationVersionRestoredEvent
 use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationDimensionContent;
 use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationVersion;
+use Manuxi\SuluAbbreviationsBundle\Reference\AbbreviationReferenceUpdater;
 use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationVersionRepository;
 use Manuxi\SuluAbbreviationsBundle\Tests\Unit\Support\ArrayViewHandler;
 use PHPUnit\Framework\TestCase;
@@ -57,6 +58,9 @@ class AbbreviationVersionControllerTest extends TestCase
     /** @var ObjectProphecy<SecurityCheckerInterface> */
     private ObjectProphecy $securityChecker;
 
+    /** @var ObjectProphecy<AbbreviationReferenceUpdater> */
+    private ObjectProphecy $referenceUpdater;
+
     private ArrayViewHandler $viewHandler;
 
     private AbbreviationVersionController $controller;
@@ -72,6 +76,9 @@ class AbbreviationVersionControllerTest extends TestCase
         $this->entityManager     = $this->prophesize(EntityManagerInterface::class);
         $this->eventCollector    = $this->prophesize(DomainEventCollectorInterface::class);
         $this->securityChecker   = $this->prophesize(SecurityCheckerInterface::class);
+        $this->referenceUpdater  = $this->prophesize(AbbreviationReferenceUpdater::class);
+        $this->referenceUpdater->update(Argument::cetera())->will(static function (): void {
+        });
         $this->viewHandler       = new ArrayViewHandler();
         $this->abbreviation      = new Abbreviation();
 
@@ -97,7 +104,8 @@ class AbbreviationVersionControllerTest extends TestCase
             $this->contentIndexer->reveal(),
             $this->entityManager->reveal(),
             $this->eventCollector->reveal(),
-            $this->securityChecker->reveal()
+            $this->securityChecker->reveal(),
+            $this->referenceUpdater->reveal()
         );
     }
 
@@ -179,6 +187,7 @@ class AbbreviationVersionControllerTest extends TestCase
             static fn ($event): bool => $event instanceof AbbreviationVersionRestoredEvent && ['version' => 123] === $event->getEventPayload()
         ))->shouldHaveBeenCalledOnce();
         $this->contentIndexer->indexDimensionContent($draft)->shouldHaveBeenCalledOnce();
+        $this->referenceUpdater->update($draft)->shouldHaveBeenCalledOnce();
     }
 
     public function testRestoreOfUnpublishedContentKeepsTheDraft(): void

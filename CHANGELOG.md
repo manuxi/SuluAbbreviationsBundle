@@ -34,6 +34,7 @@ All notable changes to this project are documented in this file.
 - Delete toolbar action is a dropdown with "delete" and "delete translation"; the edit dropdown contains "copy to locale" (only with more than one locale), "remove draft" and "unpublish".
 - Versioning: `Versioning\\VersionRecorder` stores a snapshot of the draft (normalized content) for every publish (admin, automation) in `abbr_abbreviation_versions` and keeps the newest `sulu_abbreviations.versioning.max_versions` versions per abbreviation and locale (default 20, `0` disables versioning).
 - Versions tab in the insights tab with the `restore_version` list item action; `GET /admin/api/abbreviations/{id}/versions?locale=xx` and `POST /admin/api/abbreviations/{id}/versions/{version}?action=restore&locale=xx` (restores into the draft, requires the `EDIT` permission, fires `AbbreviationVersionRestoredEvent`).
+- References of the media, contacts, categories, tags and other resources used by an abbreviation (template properties implementing `ReferenceContentTypeInterface`, excerpt image/icon/categories/tags, author): `Reference\\AbbreviationReferenceUpdater` stores draft references in the `admin` and live references in the `website` context, `Reference\\AbbreviationReferenceSubscriber` keeps them in sync with publish, unpublish and remove draft (also for the automation), `Reference\\AbbreviationReferenceRefresher` is used by `bin/console sulu:reference:refresh abbreviations`.
 - Functional tests with an in-memory SQLite kernel (`tests/Functional`).
 
 ### Changed

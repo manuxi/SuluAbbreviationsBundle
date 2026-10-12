@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Manuxi\SuluAbbreviationsBundle\Domain\Event\AbbreviationTranslationRemovedEvent;
 use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationDimensionContent;
+use Manuxi\SuluAbbreviationsBundle\Reference\AbbreviationReferenceUpdater;
 use Manuxi\SuluAbbreviationsBundle\Route\AbbreviationRouteRemover;
 use Manuxi\SuluAbbreviationsBundle\Translation\AbbreviationTranslationRemover;
 use PHPUnit\Framework\TestCase;
@@ -34,14 +35,20 @@ class AbbreviationTranslationRemoverTest extends TestCase
     /** @var ObjectProphecy<DomainEventCollectorInterface> */
     private ObjectProphecy $eventCollector;
 
+    /** @var ObjectProphecy<AbbreviationReferenceUpdater> */
+    private ObjectProphecy $referenceUpdater;
+
     private AbbreviationTranslationRemover $remover;
 
     protected function setUp(): void
     {
-        $this->entityManager  = $this->prophesize(EntityManagerInterface::class);
-        $this->contentIndexer = $this->prophesize(ContentIndexerInterface::class);
-        $this->routeRemover   = $this->prophesize(AbbreviationRouteRemover::class);
-        $this->eventCollector = $this->prophesize(DomainEventCollectorInterface::class);
+        $this->entityManager    = $this->prophesize(EntityManagerInterface::class);
+        $this->contentIndexer   = $this->prophesize(ContentIndexerInterface::class);
+        $this->routeRemover     = $this->prophesize(AbbreviationRouteRemover::class);
+        $this->eventCollector   = $this->prophesize(DomainEventCollectorInterface::class);
+        $this->referenceUpdater = $this->prophesize(AbbreviationReferenceUpdater::class);
+        $this->referenceUpdater->remove(Argument::cetera())->will(static function (): void {
+        });
 
         $this->entityManager->remove(Argument::any())->will(static function (): void {
         });
@@ -56,7 +63,8 @@ class AbbreviationTranslationRemoverTest extends TestCase
             $this->entityManager->reveal(),
             $this->contentIndexer->reveal(),
             $this->routeRemover->reveal(),
-            $this->eventCollector->reveal()
+            $this->eventCollector->reveal(),
+            $this->referenceUpdater->reveal()
         );
     }
 
@@ -136,6 +144,7 @@ class AbbreviationTranslationRemoverTest extends TestCase
         $this->remover->remove($abbreviation, 'de');
 
         $this->routeRemover->remove($abbreviation, 'de')->shouldHaveBeenCalledOnce();
+        $this->referenceUpdater->remove($abbreviation, 'de')->shouldHaveBeenCalledOnce();
         $this->contentIndexer->deindex(Abbreviation::RESOURCE_KEY, $abbreviation->getId(), ['locale' => 'de'])->shouldHaveBeenCalledOnce();
         $this->eventCollector->collect(Argument::that(
             static fn ($event): bool => $event instanceof AbbreviationTranslationRemovedEvent

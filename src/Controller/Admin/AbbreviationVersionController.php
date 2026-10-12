@@ -10,6 +10,7 @@ use Manuxi\SuluAbbreviationsBundle\Domain\Event\AbbreviationVersionRestoredEvent
 use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationDimensionContent;
 use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationVersion;
+use Manuxi\SuluAbbreviationsBundle\Reference\AbbreviationReferenceUpdater;
 use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationVersionRepository;
 use Sulu\Bundle\ActivityBundle\Application\Collector\DomainEventCollectorInterface;
 use Sulu\Bundle\ContactBundle\Entity\Contact;
@@ -61,6 +62,7 @@ class AbbreviationVersionController extends AbstractRestController implements Se
         private readonly EntityManagerInterface $entityManager,
         private readonly DomainEventCollectorInterface $domainEventCollector,
         private readonly SecurityCheckerInterface $securityChecker,
+        private readonly AbbreviationReferenceUpdater $referenceUpdater,
     ) {
         parent::__construct($viewHandler, $tokenStorage);
     }
@@ -137,6 +139,8 @@ class AbbreviationVersionController extends AbstractRestController implements Se
                 WorkflowInterface::WORKFLOW_TRANSITION_CREATE_DRAFT
             );
         }
+
+        $this->referenceUpdater->update($dimensionContent);
 
         $this->domainEventCollector->collect(new AbbreviationVersionRestoredEvent(
             $abbreviation->getId(),

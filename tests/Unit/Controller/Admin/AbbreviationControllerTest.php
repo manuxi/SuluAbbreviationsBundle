@@ -16,6 +16,7 @@ use Manuxi\SuluAbbreviationsBundle\Domain\Event\AbbreviationRemovedEvent;
 use Manuxi\SuluAbbreviationsBundle\Domain\Event\AbbreviationUnpublishedEvent;
 use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationDimensionContent;
+use Manuxi\SuluAbbreviationsBundle\Reference\AbbreviationReferenceUpdater;
 use Manuxi\SuluAbbreviationsBundle\Route\AbbreviationRouteRemover;
 use Manuxi\SuluAbbreviationsBundle\Tests\Unit\Support\ArrayViewHandler;
 use Manuxi\SuluAbbreviationsBundle\Translation\AbbreviationTranslationRemover;
@@ -84,6 +85,9 @@ class AbbreviationControllerTest extends TestCase
     /** @var ObjectProphecy<AbbreviationTranslationRemover> */
     private ObjectProphecy $translationRemover;
 
+    /** @var ObjectProphecy<AbbreviationReferenceUpdater> */
+    private ObjectProphecy $referenceUpdater;
+
     private ArrayViewHandler $viewHandler;
 
     private AbbreviationController $controller;
@@ -102,6 +106,11 @@ class AbbreviationControllerTest extends TestCase
         $this->securityChecker        = $this->prophesize(SecurityCheckerInterface::class);
         $this->routeRemover           = $this->prophesize(AbbreviationRouteRemover::class);
         $this->translationRemover     = $this->prophesize(AbbreviationTranslationRemover::class);
+        $this->referenceUpdater       = $this->prophesize(AbbreviationReferenceUpdater::class);
+        $this->referenceUpdater->update(Argument::cetera())->will(static function (): void {
+        });
+        $this->referenceUpdater->remove(Argument::cetera())->will(static function (): void {
+        });
         $this->viewHandler            = new ArrayViewHandler();
 
         $this->entityManager->getRepository(Abbreviation::class)->willReturn($this->repository->reveal());
@@ -136,7 +145,8 @@ class AbbreviationControllerTest extends TestCase
             $this->trashManager->reveal(),
             $this->securityChecker->reveal(),
             $this->routeRemover->reveal(),
-            $this->translationRemover->reveal()
+            $this->translationRemover->reveal(),
+            $this->referenceUpdater->reveal()
         );
     }
 

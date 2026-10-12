@@ -7,6 +7,7 @@ namespace Manuxi\SuluAbbreviationsBundle\Translation;
 use Doctrine\ORM\EntityManagerInterface;
 use Manuxi\SuluAbbreviationsBundle\Domain\Event\AbbreviationTranslationRemovedEvent;
 use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
+use Manuxi\SuluAbbreviationsBundle\Reference\AbbreviationReferenceUpdater;
 use Manuxi\SuluAbbreviationsBundle\Route\AbbreviationRouteRemover;
 use Sulu\Bundle\ActivityBundle\Application\Collector\DomainEventCollectorInterface;
 use Sulu\Bundle\ContentBundle\Content\Application\ContentIndexer\ContentIndexerInterface;
@@ -19,6 +20,7 @@ class AbbreviationTranslationRemover
         private readonly ContentIndexerInterface $contentIndexer,
         private readonly AbbreviationRouteRemover $routeRemover,
         private readonly DomainEventCollectorInterface $domainEventCollector,
+        private readonly AbbreviationReferenceUpdater $referenceUpdater,
     ) {
     }
 
@@ -58,6 +60,7 @@ class AbbreviationTranslationRemover
         }
 
         $this->routeRemover->remove($abbreviation, $locale);
+        $this->referenceUpdater->remove($abbreviation, $locale);
         $this->contentIndexer->deindex(Abbreviation::RESOURCE_KEY, $abbreviation->getId(), ['locale' => $locale]);
         $this->domainEventCollector->collect(new AbbreviationTranslationRemovedEvent($abbreviation->getId(), $title, $locale));
 
