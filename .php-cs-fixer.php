@@ -5,6 +5,7 @@ $finder
         __DIR__ . '/src',
         __DIR__ . '/tests',
     ])
+    ->exclude('App/var')
     ->name('*.php')
     ->ignoreDotFiles(true)
     ->ignoreVCS(true);

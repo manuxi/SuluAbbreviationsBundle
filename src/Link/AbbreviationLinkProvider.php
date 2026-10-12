@@ -4,57 +4,40 @@ declare(strict_types=1);
 
 namespace Manuxi\SuluAbbreviationsBundle\Link;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
-use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationRepository;
+use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationDimensionContent;
+use Sulu\Bundle\ContentBundle\Content\Application\ContentManager\ContentManagerInterface;
+use Sulu\Bundle\ContentBundle\Content\Infrastructure\Sulu\Link\ContentLinkProvider;
 use Sulu\Bundle\MarkupBundle\Markup\Link\LinkConfiguration;
 use Sulu\Bundle\MarkupBundle\Markup\Link\LinkConfigurationBuilder;
-use Sulu\Bundle\MarkupBundle\Markup\Link\LinkItem;
-use Sulu\Bundle\MarkupBundle\Markup\Link\LinkProviderInterface;
+use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class AbbreviationLinkProvider implements LinkProviderInterface
+/**
+ * @extends ContentLinkProvider<AbbreviationDimensionContent, Abbreviation>
+ */
+class AbbreviationLinkProvider extends ContentLinkProvider
 {
-    private AbbreviationRepository $abbreviationRepository;
-    private TranslatorInterface $translator;
-
-    public function __construct(AbbreviationRepository $abbreviationRepository, TranslatorInterface $translator)
-    {
-        $this->abbreviationRepository = $abbreviationRepository;
-        $this->translator             = $translator;
+    public function __construct(
+        ContentManagerInterface $contentManager,
+        StructureMetadataFactoryInterface $structureMetadataFactory,
+        EntityManagerInterface $entityManager,
+        private readonly TranslatorInterface $translator,
+    ) {
+        parent::__construct($contentManager, $structureMetadataFactory, $entityManager, Abbreviation::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getConfiguration(): LinkConfiguration
     {
         return LinkConfigurationBuilder::create()
             ->setTitle($this->translator->trans('sulu_abbreviations.abbreviation', [], 'admin'))
-            ->setResourceKey(Abbreviation::RESOURCE_KEY) // the resourceKey of the entity that should be loaded
+            ->setResourceKey(Abbreviation::RESOURCE_KEY)
             ->setListAdapter('table')
-            ->setDisplayProperties(['title'])
-            ->setOverlayTitle($this->translator->trans('sulu_abbreviations.abbreviation', [], 'admin'))
-            ->setEmptyText($this->translator->trans('sulu_abbreviations.empty_abbreviationlist', [], 'admin'))
+            ->setDisplayProperties(['name'])
+            ->setOverlayTitle($this->translator->trans('sulu_abbreviations.select_abbreviation', [], 'admin'))
+            ->setEmptyText($this->translator->trans('sulu_abbreviations.no_abbreviation_selected', [], 'admin'))
             ->setIcon('su-tag-pen')
             ->getLinkConfiguration();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function preload(array $hrefs, $locale, $published = true): array
-    {
-        if (0 === \count($hrefs)) {
-            return [];
-        }
-
-        $result   = [];
-        $elements = $this->abbreviationRepository->findBy(['id' => $hrefs]); // load items by id
-        foreach ($elements as $element) {
-            $element->setLocale($locale);
-            $result[] = new LinkItem((string) $element->getId(), (string) $element->getName(), $element->getRoutePath(), true === $element->isPublished());
-        }
-
-        return $result;
     }
 }

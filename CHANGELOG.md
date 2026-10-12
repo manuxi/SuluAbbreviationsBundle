@@ -2,6 +2,53 @@
 
 All notable changes to this project are documented in this file.
 
+## [Unreleased] - 2.0.0
+
+### Breaking changes
+- The content is now stored with `sulu/content-bundle` (`^0.8.3`): draft/live dimension contents instead of the translation entities. Existing data has to be migrated, see the upgrade guide.
+- Abbreviation ids are UUIDs (string) instead of integers. Page content, text editor links and bookmarks referencing the old integer ids have to be migrated.
+- Tables: `abbr_abbreviations`, `abbr_abbreviation_dimension_contents`, `abbr_abbreviation_versions`; `app_abbreviation_settings` is unchanged.
+- Removed `manuxi/sulu-shared-tools-bundle` and `phpcr/phpcr-migrations-bundle`; `sulu/automation-bundle` moved to `suggest`.
+- Removed the entities `AbbreviationTranslation`, `AbbreviationSeo*`, `AbbreviationExcerpt*`, the `Entity\Models` and `Entity\Interfaces` namespaces, the old repositories, `Common\DoctrineListRepresentationFactory`, `Mapper\AbbreviationDataMapper`, `Routing\AbbreviationsRouteDefaultsProvider`, `Preview\AbbreviationsObjectProvider`, the own task handlers and the own website controller (rendering is template based now).
+- The `sulu_abbreviations.objects` bundle configuration was removed.
+- The link provider alias is `abbreviations` (was `abbreviation`); the selection content types return normalized live content arrays instead of entities.
+- The `copy` toolbar action was replaced by `copy_locale` (copy the content into another locale).
+- The page template of the website is selected by the structure template `abbreviation_default` and rendered with `@SuluAbbreviations/abbreviation.html.twig`; the variable `content` replaces `abbreviation`.
+
+### Added
+- Draft/live separation with the content workflow (publish, unpublish, remove draft) for every locale.
+- Structure template `abbreviation_default` (`name`, `url`, `explanation`, `description`, `image`, `link`) shipped in `src/Resources/config/templates/abbreviations/`.
+- `Entity\Abbreviation` (UUID), `Entity\AbbreviationDimensionContent` (template, route, SEO, excerpt, author and workflow data), `Entity\AbbreviationVersion`; Doctrine XML mapping in `src/Resources/config/doctrine/`.
+- `Controller\Admin\AbbreviationController` with `#[Route]` attributes (list, get, create, update, delete, publish, unpublish, remove-draft, copy-locale).
+- Teaser provider `Teaser\AbbreviationTeaserProvider` (`sulu.teaser.provider` alias `abbreviations`).
+- Link provider based on `ContentLinkProvider`, sitemap provider, smart content data provider, preview object provider, search metadata and reindex provider based on the content bundle services.
+- Automation tab in the admin (schedule publish/unpublish, requires `sulu/automation-bundle`).
+- Insights tab with activity log and references list.
+- `Resolver\AbbreviationResolver` returns normalized live content and registers the abbreviation in the `abbreviations` reference store.
+- Selection content types implement `ReferenceContentTypeInterface`, so pages show up in the references list of an abbreviation.
+- `Route\AbbreviationRouteRemover` removes the routes of a deleted abbreviation (needed because the content bundle route remover is a Doctrine event subscriber, which Symfony 7.4 does not register anymore).
+- Domain events `AbbreviationDraftRemovedEvent`, `AbbreviationTranslationRemovedEvent`, `AbbreviationVersionRestoredEvent`, `AbbreviationCopiedLanguageEvent` (now with the correct event type).
+- Configuration `sulu_abbreviations.versioning.max_versions` and `sulu_abbreviations.twig.auto_abbr`.
+- Twig filter `abbr` (only registered with `sulu_abbreviations.twig.auto_abbr: true`) wraps known abbreviations in `<abbr title="...">`.
+- Delete a single translation: `Translation\\AbbreviationTranslationRemover` removes draft and live content of one locale, its routes and search documents and fires `AbbreviationTranslationRemovedEvent`; `DELETE /admin/api/abbreviations/{id}?locale=xx&deleteLocale=true` (requires the `EDIT` permission for the locale). Deleting the last remaining locale deletes the whole abbreviation (stored in the trash).
+- Delete toolbar action is a dropdown with "delete" and "delete translation"; the edit dropdown contains "copy to locale" (only with more than one locale), "remove draft" and "unpublish".
+- Versioning: `Versioning\\VersionRecorder` stores a snapshot of the draft (normalized content) for every publish (admin, automation) in `abbr_abbreviation_versions` and keeps the newest `sulu_abbreviations.versioning.max_versions` versions per abbreviation and locale (default 20, `0` disables versioning).
+- Versions tab in the insights tab with the `restore_version` list item action; `GET /admin/api/abbreviations/{id}/versions?locale=xx` and `POST /admin/api/abbreviations/{id}/versions/{version}?action=restore&locale=xx` (restores into the draft, requires the `EDIT` permission, fires `AbbreviationVersionRestoredEvent`).
+- References of the media, contacts, categories, tags and other resources used by an abbreviation (template properties implementing `ReferenceContentTypeInterface`, excerpt image/icon/categories/tags, author): `Reference\\AbbreviationReferenceUpdater` stores draft references in the `admin` and live references in the `website` context, `Reference\\AbbreviationReferenceSubscriber` keeps them in sync with publish, unpublish and remove draft (also for the automation), `Reference\\AbbreviationReferenceRefresher` is used by `bin/console sulu:reference:refresh abbreviations`.
+- HTTP cache invalidation: `EventSubscriber\\AbbreviationCacheInvalidationSubscriber` purges the cached pages containing an abbreviation (reference alias `abbreviations`), the excerpt tags (`tag`) and categories (`category`) and the pages displaying lists of abbreviations when an abbreviation is published (admin and automation, executed after the flush), unpublished, removed, restored or loses a translation. The cache manager is optional (works without `sulu/http-cache-bundle`).
+- Responses are tagged with the abbreviations they contain: the resolver and the smart content data provider (`Content\\AbbreviationsDataProvider`) add the abbreviation ids to the `abbreviations` reference store, the Twig function `sulu_get_abbreviations()` and the data provider additionally mark the response as list of abbreviations.
+- Data migration from 1.x: `bin/console sulu:abbreviations:migrate-to-content [--dry-run]` (`Migration\\LegacyDataMigrator`) creates the abbreviations (new UUID, the old id is stored in `abbr_abbreviations.legacy_id`), the draft and live content per locale (name, explanation, description, image, link, route path, author, SEO, excerpt incl. tags, categories, image and icon), moves the routes to the new id and removes the routes of unpublished translations. Idempotent, the legacy tables are only read.
+- `bin/console sulu:abbreviations:migrate-page-references [--dry-run]` (`Migration\\PageReferenceMigrator`) rewrites the integer ids of `abbreviation_selection` / `single_abbreviation_selection` properties (also inside blocks) and `<sulu-link provider="abbreviation">` links / link properties in the draft and live workspace to the new UUIDs and the provider `abbreviations`.
+- Documentation in English and German in `docs/` (publishing, translations, versions, references, teaser, http cache, smart content, selection field types, twig, settings, upgrade 1.x to 2.0), `UPGRADE.md`, a Doctrine migration template (`docs/templates/doctrine-migration.php.dist`) and rewritten READMEs.
+- Teaser: the image of the abbreviation is used when no excerpt image is set.
+- Functional tests with an in-memory SQLite kernel and PHPCR (`tests/Functional`, test webspace and page template in `tests/App/config`).
+
+### Changed
+- `sulu_resolve_abbreviation()` and `sulu_get_abbreviations()` return normalized live content arrays.
+- The settings REST route is `sulu_abbreviations.get_abbreviations_settings` and defined with `#[Route]` (path `/admin/api/abbreviations-settings`).
+- Services are defined in `services.yaml`; routes use `type: attribute`.
+- The activity translations of the English locale were stored under the wrong resource key.
+
 ## [1.9.0] - 2026-10-12
 
 ### Changed

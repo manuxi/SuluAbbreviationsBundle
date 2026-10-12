@@ -9,21 +9,31 @@ use Sulu\Bundle\ActivityBundle\Domain\Event\DomainEvent;
 
 abstract class AbstractAbbreviationEvent extends DomainEvent
 {
-    private Abbreviation $abbreviation;
-    private array $payload = [];
-
-    public function __construct(Abbreviation $abbreviation, array $payload)
-    {
+    /**
+     * @param array<string, mixed> $payload
+     */
+    public function __construct(
+        private readonly string $abbreviationId,
+        private readonly ?string $title = null,
+        private readonly ?string $locale = null,
+        private readonly array $payload = [],
+    ) {
         parent::__construct();
-        $this->abbreviation = $abbreviation;
-        $this->payload      = $payload;
     }
 
-    public function getAbbreviation(): Abbreviation
+    public function getAbbreviationId(): string
     {
-        return $this->abbreviation;
+        return $this->abbreviationId;
     }
 
+    public function getLocale(): ?string
+    {
+        return $this->locale;
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
     public function getEventPayload(): ?array
     {
         return $this->payload;
@@ -36,12 +46,22 @@ abstract class AbstractAbbreviationEvent extends DomainEvent
 
     public function getResourceId(): string
     {
-        return (string) $this->abbreviation->getId();
+        return $this->abbreviationId;
+    }
+
+    public function getResourceLocale(): ?string
+    {
+        return $this->locale;
     }
 
     public function getResourceTitle(): ?string
     {
-        return $this->abbreviation->getName();
+        return $this->title;
+    }
+
+    public function getResourceTitleLocale(): ?string
+    {
+        return $this->locale;
     }
 
     public function getResourceSecurityContext(): ?string

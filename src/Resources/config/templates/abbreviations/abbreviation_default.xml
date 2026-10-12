@@ -1,0 +1,85 @@
+<?xml version="1.0" ?>
+<template xmlns="http://schemas.sulu.io/template/template"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/template-1.0.xsd">
+
+    <key>abbreviation_default</key>
+
+    <view>@SuluAbbreviations/abbreviation</view>
+    <controller>Sulu\Bundle\ContentBundle\Content\UserInterface\Controller\Website\ContentController::indexAction</controller>
+    <cacheLifetime>604800</cacheLifetime>
+
+    <meta>
+        <title lang="en">Abbreviation</title>
+        <title lang="de">Abkürzung</title>
+    </meta>
+
+    <properties>
+        <property name="name" type="text_line" mandatory="true">
+            <meta>
+                <title lang="en">Abbreviation</title>
+                <title lang="de">Abkürzung</title>
+            </meta>
+
+            <params>
+                <param name="headline" value="true"/>
+            </params>
+
+            <tag name="sulu.rlp.part"/>
+            <tag name="sulu.search.field" role="title"/>
+        </property>
+
+        <property name="url" type="route" mandatory="true">
+            <meta>
+                <title lang="en">Resourcelocator</title>
+                <title lang="de">Adresse</title>
+            </meta>
+
+            <tag name="sulu.rlp"/>
+            <tag name="sulu.search.field" role="url"/>
+        </property>
+
+        <property name="explanation" type="text_area" mandatory="true">
+            <meta>
+                <title lang="en">Short form</title>
+                <title lang="de">Langform</title>
+            </meta>
+
+            <tag name="sulu.search.field" role="description"/>
+        </property>
+
+        <property name="description" type="text_editor">
+            <meta>
+                <title lang="en">Meaning</title>
+                <title lang="de">Bedeutung</title>
+            </meta>
+
+            <tag name="sulu.search.field" type="string"/>
+        </property>
+
+        <property name="image" type="single_media_selection" colspan="6">
+            <meta>
+                <title lang="en">Image</title>
+                <title lang="de">Bild</title>
+            </meta>
+
+            <params>
+                <param name="types" value="image"/>
+            </params>
+
+            <tag name="sulu.search.field" role="image"/>
+        </property>
+
+        <property name="link" type="link" colspan="6">
+            <meta>
+                <title lang="en">Link</title>
+                <title lang="de">Link</title>
+            </meta>
+
+            <params>
+                <param name="enable_anchor" value="true"/>
+                <param name="enable_attributes" value="true"/>
+            </params>
+        </property>
+    </properties>
+</template>

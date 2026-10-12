@@ -1,0 +1,83 @@
+<?xml version="1.0" ?>
+<template xmlns="http://schemas.sulu.io/template/template"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/template-1.0.xsd">
+
+    <key>default</key>
+
+    <view>default</view>
+    <controller>Sulu\Bundle\WebsiteBundle\Controller\DefaultController::indexAction</controller>
+    <cacheLifetime>604800</cacheLifetime>
+
+    <meta>
+        <title lang="en">Default</title>
+    </meta>
+
+    <properties>
+        <property name="title" type="text_line" mandatory="true">
+            <meta>
+                <title lang="en">Title</title>
+            </meta>
+            <tag name="sulu.rlp.part"/>
+        </property>
+
+        <property name="url" type="resource_locator" mandatory="true">
+            <meta>
+                <title lang="en">Resourcelocator</title>
+            </meta>
+            <tag name="sulu.rlp"/>
+        </property>
+
+        <property name="abbreviations" type="abbreviation_selection">
+            <meta>
+                <title lang="en">Abbreviations</title>
+            </meta>
+        </property>
+
+        <property name="abbreviation" type="single_abbreviation_selection">
+            <meta>
+                <title lang="en">Abbreviation</title>
+            </meta>
+        </property>
+
+        <property name="article" type="text_editor">
+            <meta>
+                <title lang="en">Article</title>
+            </meta>
+        </property>
+
+        <block name="blocks" default-type="abbreviations">
+            <meta>
+                <title lang="en">Blocks</title>
+            </meta>
+
+            <types>
+                <type name="abbreviations">
+                    <meta>
+                        <title lang="en">Abbreviations</title>
+                    </meta>
+
+                    <properties>
+                        <property name="blockAbbreviations" type="abbreviation_selection">
+                            <meta>
+                                <title lang="en">Abbreviations</title>
+                            </meta>
+                        </property>
+
+                        <property name="blockAbbreviation" type="single_abbreviation_selection">
+                            <meta>
+                                <title lang="en">Abbreviation</title>
+                            </meta>
+                        </property>
+
+                        <property name="blockText" type="text_editor">
+                            <meta>
+                                <title lang="en">Text</title>
+                            </meta>
+                        </property>
+                    </properties>
+                </type>
+            </types>
+        </block>
+    </properties>
+</template>

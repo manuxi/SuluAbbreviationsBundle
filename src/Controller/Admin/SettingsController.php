@@ -6,8 +6,6 @@ namespace Manuxi\SuluAbbreviationsBundle\Controller\Admin;
 
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\View\ViewHandlerInterface;
-use HandcraftedInTheAlps\RestRoutingBundle\Controller\Annotations\RouteResource;
-use HandcraftedInTheAlps\RestRoutingBundle\Routing\ClassResourceInterface;
 use Manuxi\SuluAbbreviationsBundle\Domain\Event\Settings\ModifiedEvent;
 use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationsSettings;
 use Sulu\Bundle\ActivityBundle\Application\Collector\DomainEventCollectorInterface;
@@ -15,28 +13,22 @@ use Sulu\Component\Rest\AbstractRestController;
 use Sulu\Component\Security\SecuredControllerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-/**
- * @RouteResource("abbreviations-settings")
- */
-class SettingsController extends AbstractRestController implements ClassResourceInterface, SecuredControllerInterface
+#[Route('/admin/api')]
+class SettingsController extends AbstractRestController implements SecuredControllerInterface
 {
-    private EntityManagerInterface $entityManager;
-    private DomainEventCollectorInterface $domainEventCollector;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
+        private readonly EntityManagerInterface $entityManager,
         ViewHandlerInterface $viewHandler,
-        DomainEventCollectorInterface $domainEventCollector,
+        private readonly DomainEventCollectorInterface $domainEventCollector,
         ?TokenStorageInterface $tokenStorage = null,
     ) {
-        $this->entityManager        = $entityManager;
-        $this->domainEventCollector = $domainEventCollector;
-
         parent::__construct($viewHandler, $tokenStorage);
     }
 
+    #[Route('/abbreviations-settings', name: 'sulu_abbreviations.get_abbreviations_settings', methods: ['GET'])]
     public function getAction(): Response
     {
         $entity = $this->entityManager->getRepository(AbbreviationsSettings::class)->findOneBy([]);
@@ -44,6 +36,7 @@ class SettingsController extends AbstractRestController implements ClassResource
         return $this->handleView($this->view($this->getDataForEntity($entity ?: new AbbreviationsSettings())));
     }
 
+    #[Route('/abbreviations-settings', name: 'sulu_abbreviations.put_abbreviations_settings', methods: ['PUT'])]
     public function putAction(Request $request): Response
     {
         $entity = $this->entityManager->getRepository(AbbreviationsSettings::class)->findOneBy([]);
@@ -61,6 +54,9 @@ class SettingsController extends AbstractRestController implements ClassResource
         return $this->handleView($this->view($this->getDataForEntity($entity)));
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function getDataForEntity(AbbreviationsSettings $entity): array
     {
         return [
@@ -71,6 +67,9 @@ class SettingsController extends AbstractRestController implements ClassResource
         ];
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     protected function mapDataToEntity(array $data, AbbreviationsSettings $entity): void
     {
         $entity->setToggleHeader(isset($data['toggleHeader']) ? (bool) $data['toggleHeader'] : null);
@@ -86,6 +85,8 @@ class SettingsController extends AbstractRestController implements ClassResource
 
     public function getLocale(Request $request): ?string
     {
-        return $request->query->get('locale');
+        $locale = $request->query->get('locale');
+
+        return \is_string($locale) ? $locale : null;
     }
 }

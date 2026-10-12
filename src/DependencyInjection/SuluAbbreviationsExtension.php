@@ -5,19 +5,17 @@ declare(strict_types=1);
 namespace Manuxi\SuluAbbreviationsBundle\DependencyInjection;
 
 use Manuxi\SuluAbbreviationsBundle\Admin\AbbreviationsAdmin;
+use Manuxi\SuluAbbreviationsBundle\Controller\Admin\AbbreviationVersionController;
 use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationsSettings;
-use Sulu\Bundle\PersistenceBundle\DependencyInjection\PersistenceExtensionTrait;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class SuluAbbreviationsExtension extends Extension implements PrependExtensionInterface
 {
-    use PersistenceExtensionTrait;
-
     /**
      * @throws \Exception
      */
@@ -26,24 +24,54 @@ class SuluAbbreviationsExtension extends Extension implements PrependExtensionIn
         $configuration = new Configuration();
         $config        = $this->processConfiguration($configuration, $configs);
 
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
-        $loader->load('services.xml');
-        $loader->load('controller.xml');
+        $container->setParameter('sulu_abbreviations.versioning.max_versions', $config['versioning']['max_versions']);
+        $container->setParameter('sulu_abbreviations.twig.auto_abbr', $config['twig']['auto_abbr']);
 
-        if ($container->hasParameter('kernel.bundles')) {
-            /** @var string[] $bundles */
-            $bundles = $container->getParameter('kernel.bundles');
-
-            if (\array_key_exists('SuluAutomationBundle', $bundles)) {
-                $loader->load('automation.xml');
-            }
-        }
-
-        $this->configurePersistence($config['objects'], $container);
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        $loader->load('services.yaml');
     }
 
     public function prepend(ContainerBuilder $container): void
     {
+        if ($container->hasExtension('doctrine')) {
+            $container->prependExtensionConfig(
+                'doctrine',
+                [
+                    'orm' => [
+                        'mappings' => [
+                            'SuluAbbreviationsBundle' => [
+                                'type'   => 'xml',
+                                'dir'    => __DIR__ . '/../Resources/config/doctrine',
+                                'prefix' => 'Manuxi\SuluAbbreviationsBundle\Entity',
+                                'alias'  => 'SuluAbbreviationsBundle',
+                            ],
+                        ],
+                    ],
+                ]
+            );
+        }
+
+        if ($container->hasExtension('sulu_core')) {
+            $container->prependExtensionConfig(
+                'sulu_core',
+                [
+                    'content' => [
+                        'structure' => [
+                            'paths' => [
+                                Abbreviation::TEMPLATE_TYPE => [
+                                    'path' => __DIR__ . '/../Resources/config/templates/abbreviations',
+                                    'type' => Abbreviation::TEMPLATE_TYPE,
+                                ],
+                            ],
+                            'default_type' => [
+                                Abbreviation::TEMPLATE_TYPE => Abbreviation::DEFAULT_TEMPLATE,
+                            ],
+                        ],
+                    ],
+                ]
+            );
+        }
+
         if ($container->hasExtension('sulu_search')) {
             $container->prependExtensionConfig(
                 'sulu_search',
@@ -76,6 +104,23 @@ class SuluAbbreviationsExtension extends Extension implements PrependExtensionIn
                     ],
                 ]
             );
+
+            foreach ($container->getExtensionConfig('sulu_search') as $suluSearchConfig) {
+                if (isset($suluSearchConfig['website']['indexes'])) {
+                    $container->prependExtensionConfig(
+                        'sulu_search',
+                        [
+                            'website' => [
+                                'indexes' => [
+                                    Abbreviation::RESOURCE_KEY => Abbreviation::RESOURCE_KEY . '_published',
+                                ],
+                            ],
+                        ]
+                    );
+
+                    break;
+                }
+            }
         }
 
         if ($container->hasExtension('sulu_route')) {
@@ -86,9 +131,7 @@ class SuluAbbreviationsExtension extends Extension implements PrependExtensionIn
                         Abbreviation::class => [
                             'generator' => 'schema',
                             'options'   => [
-                                // @TODO: works not yet as expected, does not translate correctly
-                                // see https://github.com/sulu/sulu/pull/5920
-                                'route_schema' => '/{translator.trans("sulu_abbreviations.abbreviations")}/{implode("-", object)}',
+                                'route_schema' => '/{translator.trans("sulu_abbreviations.url_prefix")}/{object["name"]}',
                             ],
                             'resource_key' => Abbreviation::RESOURCE_KEY,
                         ],
@@ -112,15 +155,25 @@ class SuluAbbreviationsExtension extends Extension implements PrependExtensionIn
                         ],
                     ],
                     'resources' => [
-                        'abbreviations' => [
+                        Abbreviation::RESOURCE_KEY => [
                             'routes' => [
                                 'list'   => 'sulu_abbreviations.get_abbreviations',
                                 'detail' => 'sulu_abbreviations.get_abbreviation',
                             ],
+                            'views' => [
+                                'list'   => AbbreviationsAdmin::LIST_VIEW,
+                                'detail' => AbbreviationsAdmin::EDIT_FORM_VIEW,
+                            ],
+                        ],
+                        AbbreviationVersionController::RESOURCE_KEY => [
+                            'routes' => [
+                                'list'   => 'sulu_abbreviations.get_abbreviation_versions',
+                                'detail' => 'sulu_abbreviations.post_abbreviation_version_trigger',
+                            ],
                         ],
                         AbbreviationsSettings::RESOURCE_KEY => [
                             'routes' => [
-                                'detail' => 'sulu_abbreviations.get_abbreviations-settings',
+                                'detail' => 'sulu_abbreviations.get_abbreviations_settings',
                             ],
                         ],
                     ],

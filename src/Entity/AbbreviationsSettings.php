@@ -4,13 +4,9 @@ declare(strict_types=1);
 
 namespace Manuxi\SuluAbbreviationsBundle\Entity;
 
-use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Mapping as ORM;
 use Sulu\Component\Persistence\Model\AuditableInterface;
 use Sulu\Component\Persistence\Model\AuditableTrait;
 
-#[ORM\Entity()]
-#[ORM\Table(name: 'app_abbreviation_settings')]
 class AbbreviationsSettings implements AuditableInterface
 {
     use AuditableTrait;
@@ -19,21 +15,14 @@ class AbbreviationsSettings implements AuditableInterface
     public const FORM_KEY         = 'abbreviations_config';
     public const SECURITY_CONTEXT = 'sulu.abbreviations.settings';
 
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: Types::INTEGER)]
     private ?int $id = null;
 
-    #[ORM\Column(type: Types::BOOLEAN, nullable: true)]
     private ?bool $toggleHeader = null;
 
-    #[ORM\Column(type: Types::BOOLEAN, nullable: true)]
     private ?bool $toggleHero = null;
 
-    #[ORM\Column(type: Types::BOOLEAN, nullable: true)]
     private ?bool $toggleBreadcrumbs = null;
 
-    #[ORM\Column(type: Types::STRING, nullable: true)]
     private ?string $pageAbbreviations = null;
 
     public function getId(): ?int

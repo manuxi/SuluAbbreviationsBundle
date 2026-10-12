@@ -5,57 +5,51 @@ declare(strict_types=1);
 namespace Manuxi\SuluAbbreviationsBundle\Tests\Unit\Controller\Admin;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
-use FOS\RestBundle\View\View;
-use FOS\RestBundle\View\ViewHandlerInterface;
+use Doctrine\Persistence\ObjectRepository;
 use Manuxi\SuluAbbreviationsBundle\Controller\Admin\SettingsController;
 use Manuxi\SuluAbbreviationsBundle\Domain\Event\Settings\ModifiedEvent;
 use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationsSettings;
+use Manuxi\SuluAbbreviationsBundle\Tests\Unit\Support\ArrayViewHandler;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Sulu\Bundle\ActivityBundle\Application\Collector\DomainEventCollectorInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class SettingsControllerTest extends TestCase
 {
     use ProphecyTrait;
 
-    /**
-     * @var ObjectProphecy<EntityManagerInterface>
-     */
+    /** @var ObjectProphecy<EntityManagerInterface> */
     private ObjectProphecy $entityManager;
 
-    /**
-     * @var ObjectProphecy<EntityRepository<AbbreviationsSettings>>
-     */
+    /** @var ObjectProphecy<ObjectRepository<AbbreviationsSettings>> */
     private ObjectProphecy $repository;
 
-    /**
-     * @var ObjectProphecy<DomainEventCollectorInterface>
-     */
-    private ObjectProphecy $domainEventCollector;
+    /** @var ObjectProphecy<DomainEventCollectorInterface> */
+    private ObjectProphecy $eventCollector;
 
     private SettingsController $controller;
 
     protected function setUp(): void
     {
-        $this->entityManager        = $this->prophesize(EntityManagerInterface::class);
-        $this->repository           = $this->prophesize(EntityRepository::class);
-        $this->domainEventCollector = $this->prophesize(DomainEventCollectorInterface::class);
-        $this->entityManager->getRepository(AbbreviationsSettings::class)->willReturn($this->repository->reveal());
+        $this->entityManager  = $this->prophesize(EntityManagerInterface::class);
+        $this->repository     = $this->prophesize(ObjectRepository::class);
+        $this->eventCollector = $this->prophesize(DomainEventCollectorInterface::class);
 
-        $viewHandler = $this->prophesize(ViewHandlerInterface::class);
-        $viewHandler->handle(Argument::type(View::class))->will(static function (array $args): JsonResponse {
-            return new JsonResponse($args[0]->getData());
+        $this->entityManager->getRepository(AbbreviationsSettings::class)->willReturn($this->repository->reveal());
+        $this->entityManager->persist(Argument::any())->will(static function (): void {
+        });
+        $this->entityManager->flush()->will(static function (): void {
+        });
+        $this->eventCollector->collect(Argument::any())->will(static function (): void {
         });
 
         $this->controller = new SettingsController(
             $this->entityManager->reveal(),
-            $viewHandler->reveal(),
-            $this->domainEventCollector->reveal()
+            new ArrayViewHandler(),
+            $this->eventCollector->reveal()
         );
     }
 
@@ -71,45 +65,58 @@ class SettingsControllerTest extends TestCase
         );
     }
 
-    public function testPutCreatesSettingsAndCollectsModifiedEvent(): void
-    {
-        $this->repository->findOneBy([])->willReturn(null);
-        $this->entityManager->persist(Argument::type(AbbreviationsSettings::class))->shouldBeCalledOnce();
-        $this->entityManager->flush()->shouldBeCalledOnce();
-
-        $payload = ['toggleHeader' => true, 'toggleHero' => false, 'toggleBreadcrumbs' => true, 'pageAbbreviations' => 'page-uuid'];
-
-        $this->domainEventCollector->collect(Argument::that(
-            static fn ($event): bool => $event instanceof ModifiedEvent && $event->getEventPayload() === $payload
-        ))->shouldBeCalledOnce();
-
-        $response = $this->controller->putAction($this->createJsonRequest($payload));
-
-        $this->assertSame($payload, json_decode((string) $response->getContent(), true));
-    }
-
-    public function testPutWithPartialDataDoesNotFail(): void
+    public function testGetReturnsStoredSettings(): void
     {
         $settings = new AbbreviationsSettings();
-        $settings->setToggleHero(true);
-
+        $settings->setToggleHeader(true);
+        $settings->setPageAbbreviations('page');
         $this->repository->findOneBy([])->willReturn($settings);
-        $this->entityManager->persist(Argument::any())->shouldNotBeCalled();
-        $this->entityManager->flush()->shouldBeCalledOnce();
-        $this->domainEventCollector->collect(Argument::type(ModifiedEvent::class))->shouldBeCalledOnce();
 
-        $this->controller->putAction($this->createJsonRequest(['toggleHeader' => true]));
+        $data = json_decode((string) $this->controller->getAction()->getContent(), true);
 
-        $this->assertTrue($settings->getToggleHeader());
-        $this->assertNull($settings->getToggleHero());
-        $this->assertNull($settings->getPageAbbreviations());
+        $this->assertTrue($data['toggleHeader']);
+        $this->assertSame('page', $data['pageAbbreviations']);
     }
 
-    /**
-     * @param array<string, mixed> $data
-     */
-    private function createJsonRequest(array $data): Request
+    public function testPutCreatesSettingsWhenMissing(): void
     {
-        return new Request([], [], [], [], [], ['CONTENT_TYPE' => 'application/json'], (string) json_encode($data));
+        $this->repository->findOneBy([])->willReturn(null);
+
+        $request  = new Request([], [], [], [], [], [], (string) json_encode(['toggleHeader' => true, 'toggleHero' => false, 'pageAbbreviations' => 'page']));
+        $response = $this->controller->putAction($request);
+
+        $this->entityManager->persist(Argument::type(AbbreviationsSettings::class))->shouldHaveBeenCalledOnce()->will(static function (): void {
+        });
+        $this->entityManager->flush()->shouldHaveBeenCalledOnce()->will(static function (): void {
+        });
+        $this->eventCollector->collect(Argument::type(ModifiedEvent::class))->shouldHaveBeenCalledOnce()->will(static function (): void {
+        });
+
+        $data = json_decode((string) $response->getContent(), true);
+        $this->assertTrue($data['toggleHeader']);
+        $this->assertFalse($data['toggleHero']);
+        $this->assertNull($data['toggleBreadcrumbs']);
+        $this->assertSame('page', $data['pageAbbreviations']);
+    }
+
+    public function testPutUpdatesExistingSettings(): void
+    {
+        $settings = new AbbreviationsSettings();
+        $settings->setToggleBreadcrumbs(true);
+        $this->repository->findOneBy([])->willReturn($settings);
+
+        $request = new Request([], [], [], [], [], [], (string) json_encode(['toggleBreadcrumbs' => false]));
+        $this->controller->putAction($request);
+
+        $this->assertFalse($settings->getToggleBreadcrumbs());
+        $this->entityManager->persist(Argument::any())->shouldNotHaveBeenCalled()->will(static function (): void {
+        });
+    }
+
+    public function testSecurityContextAndLocale(): void
+    {
+        $this->assertSame(AbbreviationsSettings::SECURITY_CONTEXT, $this->controller->getSecurityContext());
+        $this->assertSame('en', $this->controller->getLocale(new Request(['locale' => 'en'])));
+        $this->assertNull($this->controller->getLocale(new Request()));
     }
 }
