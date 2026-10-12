@@ -8,6 +8,6 @@ class AbbreviationCopiedLanguageEvent extends AbstractAbbreviationEvent
 {
     public function getEventType(): string
     {
-        return 'published';
+        return 'copied_language';
     }
 }

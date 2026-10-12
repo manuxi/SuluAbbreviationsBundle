@@ -2,6 +2,42 @@
 
 All notable changes to this project are documented in this file.
 
+## [Unreleased] - 2.0.0
+
+### Breaking changes
+- The content is now stored with `sulu/content-bundle` (`^0.8.3`): draft/live dimension contents instead of the translation entities. Existing data has to be migrated, see the upgrade guide.
+- Abbreviation ids are UUIDs (string) instead of integers. Page content, text editor links and bookmarks referencing the old integer ids have to be migrated.
+- Tables: `abbr_abbreviations`, `abbr_abbreviation_dimension_contents`, `abbr_abbreviation_versions`; `app_abbreviation_settings` is unchanged.
+- Removed `manuxi/sulu-shared-tools-bundle` and `phpcr/phpcr-migrations-bundle`; `sulu/automation-bundle` moved to `suggest`.
+- Removed the entities `AbbreviationTranslation`, `AbbreviationSeo*`, `AbbreviationExcerpt*`, the `Entity\Models` and `Entity\Interfaces` namespaces, the old repositories, `Common\DoctrineListRepresentationFactory`, `Mapper\AbbreviationDataMapper`, `Routing\AbbreviationsRouteDefaultsProvider`, `Preview\AbbreviationsObjectProvider`, the own task handlers and the own website controller (rendering is template based now).
+- The `sulu_abbreviations.objects` bundle configuration was removed.
+- The link provider alias is `abbreviations` (was `abbreviation`); the selection content types return normalized live content arrays instead of entities.
+- The `copy` toolbar action was replaced by `copy_locale` (copy the content into another locale).
+- The page template of the website is selected by the structure template `abbreviation_default` and rendered with `@SuluAbbreviations/abbreviation.html.twig`; the variable `content` replaces `abbreviation`.
+
+### Added
+- Draft/live separation with the content workflow (publish, unpublish, remove draft) for every locale.
+- Structure template `abbreviation_default` (`name`, `url`, `explanation`, `description`, `image`, `link`) shipped in `src/Resources/config/templates/abbreviations/`.
+- `Entity\Abbreviation` (UUID), `Entity\AbbreviationDimensionContent` (template, route, SEO, excerpt, author and workflow data), `Entity\AbbreviationVersion`; Doctrine XML mapping in `src/Resources/config/doctrine/`.
+- `Controller\Admin\AbbreviationController` with `#[Route]` attributes (list, get, create, update, delete, publish, unpublish, remove-draft, copy-locale).
+- Teaser provider `Teaser\AbbreviationTeaserProvider` (`sulu.teaser.provider` alias `abbreviations`).
+- Link provider based on `ContentLinkProvider`, sitemap provider, smart content data provider, preview object provider, search metadata and reindex provider based on the content bundle services.
+- Automation tab in the admin (schedule publish/unpublish, requires `sulu/automation-bundle`).
+- Insights tab with activity log and references list.
+- `Resolver\AbbreviationResolver` returns normalized live content and registers the abbreviation in the `abbreviations` reference store.
+- Selection content types implement `ReferenceContentTypeInterface`, so pages show up in the references list of an abbreviation.
+- `Route\AbbreviationRouteRemover` removes the routes of a deleted abbreviation (needed because the content bundle route remover is a Doctrine event subscriber, which Symfony 7.4 does not register anymore).
+- Domain events `AbbreviationDraftRemovedEvent`, `AbbreviationTranslationRemovedEvent`, `AbbreviationVersionRestoredEvent`, `AbbreviationCopiedLanguageEvent` (now with the correct event type).
+- Configuration `sulu_abbreviations.versioning.max_versions` and `sulu_abbreviations.twig.auto_abbr`.
+- Twig filter `abbr` (only registered with `sulu_abbreviations.twig.auto_abbr: true`) wraps known abbreviations in `<abbr title="...">`.
+- Functional tests with an in-memory SQLite kernel (`tests/Functional`).
+
+### Changed
+- `sulu_resolve_abbreviation()` and `sulu_get_abbreviations()` return normalized live content arrays.
+- The settings REST route is `sulu_abbreviations.get_abbreviations_settings` and defined with `#[Route]` (path `/admin/api/abbreviations-settings`).
+- Services are defined in `services.yaml`; routes use `type: attribute`.
+- The activity translations of the English locale were stored under the wrong resource key.
+
 ## [1.9.0] - 2026-10-12
 
 ### Changed

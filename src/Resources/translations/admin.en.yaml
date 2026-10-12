@@ -8,6 +8,8 @@ sulu_abbreviations:
     published: "published"
     published_date: "Publish Date"
     published_at: "Published at"
+    published_state: "Status"
+    authored_date: "Authored at"
     link: "Link"
     website: "Website"
     image: "Image"
@@ -53,14 +55,18 @@ sulu_abbreviations:
             abbreviations_published: "Abbreviations"
 sulu_activity:
     resource:
-        abbreviation: "Abbreviation"
+        abbreviations: "Abbreviation"
     description:
-        abbreviation:
+        abbreviations:
             created: "{userFullName} created the abbreviation \"{resourceTitle}\"."
             modified: "{userFullName} modified the abbreviation \"{resourceTitle}\"."
             removed: "{userFullName} deleted the abbreviation \"{resourceTitle}\"."
             restored: "{userFullName} restored the abbreviation \"{resourceTitle}\"."
             published: "{userFullName} published the abbreviation \"{resourceTitle}\"."
             unpublished: "{userFullName} unpublished the abbreviation \"{resourceTitle}\"."
+            draft_removed: "{userFullName} discarded the draft of the abbreviation \"{resourceTitle}\"."
+            copied_language: "{userFullName} copied the abbreviation \"{resourceTitle}\" to another language."
+            translation_removed: "{userFullName} deleted a translation of the abbreviation \"{resourceTitle}\"."
+            version_restored: "{userFullName} restored a version of the abbreviation \"{resourceTitle}\"."
         abbreviations_settings:
-            modified: "{userFullName} modified the settings for abbreviations."
+            modified: "{userFullName} modified the settings for abbreviations."

@@ -2,117 +2,90 @@
 <list xmlns="http://schemas.sulu.io/list-builder/list">
     <key>abbreviations</key>
 
-    <joins name="translation">
+    <joins name="dimensionContent">
         <join>
-            <entity-name>%sulu.model.abbreviation_translation.class%</entity-name>
-            <field-name>%sulu.model.abbreviation.class%.translations</field-name>
-            <condition>%sulu.model.abbreviation_translation.class%.locale = :locale</condition>
+            <entity-name>dimensionContent</entity-name>
+            <field-name>Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation.dimensionContents</field-name>
+            <method>LEFT</method>
+            <condition>dimensionContent.locale = :locale AND dimensionContent.stage = 'draft'</condition>
         </join>
     </joins>
 
-    <joins name="changer" ref="translation">
+    <joins name="unlocalizedDimensionContent">
         <join>
-            <entity-name>%sulu.model.user.class%_changer</entity-name>
-            <field-name>%sulu.model.abbreviation_translation.class%.changer</field-name>
-        </join>
-        <join>
-            <entity-name>%sulu.model.contact.class%_changer</entity-name>
-            <field-name>%sulu.model.user.class%_changer.contact</field-name>
+            <entity-name>unlocalizedDimensionContent</entity-name>
+            <field-name>Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation.dimensionContents</field-name>
+            <method>LEFT</method>
+            <condition>unlocalizedDimensionContent.locale IS NULL AND unlocalizedDimensionContent.stage = 'draft'</condition>
         </join>
     </joins>
 
-    <joins name="creator" ref="translation">
+    <joins name="ghostDimensionContent" ref="unlocalizedDimensionContent">
         <join>
-            <entity-name>%sulu.model.user.class%_creator</entity-name>
-            <field-name>%sulu.model.abbreviation_translation.class%.creator</field-name>
-        </join>
-        <join>
-            <entity-name>%sulu.model.contact.class%_creator</entity-name>
-            <field-name>%sulu.model.user.class%_creator.contact</field-name>
+            <entity-name>ghostDimensionContent</entity-name>
+            <field-name>Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation.dimensionContents</field-name>
+            <method>LEFT</method>
+            <condition>dimensionContent.locale IS NULL AND ghostDimensionContent.locale = unlocalizedDimensionContent.ghostLocale AND ghostDimensionContent.stage = 'draft'</condition>
         </join>
     </joins>
 
     <properties>
         <property name="id" visibility="no" translation="sulu_admin.id">
             <field-name>id</field-name>
-            <entity-name>%sulu.model.abbreviation.class%</entity-name>
+            <entity-name>Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation</entity-name>
         </property>
 
-        <property name="name" visibility="always" searchability="yes" translation="sulu_abbreviations.name">
-            <field-name>name</field-name>
-            <entity-name>%sulu.model.abbreviation_translation.class%</entity-name>
-
-            <joins ref="translation"/>
-        </property>
-
-        <property name="explanation" visibility="yes" searchability="yes" translation="sulu_abbreviations.explanation">
-            <field-name>explanation</field-name>
-            <entity-name>%sulu.model.abbreviation_translation.class%</entity-name>
-
-            <joins ref="translation"/>
-        </property>
-
-        <property name="description" visibility="no" searchability="yes" translation="sulu_abbreviations.description">
-            <field-name>description</field-name>
-            <entity-name>%sulu.model.abbreviation_translation.class%</entity-name>
-
-            <joins ref="translation"/>
-        </property>
-
-        <property name="publishedState" translation="sulu_abbreviations.published" visibility="yes" type="bool">
-            <field-name>publishedState</field-name>
-            <entity-name>%sulu.model.abbreviation_translation.class%</entity-name>
-            <joins ref="translation"/>
-        </property>
-
-        <property name="publishedAt" visibility="yes" translation="sulu_abbreviations.published_date" type="datetime">
-            <field-name>publishedAt</field-name>
-            <entity-name>%sulu.model.abbreviation_translation.class%</entity-name>
-            <joins ref="translation"/>
-        </property>
-
-        <property name="created" translation="sulu_admin.created" type="datetime" visibility="yes">
-            <field-name>created</field-name>
-            <entity-name>%sulu.model.abbreviation_translation.class%</entity-name>
-
-            <joins ref="translation"/>
-        </property>
-
-        <concatenation-property name="creator" translation="sulu_admin.creator" visibility="yes" searchability="yes">
+        <case-property name="name" translation="sulu_abbreviations.name" visibility="always" searchability="yes">
             <field>
-                <field-name>firstName</field-name>
-                <entity-name>%sulu.model.contact.class%_creator</entity-name>
+                <field-name>name</field-name>
+                <entity-name>dimensionContent</entity-name>
 
-                <joins ref="creator"/>
+                <joins ref="dimensionContent"/>
             </field>
+
             <field>
-                <field-name>lastName</field-name>
-                <entity-name>%sulu.model.contact.class%_creator</entity-name>
+                <field-name>name</field-name>
+                <entity-name>ghostDimensionContent</entity-name>
 
-                <joins ref="creator"/>
+                <joins ref="ghostDimensionContent"/>
             </field>
-        </concatenation-property>
 
-        <property name="changed" translation="sulu_admin.changed" type="datetime" visibility="no">
-            <field-name>changed</field-name>
-            <entity-name>%sulu.model.abbreviation_translation.class%</entity-name>
+            <transformer type="title"/>
+        </case-property>
 
-            <joins ref="translation"/>
+        <property name="workflowPlace" translation="sulu_abbreviations.published_state" visibility="yes">
+            <field-name>workflowPlace</field-name>
+            <entity-name>dimensionContent</entity-name>
+
+            <joins ref="dimensionContent"/>
         </property>
 
-        <concatenation-property name="changer" translation="sulu_admin.changer" visibility="no" searchability="yes">
-            <field>
-                <field-name>firstName</field-name>
-                <entity-name>%sulu.model.contact.class%_changer</entity-name>
+        <property name="workflowPublished" translation="sulu_abbreviations.published_date" type="datetime" visibility="yes">
+            <field-name>workflowPublished</field-name>
+            <entity-name>dimensionContent</entity-name>
 
-                <joins ref="changer"/>
-            </field>
-            <field>
-                <field-name>lastName</field-name>
-                <entity-name>%sulu.model.contact.class%_changer</entity-name>
+            <joins ref="dimensionContent"/>
+        </property>
 
-                <joins ref="changer"/>
-            </field>
-        </concatenation-property>
+        <property name="authored" translation="sulu_abbreviations.authored_date" type="datetime" visibility="no">
+            <field-name>authored</field-name>
+            <entity-name>dimensionContent</entity-name>
+
+            <joins ref="dimensionContent"/>
+        </property>
+
+        <property name="locale" translation="sulu_admin.locale" visibility="never">
+            <field-name>locale</field-name>
+            <entity-name>dimensionContent</entity-name>
+
+            <joins ref="dimensionContent"/>
+        </property>
+
+        <property name="ghostLocale" translation="sulu_admin.ghost_locale" visibility="never">
+            <field-name>locale</field-name>
+            <entity-name>ghostDimensionContent</entity-name>
+
+            <joins ref="ghostDimensionContent"/>
+        </property>
     </properties>
 </list>

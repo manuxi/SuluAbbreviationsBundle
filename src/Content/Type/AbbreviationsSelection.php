@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace Manuxi\SuluAbbreviationsBundle\Content\Type;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
+use Manuxi\SuluAbbreviationsBundle\Resolver\AbbreviationResolver;
+use Sulu\Bundle\ReferenceBundle\Application\Collector\ReferenceCollectorInterface;
+use Sulu\Bundle\ReferenceBundle\Infrastructure\Sulu\ContentType\ReferenceContentTypeInterface;
 use Sulu\Component\Content\Compat\PropertyInterface;
 use Sulu\Component\Content\SimpleContentType;
 
-class AbbreviationsSelection extends SimpleContentType
+class AbbreviationsSelection extends SimpleContentType implements ReferenceContentTypeInterface
 {
     public function __construct(
-        protected EntityManagerInterface $entityManager,
+        private readonly AbbreviationResolver $resolver,
     ) {
         parent::__construct('abbreviation_selection', []);
     }
@@ -20,7 +22,7 @@ class AbbreviationsSelection extends SimpleContentType
     /**
      * Returns the published abbreviations of the current locale in the order of the selection.
      *
-     * @return Abbreviation[]
+     * @return array<int, array<string, mixed>>
      */
     public function getContentData(PropertyInterface $property): array
     {
@@ -30,24 +32,7 @@ class AbbreviationsSelection extends SimpleContentType
             return [];
         }
 
-        $ids    = array_values(array_map('intval', $ids));
-        $locale = $property->getStructure()->getLanguageCode();
-
-        /** @var Abbreviation[] $abbreviations */
-        $abbreviations = $this->entityManager->getRepository(Abbreviation::class)->findBy(['id' => $ids]);
-
-        $abbreviations = array_values(array_filter(
-            $abbreviations,
-            static fn (Abbreviation $abbreviation): bool => true === $abbreviation->setLocale($locale)->isPublished()
-        ));
-
-        $idPositions = array_flip($ids);
-        usort(
-            $abbreviations,
-            static fn (Abbreviation $a, Abbreviation $b): int => $idPositions[$a->getId()] <=> $idPositions[$b->getId()]
-        );
-
-        return $abbreviations;
+        return $this->resolver->resolveMany(array_values($ids), $property->getStructure()->getLanguageCode());
     }
 
     /**
@@ -58,5 +43,21 @@ class AbbreviationsSelection extends SimpleContentType
         return [
             'ids' => $property->getValue(),
         ];
+    }
+
+    public function getReferences(PropertyInterface $property, ReferenceCollectorInterface $referenceCollector, string $propertyPrefix = ''): void
+    {
+        $ids = $property->getValue();
+        if (!\is_array($ids)) {
+            return;
+        }
+
+        foreach ($ids as $id) {
+            if (!\is_string($id) || '' === $id) {
+                continue;
+            }
+
+            $referenceCollector->addReference(Abbreviation::RESOURCE_KEY, $id, $propertyPrefix . $property->getName());
+        }
     }
 }

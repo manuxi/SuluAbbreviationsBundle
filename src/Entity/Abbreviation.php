@@ -4,307 +4,56 @@ declare(strict_types=1);
 
 namespace Manuxi\SuluAbbreviationsBundle\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
-use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationRepository;
-use Manuxi\SuluSharedToolsBundle\Entity\Interfaces\AuditableTranslatableInterface;
-use Manuxi\SuluSharedToolsBundle\Entity\Interfaces\SearchableInterface;
-use Manuxi\SuluSharedToolsBundle\Entity\Traits\AuditableTranslatableTrait;
-use Manuxi\SuluSharedToolsBundle\Entity\Traits\ImageTranslatableTrait;
-use Manuxi\SuluSharedToolsBundle\Entity\Traits\LinkTranslatableTrait;
-use Manuxi\SuluSharedToolsBundle\Entity\Traits\PublishedTranslatableTrait;
-use Manuxi\SuluSharedToolsBundle\Entity\Traits\RoutePathTranslatableTrait;
-use Manuxi\SuluSharedToolsBundle\Entity\Traits\ShowAuthorTranslatableTrait;
-use Manuxi\SuluSharedToolsBundle\Entity\Traits\ShowDateTranslatableTrait;
+use Sulu\Bundle\ContentBundle\Content\Domain\Model\ContentRichEntityInterface;
+use Sulu\Bundle\ContentBundle\Content\Domain\Model\ContentRichEntityTrait;
+use Sulu\Bundle\ContentBundle\Content\Domain\Model\DimensionContentInterface;
+use Symfony\Component\Uid\Uuid;
 
-#[ORM\Entity(repositoryClass: AbbreviationRepository::class)]
-#[ORM\Table(name: 'app_abbreviation')]
-class Abbreviation implements AuditableTranslatableInterface, SearchableInterface
+/**
+ * @implements ContentRichEntityInterface<AbbreviationDimensionContent>
+ */
+class Abbreviation implements ContentRichEntityInterface
 {
-    use AuditableTranslatableTrait;
-    use ImageTranslatableTrait;
-    use LinkTranslatableTrait;
-    use PublishedTranslatableTrait;
-    use RoutePathTranslatableTrait;
-    use ShowAuthorTranslatableTrait;
-    use ShowDateTranslatableTrait;
+    /**
+     * @phpstan-use ContentRichEntityTrait<AbbreviationDimensionContent>
+     */
+    use ContentRichEntityTrait;
 
-    public const RESOURCE_KEY     = 'abbreviations';
-    public const FORM_KEY         = 'abbreviation_details';
-    public const LIST_KEY         = 'abbreviations';
-    public const SECURITY_CONTEXT = 'sulu.abbreviations.abbreviations';
+    public const RESOURCE_KEY      = 'abbreviations';
+    public const LIST_KEY          = 'abbreviations';
+    public const FORM_KEY          = 'abbreviation_details';
+    public const TEMPLATE_TYPE     = 'abbreviation';
+    public const DEFAULT_TEMPLATE  = 'abbreviation_default';
+    public const SECURITY_CONTEXT  = 'sulu.abbreviations.abbreviations';
 
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: Types::INTEGER)]
-    private ?int $id = null;
+    private string $id;
 
-    #[Serializer\Exclude]
-    #[ORM\OneToOne(mappedBy: 'abbreviation', targetEntity: AbbreviationSeo::class, cascade: ['persist', 'remove'])]
-    private ?AbbreviationSeo $abbreviationSeo = null;
+    private ?int $legacyId = null;
 
-    #[Serializer\Exclude]
-    #[ORM\OneToOne(mappedBy: 'abbreviation', targetEntity: AbbreviationExcerpt::class, cascade: ['persist', 'remove'])]
-    private ?AbbreviationExcerpt $abbreviationExcerpt = null;
-
-    #[Serializer\Exclude]
-    #[ORM\OneToMany(mappedBy: 'abbreviation', targetEntity: AbbreviationTranslation::class, cascade: ['all'], fetch: 'EXTRA_LAZY', indexBy: 'locale')]
-    private Collection $translations;
-
-    private string $locale = 'de';
-
-    private array $ext = [];
-
-    public function __construct()
+    public function __construct(?string $id = null)
     {
-        $this->translations = new ArrayCollection();
-        $this->initExt();
+        $this->id = $id ?? Uuid::v7()->toRfc4122();
     }
 
-    public function getId(): ?int
+    public function getId(): string
     {
         return $this->id;
     }
 
-    #[Serializer\VirtualProperty(name: 'title')]
-    public function getTitle(): ?string
+    public function getLegacyId(): ?int
     {
-        return $this->getName();
+        return $this->legacyId;
     }
 
-    #[Serializer\VirtualProperty(name: 'name')]
-    public function getName(): ?string
+    public function setLegacyId(?int $legacyId): self
     {
-        $translation = $this->getTranslation($this->locale);
-        if (!$translation) {
-            return null;
-        }
-
-        return $translation->getName();
-    }
-
-    public function setName(?string $name): self
-    {
-        $translation = $this->getTranslation($this->locale);
-        if (!$translation) {
-            $translation = $this->createTranslation($this->locale);
-        }
-
-        $translation->setName($name);
+        $this->legacyId = $legacyId;
 
         return $this;
     }
 
-    #[Serializer\VirtualProperty(name: 'explanation')]
-    public function getExplanation(): ?string
+    public function createDimensionContent(): DimensionContentInterface
     {
-        $translation = $this->getTranslation($this->locale);
-        if (!$translation) {
-            return null;
-        }
-
-        return $translation->getExplanation();
-    }
-
-    public function setExplanation(?string $explanation): self
-    {
-        $translation = $this->getTranslation($this->locale);
-        if (!$translation) {
-            $translation = $this->createTranslation($this->locale);
-        }
-
-        $translation->setExplanation($explanation);
-
-        return $this;
-    }
-
-    #[Serializer\VirtualProperty(name: 'description')]
-    public function getDescription(): ?string
-    {
-        $translation = $this->getTranslation($this->locale);
-        if (!$translation) {
-            return null;
-        }
-
-        return $translation->getDescription();
-    }
-
-    public function setDescription(?string $description): self
-    {
-        $translation = $this->getTranslation($this->locale);
-        if (!$translation) {
-            $translation = $this->createTranslation($this->locale);
-        }
-
-        $translation->setDescription($description);
-
-        return $this;
-    }
-
-    public function getLocale(): string
-    {
-        return $this->locale;
-    }
-
-    public function setLocale(string $locale): self
-    {
-        $this->locale = $locale;
-        $this->propagateLocale($locale);
-
-        return $this;
-    }
-
-    /**
-     * @return AbbreviationTranslation[]
-     */
-    public function getTranslations(): array
-    {
-        return $this->translations->toArray();
-    }
-
-    protected function getTranslation(string $locale): ?AbbreviationTranslation
-    {
-        if (!$this->translations->containsKey($locale)) {
-            return null;
-        }
-
-        return $this->translations->get($locale);
-    }
-
-    protected function createTranslation(string $locale): AbbreviationTranslation
-    {
-        $translation = new AbbreviationTranslation($this, $locale);
-        $this->translations->set($locale, $translation);
-
-        return $translation;
-    }
-
-    #[Serializer\VirtualProperty(name: 'availableLocales')]
-    public function getAvailableLocales(): array
-    {
-        return array_values($this->translations->getKeys());
-    }
-
-    /**
-     * Returns a not yet persisted copy with all translations, seo and excerpt data.
-     * The copy is unpublished in all locales and its route paths get the suffix "-copy".
-     */
-    public function copy(): self
-    {
-        $copy = new self();
-
-        foreach ($this->translations as $locale => $translation) {
-            $copy->translations->set($locale, $translation->copyTo($copy));
-        }
-
-        $copy->abbreviationSeo     = $this->getSeo()->copyTo($copy);
-        $copy->abbreviationExcerpt = $this->getExcerpt()->copyTo($copy);
-        $copy->ext                 = [];
-        $copy->setLocale($this->locale);
-
-        return $copy;
-    }
-
-    public function copyToLocale(string $locale): self
-    {
-        if ($currentTranslation = $this->getTranslation($this->getLocale())) {
-            $newTranslation = clone $currentTranslation;
-            $newTranslation->setLocale($locale);
-            $this->translations->set($locale, $newTranslation);
-
-            // copy ext also...
-            foreach ($this->ext as $translatable) {
-                $translatable->copyToLocale($locale);
-            }
-
-            $this->setLocale($locale);
-        }
-
-        return $this;
-    }
-
-    public function getSeo(): AbbreviationSeo
-    {
-        if (!$this->abbreviationSeo instanceof AbbreviationSeo) {
-            $this->abbreviationSeo = new AbbreviationSeo();
-            $this->abbreviationSeo->setAbbreviation($this);
-        }
-
-        return $this->abbreviationSeo;
-    }
-
-    public function setSeo(?AbbreviationSeo $abbreviationSeo): self
-    {
-        $this->abbreviationSeo = $abbreviationSeo;
-
-        return $this;
-    }
-
-    public function getExcerpt(): AbbreviationExcerpt
-    {
-        if (!$this->abbreviationExcerpt instanceof AbbreviationExcerpt) {
-            $this->abbreviationExcerpt = new AbbreviationExcerpt();
-            $this->abbreviationExcerpt->setAbbreviation($this);
-        }
-
-        return $this->abbreviationExcerpt;
-    }
-
-    public function setExcerpt(?AbbreviationExcerpt $abbreviationExcerpt): self
-    {
-        $this->abbreviationExcerpt = $abbreviationExcerpt;
-
-        return $this;
-    }
-
-    #[Serializer\VirtualProperty(name: 'ext')]
-    public function getExt(): array
-    {
-        return $this->ext;
-    }
-
-    public function setExt(array $ext): self
-    {
-        $this->ext = $ext;
-
-        return $this;
-    }
-
-    public function addExt(string $key, $value): self
-    {
-        $this->ext[$key] = $value;
-
-        return $this;
-    }
-
-    public function hasExt(string $key): bool
-    {
-        return \array_key_exists($key, $this->ext);
-    }
-
-    private function propagateLocale(string $locale): self
-    {
-        $abbreviationSeo = $this->getSeo();
-        $abbreviationSeo->setLocale($locale);
-        $abbreviationExcerpt = $this->getExcerpt();
-        $abbreviationExcerpt->setLocale($locale);
-        $this->initExt();
-
-        return $this;
-    }
-
-    private function initExt(): self
-    {
-        if (!$this->hasExt('seo')) {
-            $this->addExt('seo', $this->getSeo());
-        }
-        if (!$this->hasExt('excerpt')) {
-            $this->addExt('excerpt', $this->getExcerpt());
-        }
-
-        return $this;
+        return new AbbreviationDimensionContent($this);
     }
 }

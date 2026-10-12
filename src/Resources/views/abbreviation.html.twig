@@ -1,22 +1,21 @@
-{% extends "body.html.twig" %}
+{% extends "base.html.twig" %}
 
 {% block content %}
     <div class="container">
         <div class="row">
             <div class="col-12 mb-3">
-                <h2>{{ "sulu_abbreviations.name"|trans({}, 'admin') }}: {{ abbreviation.name }}</h2>
-                <h3>{{ "sulu_abbreviations.explanation"|trans({}, 'admin') }}: {{ abbreviation.explanation }}</h3>
-                {% if abbreviation.description %}
+                <h2>{{ "sulu_abbreviations.name"|trans({}, 'admin') }}: {{ content.name }}</h2>
+                <h3>{{ "sulu_abbreviations.explanation"|trans({}, 'admin') }}: {{ content.explanation }}</h3>
+                {% if content.description %}
                     <strong>{{ "sulu_abbreviations.description"|trans({}, 'admin') }}:</strong>
-                    <p>{{ abbreviation.description|raw }}</p>
+                    <div>{{ content.description|raw }}</div>
                 {% endif %}
 
-                {% if abbreviation.image %}
-                    {% set media = sulu_resolve_media(abbreviation.image, app.request.locale) %}
+                {% if content.image %}
+                    {% set media = sulu_resolve_media(content.image.id, app.request.locale) %}
                     {% set abbreviationImage = media.thumbnails["sulu-240x"] %}
-                    <img src="{{ asset(abbreviationImage) }}" class="img-thumbnail d-block" style="width:4rem;" alt="{{ abbreviation.explanation }}">
+                    <img src="{{ asset(abbreviationImage) }}" class="img-thumbnail d-block" style="width:4rem;" alt="{{ content.explanation }}">
                 {% endif %}
-
             </div>
         </div>
     </div>

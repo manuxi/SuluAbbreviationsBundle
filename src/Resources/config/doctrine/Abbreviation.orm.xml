@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation" table="abbr_abbreviations">
+        <id name="id" type="string" length="36" column="id">
+            <generator strategy="NONE"/>
+        </id>
+
+        <field name="legacyId" type="integer" column="legacy_id" nullable="true" unique="true"/>
+
+        <one-to-many field="dimensionContents" target-entity="Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationDimensionContent" mapped-by="abbreviation" orphan-removal="true">
+            <cascade>
+                <cascade-persist/>
+                <cascade-remove/>
+            </cascade>
+        </one-to-many>
+    </entity>
+</doctrine-mapping>

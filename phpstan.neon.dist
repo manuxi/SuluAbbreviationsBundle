@@ -6,8 +6,14 @@ parameters:
     paths:
         - src
         - tests
+    excludePaths:
+        - tests/App/var (?)
     tmpDir: var/cache/phpstan
     ignoreErrors:
+        -
+            message: '#is never assigned int so it can be removed from the property type#'
+            identifier: property.unusedType
+            path: src/Entity
         -
             message: '#^Call to an undefined method Prophecy\\Prophecy\\ObjectProphecy#'
             path: tests

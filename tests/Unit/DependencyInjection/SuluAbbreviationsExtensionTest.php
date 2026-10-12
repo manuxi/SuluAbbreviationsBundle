@@ -4,101 +4,142 @@ declare(strict_types=1);
 
 namespace Manuxi\SuluAbbreviationsBundle\Tests\Unit\DependencyInjection;
 
+use Manuxi\SuluAbbreviationsBundle\Admin\AbbreviationsAdmin;
 use Manuxi\SuluAbbreviationsBundle\DependencyInjection\SuluAbbreviationsExtension;
-use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationRepository;
-use Manuxi\SuluAbbreviationsBundle\Routing\AbbreviationsRouteDefaultsProvider;
-use Manuxi\SuluAbbreviationsBundle\SuluAbbreviationsBundle;
+use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
+use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationsSettings;
 use PHPUnit\Framework\TestCase;
-use Sulu\Bundle\AutomationBundle\SuluAutomationBundle;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\Extension;
 
 class SuluAbbreviationsExtensionTest extends TestCase
 {
     /**
-     * @param array<string, class-string> $bundles
+     * @param string[]                                        $extensions
+     * @param array<string, array<int, array<string, mixed>>> $existingConfigs
      */
-    private function loadContainer(array $bundles = []): ContainerBuilder
+    private function prepend(array $extensions, array $existingConfigs = []): ContainerBuilder
     {
         $container = new ContainerBuilder();
-        $container->setParameter('kernel.bundles', $bundles);
+        foreach ($extensions as $name) {
+            $container->registerExtension(new class($name) extends Extension {
+                public function __construct(private readonly string $alias)
+                {
+                }
 
-        (new SuluAbbreviationsExtension())->load([], $container);
+                public function getAlias(): string
+                {
+                    return $this->alias;
+                }
+
+                public function load(array $configs, ContainerBuilder $container): void
+                {
+                }
+            });
+        }
+
+        foreach ($existingConfigs as $name => $configs) {
+            foreach ($configs as $config) {
+                $container->prependExtensionConfig($name, $config);
+            }
+        }
+
+        (new SuluAbbreviationsExtension())->prepend($container);
 
         return $container;
     }
 
-    public function testAbbreviationRepositoryIsRegisteredOnce(): void
+    public function testNothingIsPrependedWithoutTheTargetExtensions(): void
     {
-        $container = $this->loadContainer();
+        $container = $this->prepend([]);
 
-        $repositoryDefinitions = array_filter(
-            $container->findTaggedServiceIds('doctrine.repository_service'),
-            static fn (string $id): bool => AbbreviationRepository::class === ($container->getDefinition($id)->getClass() ?? $id),
-            \ARRAY_FILTER_USE_KEY
-        );
-
-        $this->assertCount(1, $repositoryDefinitions);
-        $this->assertTrue($container->hasAlias('sulu_abbreviations.repository.abbreviation'));
-        $this->assertSame(
-            AbbreviationRepository::class,
-            (string) $container->getAlias('sulu_abbreviations.repository.abbreviation')
-        );
+        $this->assertSame([], $container->getExtensionConfig('doctrine'));
+        $this->assertSame([], $container->getExtensionConfig('sulu_admin'));
     }
 
-    public function testRouteDefaultsProviderIsRegisteredOnce(): void
+    public function testDoctrineMapping(): void
     {
-        $container = $this->loadContainer();
+        $config = $this->prepend(['doctrine'])->getExtensionConfig('doctrine')[0];
 
-        $providers = array_filter(
-            array_keys($container->findTaggedServiceIds('sulu_route.defaults_provider')),
-            static fn (string $id): bool => AbbreviationsRouteDefaultsProvider::class === $container->getDefinition($id)->getClass()
-        );
-
-        $this->assertCount(1, $providers);
-        $this->assertTrue($container->hasAlias(AbbreviationsRouteDefaultsProvider::class));
+        $mapping = $config['orm']['mappings']['SuluAbbreviationsBundle'];
+        $this->assertSame('xml', $mapping['type']);
+        $this->assertSame('Manuxi\SuluAbbreviationsBundle\Entity', $mapping['prefix']);
+        $this->assertDirectoryExists($mapping['dir']);
+        $this->assertFileExists($mapping['dir'] . '/Abbreviation.orm.xml');
     }
 
-    public function testContentTypeAliasesAreUnique(): void
+    public function testTemplatePathAndDefaultType(): void
     {
-        $container = $this->loadContainer();
+        $config = $this->prepend(['sulu_core'])->getExtensionConfig('sulu_core')[0];
 
-        $aliases = [];
-        foreach ($container->findTaggedServiceIds('sulu.content.type') as $tags) {
-            foreach ($tags as $attributes) {
-                $aliases[] = $attributes['alias'];
-            }
-        }
-
-        sort($aliases);
-        $this->assertSame(['abbreviation_selection', 'single_abbreviation_selection'], $aliases);
+        $structure = $config['content']['structure'];
+        $this->assertSame('abbreviation', $structure['paths']['abbreviation']['type']);
+        $this->assertFileExists($structure['paths']['abbreviation']['path'] . '/abbreviation_default.xml');
+        $this->assertSame('abbreviation_default', $structure['default_type']['abbreviation']);
     }
 
-    public function testPrependDoesNotConfigureFramework(): void
+    public function testRouteMapping(): void
+    {
+        $config = $this->prepend(['sulu_route'])->getExtensionConfig('sulu_route')[0];
+
+        $mapping = $config['mappings'][Abbreviation::class];
+        $this->assertSame('schema', $mapping['generator']);
+        $this->assertSame(Abbreviation::RESOURCE_KEY, $mapping['resource_key']);
+        $this->assertStringContainsString('sulu_abbreviations.url_prefix', $mapping['options']['route_schema']);
+        $this->assertStringContainsString('object["name"]', $mapping['options']['route_schema']);
+    }
+
+    public function testAdminConfiguration(): void
+    {
+        $config = $this->prepend(['sulu_admin'])->getExtensionConfig('sulu_admin')[0];
+
+        $this->assertSame('sulu_abbreviations.get_abbreviations', $config['resources'][Abbreviation::RESOURCE_KEY]['routes']['list']);
+        $this->assertSame('sulu_abbreviations.get_abbreviation', $config['resources'][Abbreviation::RESOURCE_KEY]['routes']['detail']);
+        $this->assertSame(AbbreviationsAdmin::EDIT_FORM_VIEW, $config['resources'][Abbreviation::RESOURCE_KEY]['views']['detail']);
+        $this->assertSame('sulu_abbreviations.get_abbreviations_settings', $config['resources'][AbbreviationsSettings::RESOURCE_KEY]['routes']['detail']);
+        $this->assertArrayHasKey('abbreviation_selection', $config['field_type_options']['selection']);
+        $this->assertArrayHasKey('single_abbreviation_selection', $config['field_type_options']['single_selection']);
+        $this->assertSame(Abbreviation::LIST_KEY, $config['field_type_options']['selection']['abbreviation_selection']['types']['list_overlay']['list_key']);
+    }
+
+    public function testSearchIndexesWithoutWebsiteConfiguration(): void
+    {
+        $configs = $this->prepend(['sulu_search'])->getExtensionConfig('sulu_search');
+
+        $this->assertCount(1, $configs);
+        $this->assertArrayHasKey('abbreviations', $configs[0]['indexes']);
+        $this->assertArrayHasKey('abbreviations_published', $configs[0]['indexes']);
+        $this->assertSame(Abbreviation::SECURITY_CONTEXT, $configs[0]['indexes']['abbreviations']['security_context']);
+    }
+
+    public function testWebsiteSearchIndexIsMappedToThePublishedIndex(): void
+    {
+        $configs = $this->prepend(['sulu_search'], ['sulu_search' => [['website' => ['indexes' => ['page' => 'page_published']]]]])
+            ->getExtensionConfig('sulu_search');
+
+        $merged = array_merge(...$configs);
+        $this->assertSame('abbreviations_published', $configs[0]['website']['indexes']['abbreviations']);
+        $this->assertArrayHasKey('indexes', $merged);
+    }
+
+    public function testLoadRegistersServicesAndParameters(): void
     {
         $container = new ContainerBuilder();
-        $container->registerExtension(new FrameworkExtension());
+        (new SuluAbbreviationsExtension())->load([['versioning' => ['max_versions' => 5], 'twig' => ['auto_abbr' => true]]], $container);
 
-        (new SuluAbbreviationsExtension())->prepend($container);
-
-        $this->assertSame([], $container->getExtensionConfig('framework'));
+        $this->assertSame(5, $container->getParameter('sulu_abbreviations.versioning.max_versions'));
+        $this->assertTrue($container->getParameter('sulu_abbreviations.twig.auto_abbr'));
+        $this->assertTrue($container->hasDefinition(AbbreviationsAdmin::class));
+        $this->assertTrue($container->hasDefinition('sulu_abbreviations.reference_store'));
+        $this->assertTrue($container->hasDefinition('sulu_abbreviations.data_provider'));
     }
 
-    public function testTranslationsAreInAutoDiscoveredDirectory(): void
+    public function testLoadUsesDefaults(): void
     {
-        $directory = \dirname((string) (new \ReflectionClass(SuluAbbreviationsBundle::class))->getFileName()) . '/Resources/translations';
+        $container = new ContainerBuilder();
+        (new SuluAbbreviationsExtension())->load([], $container);
 
-        foreach (['admin.de.yaml', 'admin.en.yaml', 'messages.de.yaml', 'messages.en.yaml'] as $file) {
-            $this->assertFileExists($directory . '/' . $file);
-        }
-    }
-
-    public function testAutomationServicesAreOnlyLoadedWithAutomationBundle(): void
-    {
-        $this->assertFalse($this->loadContainer()->hasDefinition('sulu_abbreviations.automation.publish_handler'));
-
-        $container = $this->loadContainer(['SuluAutomationBundle' => SuluAutomationBundle::class]);
-        $this->assertTrue($container->hasDefinition('sulu_abbreviations.automation.publish_handler'));
-        $this->assertTrue($container->hasDefinition('sulu_abbreviations.automation.unpublish_handler'));
+        $this->assertSame(20, $container->getParameter('sulu_abbreviations.versioning.max_versions'));
+        $this->assertFalse($container->getParameter('sulu_abbreviations.twig.auto_abbr'));
     }
 }

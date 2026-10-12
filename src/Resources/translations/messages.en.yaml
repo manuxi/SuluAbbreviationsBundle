@@ -1,5 +1,6 @@
 sulu_abbreviations:
     abbreviation: "Abbreviation"
+    url_prefix: "abbreviations"
     abbreviations: "Abbreviations"
 search:
     index:
@@ -7,4 +8,4 @@ search:
         abbreviations_published: "Abbreviations"
     icon:
         abbreviations: "tags"
-        abbreviations_published: "tags"
+        abbreviations_published: "tags"
