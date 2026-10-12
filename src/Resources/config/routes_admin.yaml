@@ -9,3 +9,9 @@ sulu_abbreviations_settings_admin_api:
     type: attribute
     options:
         expose: true
+
+sulu_abbreviations_version_admin_api:
+    resource: Manuxi\SuluAbbreviationsBundle\Controller\Admin\AbbreviationVersionController
+    type: attribute
+    options:
+        expose: true

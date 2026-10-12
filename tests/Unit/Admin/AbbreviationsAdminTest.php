@@ -93,7 +93,7 @@ class AbbreviationsAdminTest extends TestCase
         }
     }
 
-    private function createAdmin(?AutomationViewBuilderFactoryInterface $automation = null): AbbreviationsAdmin
+    private function createAdmin(?AutomationViewBuilderFactoryInterface $automation = null, bool $versioningEnabled = true): AbbreviationsAdmin
     {
         return new AbbreviationsAdmin(
             $this->viewBuilderFactory,
@@ -102,7 +102,8 @@ class AbbreviationsAdminTest extends TestCase
             $this->webspaceManager->reveal(),
             $this->activityViewBuilderFactory->reveal(),
             $this->referenceViewBuilderFactory->reveal(),
-            $automation
+            $automation,
+            $versioningEnabled
         );
     }
 
@@ -172,6 +173,7 @@ class AbbreviationsAdminTest extends TestCase
             AbbreviationsAdmin::EDIT_FORM_VIEW,
             AbbreviationsAdmin::EDIT_INSIGHTS_VIEW,
             AbbreviationsAdmin::EDIT_INSIGHTS_VIEW . '.activity',
+            AbbreviationsAdmin::EDIT_INSIGHTS_VIEW . '.versions',
             AbbreviationsAdmin::EDIT_INSIGHTS_VIEW . '.references',
         ] as $name) {
             $this->assertTrue($collection->has($name), $name);
@@ -186,9 +188,32 @@ class AbbreviationsAdminTest extends TestCase
         $this->activityViewBuilderFactory->hasActivityListPermission()->willReturn(false);
         $this->referenceViewBuilderFactory->hasReferenceListPermission()->willReturn(false);
 
-        $collection = $this->collectViews($this->createAdmin());
+        $collection = $this->collectViews($this->createAdmin(null, false));
 
         $this->assertFalse($collection->has(AbbreviationsAdmin::EDIT_INSIGHTS_VIEW));
+    }
+
+    public function testVersionsViewIsConfiguredWithRestoreAction(): void
+    {
+        $view = $this->collectViews($this->createAdmin())->get(AbbreviationsAdmin::EDIT_INSIGHTS_VIEW . '.versions')->getView();
+
+        $this->assertSame('abbreviation_versions', $view->getOption('resourceKey'));
+        $this->assertSame('abbreviation_versions', $view->getOption('listKey'));
+        $this->assertSame(AbbreviationsAdmin::EDIT_INSIGHTS_VIEW, $view->getParent());
+        $this->assertSame(['id'], $view->getOption('routerAttributesToListRequest'));
+
+        $itemActions = $view->getOption('itemActions');
+        \assert(\is_array($itemActions));
+        $this->assertSame('restore_version', $itemActions[0]->getType());
+        $this->assertSame(['success_view' => AbbreviationsAdmin::EDIT_FORM_VIEW], $itemActions[0]->getOptions());
+    }
+
+    public function testVersionsViewIsOmittedWhenVersioningIsDisabled(): void
+    {
+        $collection = $this->collectViews($this->createAdmin(null, false));
+
+        $this->assertFalse($collection->has(AbbreviationsAdmin::EDIT_INSIGHTS_VIEW . '.versions'));
+        $this->assertTrue($collection->has(AbbreviationsAdmin::EDIT_INSIGHTS_VIEW . '.activity'));
     }
 
     public function testOnlyReferencesTabWhenActivityIsNotAllowed(): void

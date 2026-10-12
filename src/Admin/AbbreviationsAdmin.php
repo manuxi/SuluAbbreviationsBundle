@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Manuxi\SuluAbbreviationsBundle\Admin;
 
+use Manuxi\SuluAbbreviationsBundle\Controller\Admin\AbbreviationVersionController;
 use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use Sulu\Bundle\ActivityBundle\Infrastructure\Sulu\Admin\View\ActivityViewBuilderFactoryInterface;
 use Sulu\Bundle\AdminBundle\Admin\Admin;
 use Sulu\Bundle\AdminBundle\Admin\Navigation\NavigationItem;
 use Sulu\Bundle\AdminBundle\Admin\Navigation\NavigationItemCollection;
 use Sulu\Bundle\AdminBundle\Admin\View\DropdownToolbarAction;
+use Sulu\Bundle\AdminBundle\Admin\View\ListItemAction;
 use Sulu\Bundle\AdminBundle\Admin\View\ToolbarAction;
 use Sulu\Bundle\AdminBundle\Admin\View\ViewBuilderFactoryInterface;
 use Sulu\Bundle\AdminBundle\Admin\View\ViewCollection;
@@ -39,6 +41,7 @@ class AbbreviationsAdmin extends Admin
         private readonly ActivityViewBuilderFactoryInterface $activityViewBuilderFactory,
         private readonly ReferenceViewBuilderFactoryInterface $referenceViewBuilderFactory,
         private readonly ?AutomationViewBuilderFactoryInterface $automationViewBuilderFactory = null,
+        private readonly bool $versioningEnabled = true,
     ) {
     }
 
@@ -194,7 +197,7 @@ class AbbreviationsAdmin extends Admin
         $hasActivity   = $this->activityViewBuilderFactory->hasActivityListPermission();
         $hasReferences = $this->referenceViewBuilderFactory->hasReferenceListPermission();
 
-        if (!$hasActivity && !$hasReferences) {
+        if (!$hasActivity && !$hasReferences && !$this->versioningEnabled) {
             return;
         }
 
@@ -216,6 +219,26 @@ class AbbreviationsAdmin extends Admin
                         '/activities',
                         Abbreviation::RESOURCE_KEY
                     )
+                    ->setParent(static::EDIT_INSIGHTS_VIEW)
+            );
+        }
+
+        if ($this->versioningEnabled) {
+            $viewCollection->add(
+                $this->viewBuilderFactory
+                    ->createListViewBuilder(static::EDIT_INSIGHTS_VIEW . '.versions', '/versions')
+                    ->setTabTitle('sulu_admin.versions')
+                    ->setResourceKey(AbbreviationVersionController::RESOURCE_KEY)
+                    ->setListKey(AbbreviationVersionController::RESOURCE_KEY)
+                    ->addListAdapters(['table'])
+                    ->addAdapterOptions(['table' => ['skin' => 'flat']])
+                    ->disableTabGap()
+                    ->disableSearching()
+                    ->disableSelection()
+                    ->disableColumnOptions()
+                    ->disableFiltering()
+                    ->addRouterAttributesToListRequest(['id'])
+                    ->addItemActions([new ListItemAction('restore_version', ['success_view' => static::EDIT_FORM_VIEW])])
                     ->setParent(static::EDIT_INSIGHTS_VIEW)
             );
         }

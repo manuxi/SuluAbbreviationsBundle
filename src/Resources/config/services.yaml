@@ -14,6 +14,7 @@ services:
             - '@sulu_activity.activity_list_view_builder_factory'
             - '@sulu_reference.reference_list_view_builder_factory'
             - '@?sulu_automation.automation_view_builder_factory'
+            - '@=parameter("sulu_abbreviations.versioning.max_versions") > 0'
         tags:
             - { name: sulu.admin }
             - { name: sulu.context, context: admin }
@@ -58,10 +59,39 @@ services:
             - { name: controller.service_arguments }
             - { name: sulu.context, context: admin }
 
+    Manuxi\SuluAbbreviationsBundle\Controller\Admin\AbbreviationVersionController:
+        public: true
+        arguments:
+            - '@fos_rest.view_handler.default'
+            - '@security.token_storage'
+            - '@sulu_core.list_rest_helper'
+            - '@Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationVersionRepository'
+            - '@sulu_content.content_manager'
+            - '@sulu_content.content_indexer'
+            - '@doctrine.orm.entity_manager'
+            - '@sulu_activity.domain_event_collector'
+            - '@sulu_security.security_checker'
+        tags:
+            - { name: controller.service_arguments }
+            - { name: sulu.context, context: admin }
+
     # Repository and resolver
     Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationRepository:
         arguments:
             - '@doctrine.orm.entity_manager'
+
+    Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationVersionRepository:
+        arguments:
+            - '@doctrine.orm.entity_manager'
+
+    Manuxi\SuluAbbreviationsBundle\Versioning\VersionRecorder:
+        arguments:
+            - '@Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationVersionRepository'
+            - '@sulu_content.content_manager'
+            - '@security.token_storage'
+            - '%sulu_abbreviations.versioning.max_versions%'
+        tags:
+            - { name: kernel.event_listener, event: workflow.content_workflow.completed.publish, method: onPublish }
 
     Manuxi\SuluAbbreviationsBundle\Route\AbbreviationRouteRemover:
         arguments:

@@ -96,6 +96,8 @@ class SuluAbbreviationsExtensionTest extends TestCase
         $this->assertSame('sulu_abbreviations.get_abbreviations', $config['resources'][Abbreviation::RESOURCE_KEY]['routes']['list']);
         $this->assertSame('sulu_abbreviations.get_abbreviation', $config['resources'][Abbreviation::RESOURCE_KEY]['routes']['detail']);
         $this->assertSame(AbbreviationsAdmin::EDIT_FORM_VIEW, $config['resources'][Abbreviation::RESOURCE_KEY]['views']['detail']);
+        $this->assertSame('sulu_abbreviations.get_abbreviation_versions', $config['resources']['abbreviation_versions']['routes']['list']);
+        $this->assertSame('sulu_abbreviations.post_abbreviation_version_trigger', $config['resources']['abbreviation_versions']['routes']['detail']);
         $this->assertSame('sulu_abbreviations.get_abbreviations_settings', $config['resources'][AbbreviationsSettings::RESOURCE_KEY]['routes']['detail']);
         $this->assertArrayHasKey('abbreviation_selection', $config['field_type_options']['selection']);
         $this->assertArrayHasKey('single_abbreviation_selection', $config['field_type_options']['single_selection']);

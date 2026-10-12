@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Manuxi\SuluAbbreviationsBundle\DependencyInjection;
 
 use Manuxi\SuluAbbreviationsBundle\Admin\AbbreviationsAdmin;
+use Manuxi\SuluAbbreviationsBundle\Controller\Admin\AbbreviationVersionController;
 use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationsSettings;
 use Symfony\Component\Config\FileLocator;
@@ -162,6 +163,12 @@ class SuluAbbreviationsExtension extends Extension implements PrependExtensionIn
                             'views' => [
                                 'list'   => AbbreviationsAdmin::LIST_VIEW,
                                 'detail' => AbbreviationsAdmin::EDIT_FORM_VIEW,
+                            ],
+                        ],
+                        AbbreviationVersionController::RESOURCE_KEY => [
+                            'routes' => [
+                                'list'   => 'sulu_abbreviations.get_abbreviation_versions',
+                                'detail' => 'sulu_abbreviations.post_abbreviation_version_trigger',
                             ],
                         ],
                         AbbreviationsSettings::RESOURCE_KEY => [
