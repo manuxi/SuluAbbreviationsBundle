@@ -99,9 +99,11 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
         try {
             switch ($action) {
                 case 'publish':
+                    $this->checkLivePermission($request);
                     $entity = $this->abbreviationModel->publish($id, $request);
                     break;
                 case 'unpublish':
+                    $this->checkLivePermission($request);
                     $entity = $this->abbreviationModel->unpublish($id, $request);
                     break;
                 case 'copy':
@@ -159,6 +161,14 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
         $this->abbreviationModel->delete($entity);
 
         return $this->handleView($this->view(null, 204));
+    }
+
+    private function checkLivePermission(Request $request): void
+    {
+        $this->securityChecker->checkPermission(
+            new SecurityCondition($this->getSecurityContext(), $request->query->get('locale')),
+            PermissionTypes::LIVE
+        );
     }
 
     public function getSecurityContext(): string

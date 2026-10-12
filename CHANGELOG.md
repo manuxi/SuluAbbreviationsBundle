@@ -31,6 +31,7 @@ All notable changes to this project are documented in this file.
 - The edit form always showed the delete action and the publish toggler because its toolbar was overwritten after the permission checks. Delete now requires the `DELETE` permission, the publish toggler the `LIVE` permission; the add form only offers save.
 - Preview crashed: `AbbreviationsObjectProvider::getSecurityContext()` accessed an undefined `documentInspector`, `setContext()` called the non-existing `setStructureType()` and `setValues()` was empty. The provider now returns `Abbreviation::SECURITY_CONTEXT`, maps the form data via `AbbreviationDataMapper` and initializes lazy translation collections before serializing.
 - The `copy` action failed with a `TypeError` because `Abbreviation::copy()` returned `null`. `Abbreviation::copy()` now returns a new, not yet persisted abbreviation with copies of all translations, SEO and excerpt data (categories, tags and media are shared). The copy is unpublished in all locales and the route paths get the suffix `-copy`; `AbbreviationModel::copy()` creates the routes of all locales (conflicts are resolved by the route manager) and collects an `AbbreviationCreatedEvent`.
+- `POST /admin/api/abbreviations/{id}?action=publish|unpublish` only required the `ADD` permission (derived from the HTTP method). Both actions now require the `LIVE` permission for the requested locale.
 
 ### Removed
 - `Content\AbbreviationsSelectionContentType` (duplicate of `Content\Type\AbbreviationsSelection`). Templates must use the property type `abbreviation_selection`.

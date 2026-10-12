@@ -8,6 +8,7 @@ use FOS\RestBundle\View\View;
 use FOS\RestBundle\View\ViewHandlerInterface;
 use Manuxi\SuluAbbreviationsBundle\Common\DoctrineListRepresentationFactory;
 use Manuxi\SuluAbbreviationsBundle\Controller\Admin\AbbreviationsController;
+use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use Manuxi\SuluAbbreviationsBundle\Entity\Models\AbbreviationExcerptModel;
 use Manuxi\SuluAbbreviationsBundle\Entity\Models\AbbreviationModel;
 use Manuxi\SuluAbbreviationsBundle\Entity\Models\AbbreviationSeoModel;
@@ -17,9 +18,12 @@ use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Sulu\Bundle\TrashBundle\Application\TrashManager\TrashManagerInterface;
+use Sulu\Component\Security\Authorization\PermissionTypes;
 use Sulu\Component\Security\Authorization\SecurityCheckerInterface;
+use Sulu\Component\Security\Authorization\SecurityCondition;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class AbbreviationsControllerTest extends TestCase
 {
@@ -103,6 +107,33 @@ class AbbreviationsControllerTest extends TestCase
         $response = $this->controller->postAction($request);
 
         $this->assertSame(201, $response->getStatusCode());
+    }
+
+    public function testPublishRequiresLivePermission(): void
+    {
+        $entity  = $this->createAbbreviation(5);
+        $request = new Request(['action' => 'publish', 'locale' => 'de']);
+
+        $this->securityChecker->checkPermission(
+            Argument::that(static fn (SecurityCondition $condition): bool => Abbreviation::SECURITY_CONTEXT === $condition->getSecurityContext() && 'de' === $condition->getLocale()),
+            PermissionTypes::LIVE
+        )->shouldBeCalledOnce()->willReturn(true);
+        $this->model->publish(5, $request)->shouldBeCalledOnce()->willReturn($entity);
+
+        $this->controller->postTriggerAction(5, $request);
+    }
+
+    public function testUnpublishWithoutLivePermissionIsDenied(): void
+    {
+        $request = new Request(['action' => 'unpublish', 'locale' => 'de']);
+
+        $this->securityChecker->checkPermission(Argument::type(SecurityCondition::class), PermissionTypes::LIVE)
+            ->willThrow(new AccessDeniedException());
+        $this->model->unpublish(Argument::cetera())->shouldNotBeCalled();
+
+        $this->expectException(AccessDeniedException::class);
+
+        $this->controller->postTriggerAction(5, $request);
     }
 
     private function getLastView(): View
