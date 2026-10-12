@@ -14,7 +14,7 @@ use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationSeoTranslation;
  * @method AbbreviationSeoTranslation[]    findAll()
  * @method AbbreviationSeoTranslation[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  *
- * @extends ServiceEntityRepository<AbbreviationTranslation>
+ * @extends ServiceEntityRepository<AbbreviationSeoTranslation>
  */
 class AbbreviationSeoTranslationRepository extends ServiceEntityRepository
 {

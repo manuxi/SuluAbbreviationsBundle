@@ -34,6 +34,7 @@ All notable changes to this project are documented in this file.
 - `POST /admin/api/abbreviations/{id}?action=publish|unpublish` only required the `ADD` permission (derived from the HTTP method). Both actions now require the `LIVE` permission for the requested locale.
 - Trash restore created the route with an integer entity id and an integer history flag (`Route::setEntityId()` expects a string, `setHistory()` a bool) and put the JSON-decoded `ext` arrays back into the entity instead of the SEO/excerpt objects.
 - `AbbreviationLinkProvider` passes the id and title as strings and the published state as bool to `LinkItem`.
+- Wrong `@extends ServiceEntityRepository<...>` generics in the SEO, excerpt and translation repositories (referenced the non-existing classes `Event` / `AbbreviationTranslation`).
 
 ### Removed
 - `Content\AbbreviationsSelectionContentType` (duplicate of `Content\Type\AbbreviationsSelection`). Templates must use the property type `abbreviation_selection`.

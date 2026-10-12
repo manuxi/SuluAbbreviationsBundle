@@ -14,7 +14,7 @@ use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationExcerptTranslation;
  * @method AbbreviationExcerptTranslation[]    findAll()
  * @method AbbreviationExcerptTranslation[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  *
- * @extends ServiceEntityRepository<AbbreviationTranslation>
+ * @extends ServiceEntityRepository<AbbreviationExcerptTranslation>
  */
 class AbbreviationExcerptTranslationRepository extends ServiceEntityRepository
 {

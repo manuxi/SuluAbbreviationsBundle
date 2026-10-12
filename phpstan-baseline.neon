@@ -313,18 +313,6 @@ parameters:
 			path: src/Repository/AbbreviationExcerptRepository.php
 
 		-
-			message: '#^PHPDoc tag @extends has invalid type Manuxi\\SuluAbbreviationsBundle\\Repository\\Event\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Repository/AbbreviationExcerptRepository.php
-
-		-
-			message: '#^Parameter \#2 \$entityClass of method Doctrine\\Bundle\\DoctrineBundle\\Repository\\LazyServiceEntityRepository\<Manuxi\\SuluAbbreviationsBundle\\Repository\\Event\>\:\:__construct\(\) expects class\-string\<Manuxi\\SuluAbbreviationsBundle\\Repository\\Event\>, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Repository/AbbreviationExcerptRepository.php
-
-		-
 			message: '#^Class Manuxi\\SuluAbbreviationsBundle\\Repository\\AbbreviationExcerptTranslationRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -345,18 +333,6 @@ parameters:
 		-
 			message: '#^Class Manuxi\\SuluAbbreviationsBundle\\Repository\\AbbreviationExcerptTranslationRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: src/Repository/AbbreviationExcerptTranslationRepository.php
-
-		-
-			message: '#^PHPDoc tag @extends has invalid type Manuxi\\SuluAbbreviationsBundle\\Repository\\AbbreviationTranslation\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Repository/AbbreviationExcerptTranslationRepository.php
-
-		-
-			message: '#^Parameter \#2 \$entityClass of method Doctrine\\Bundle\\DoctrineBundle\\Repository\\LazyServiceEntityRepository\<Manuxi\\SuluAbbreviationsBundle\\Repository\\AbbreviationTranslation\>\:\:__construct\(\) expects class\-string\<Manuxi\\SuluAbbreviationsBundle\\Repository\\AbbreviationTranslation\>, string given\.$#'
-			identifier: argument.type
 			count: 1
 			path: src/Repository/AbbreviationExcerptTranslationRepository.php
 
@@ -493,18 +469,6 @@ parameters:
 			path: src/Repository/AbbreviationSeoRepository.php
 
 		-
-			message: '#^PHPDoc tag @extends has invalid type Manuxi\\SuluAbbreviationsBundle\\Repository\\Event\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Repository/AbbreviationSeoRepository.php
-
-		-
-			message: '#^Parameter \#2 \$entityClass of method Doctrine\\Bundle\\DoctrineBundle\\Repository\\LazyServiceEntityRepository\<Manuxi\\SuluAbbreviationsBundle\\Repository\\Event\>\:\:__construct\(\) expects class\-string\<Manuxi\\SuluAbbreviationsBundle\\Repository\\Event\>, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Repository/AbbreviationSeoRepository.php
-
-		-
 			message: '#^Class Manuxi\\SuluAbbreviationsBundle\\Repository\\AbbreviationSeoTranslationRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -525,18 +489,6 @@ parameters:
 		-
 			message: '#^Class Manuxi\\SuluAbbreviationsBundle\\Repository\\AbbreviationSeoTranslationRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: src/Repository/AbbreviationSeoTranslationRepository.php
-
-		-
-			message: '#^PHPDoc tag @extends has invalid type Manuxi\\SuluAbbreviationsBundle\\Repository\\AbbreviationTranslation\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Repository/AbbreviationSeoTranslationRepository.php
-
-		-
-			message: '#^Parameter \#2 \$entityClass of method Doctrine\\Bundle\\DoctrineBundle\\Repository\\LazyServiceEntityRepository\<Manuxi\\SuluAbbreviationsBundle\\Repository\\AbbreviationTranslation\>\:\:__construct\(\) expects class\-string\<Manuxi\\SuluAbbreviationsBundle\\Repository\\AbbreviationTranslation\>, string given\.$#'
-			identifier: argument.type
 			count: 1
 			path: src/Repository/AbbreviationSeoTranslationRepository.php
 
