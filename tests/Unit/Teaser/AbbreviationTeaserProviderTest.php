@@ -78,6 +78,36 @@ class AbbreviationTeaserProviderTest extends TestCase
         $this->assertNull($this->callDescription($content, []));
     }
 
+    public function testMediaPrefersTheExcerptImage(): void
+    {
+        $content = new AbbreviationDimensionContent(new Abbreviation());
+        $content->setExcerptImage(['id' => 7]);
+
+        $this->assertSame(7, $this->callMediaId($content, ['image' => ['id' => 3]]));
+    }
+
+    public function testMediaFallsBackToTheImageOfTheAbbreviation(): void
+    {
+        $content = new AbbreviationDimensionContent(new Abbreviation());
+
+        $this->assertSame(3, $this->callMediaId($content, ['image' => ['id' => '3']]));
+        $this->assertNull($this->callMediaId($content, ['image' => null]));
+        $this->assertNull($this->callMediaId($content, []));
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function callMediaId(AbbreviationDimensionContent $content, array $data): ?int
+    {
+        $method = new \ReflectionMethod(AbbreviationTeaserProvider::class, 'getMediaId');
+
+        $mediaId = $method->invoke($this->createProvider(), $content, $data);
+        \assert(null === $mediaId || \is_int($mediaId));
+
+        return $mediaId;
+    }
+
     /**
      * @param array<string, mixed> $data
      */

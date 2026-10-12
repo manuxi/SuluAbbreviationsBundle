@@ -343,7 +343,7 @@ class PageReferenceMigrator
     }
 
     /**
-     * @param ItemMetadata[]        $items
+     * @param ItemMetadata[]            $items
      * @param array<int|string, string> $properties
      */
     private function collect(array $items, array &$properties): void

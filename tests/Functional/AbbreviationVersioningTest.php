@@ -8,6 +8,7 @@ use Manuxi\SuluAbbreviationsBundle\Controller\Admin\AbbreviationVersionControlle
 use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationDimensionContent;
 use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationVersionRepository;
+use Manuxi\SuluAbbreviationsBundle\Translation\AbbreviationTranslationRemover;
 use Sulu\Bundle\ContentBundle\Content\Application\ContentManager\ContentManagerInterface;
 use Sulu\Bundle\ContentBundle\Content\Domain\Model\WorkflowInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -86,6 +87,40 @@ class AbbreviationVersioningTest extends AbbreviationKernelTestCase
 
         $live = $this->contentManager->resolve($abbreviation, ['locale' => 'en', 'stage' => 'live']);
         $this->assertSame('Second', $live->getTemplateData()['explanation']);
+    }
+
+    public function testDeletedTranslationCanBeRestoredFromItsVersions(): void
+    {
+        $abbreviation = $this->createAndPublish('HTML', 'English');
+        $this->contentManager->persist($abbreviation, [
+            'template'    => Abbreviation::DEFAULT_TEMPLATE,
+            'name'        => 'HTML (de)',
+            'explanation' => 'Deutsch',
+            'url'         => null,
+        ], ['locale' => 'de']);
+        $this->getEntityManager()->flush();
+        $this->contentManager->applyTransition($abbreviation, ['locale' => 'de'], WorkflowInterface::WORKFLOW_TRANSITION_PUBLISH);
+        $this->getEntityManager()->flush();
+
+        $remover = $this->getService(AbbreviationTranslationRemover::class);
+        \assert($remover instanceof AbbreviationTranslationRemover);
+        $this->assertTrue($remover->remove($abbreviation, 'de'));
+        $this->getEntityManager()->flush();
+        $this->assertSame(['en'], $remover->getAvailableLocales($abbreviation));
+
+        $version = $this->getVersionRepository()->findLatestVersionNumber($abbreviation, 'de');
+        $this->assertNotNull($version);
+
+        $controller = $this->getService(AbbreviationVersionController::class);
+        \assert($controller instanceof AbbreviationVersionController);
+        $request = new Request(['action' => 'restore', 'locale' => 'de', '_format' => 'json'], [], ['_format' => 'json']);
+        $this->pushRequest($request);
+        $controller->postTriggerAction($request, $abbreviation->getId(), $version);
+
+        $this->assertEqualsCanonicalizing(['en', 'de'], $remover->getAvailableLocales($abbreviation));
+        $draft = $this->contentManager->resolve($abbreviation, ['locale' => 'de']);
+        $this->assertSame('Deutsch', $draft->getTemplateData()['explanation']);
+        $this->assertSame('de', $draft->getLocale());
     }
 
     public function testListReturnsNewestVersionFirstAsRepresentation(): void

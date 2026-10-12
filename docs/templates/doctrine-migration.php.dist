@@ -1,0 +1,57 @@
+<?php
+
+declare(strict_types=1);
+
+namespace DoctrineMigrations;
+
+use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\AbstractMigration;
+
+/**
+ * Creates the tables of SuluAbbreviationsBundle 2.0 (MySQL / MariaDB).
+ *
+ * Copy this file to your "migrations" directory and rename it (e.g. Version20261101000000.php) and the class
+ * accordingly, or generate your own migration with "bin/console doctrine:migrations:diff". The tables of
+ * version 1.x (app_abbreviation*) are not touched, remove them manually after the data was migrated with
+ * "bin/console sulu:abbreviations:migrate-to-content".
+ */
+final class VersionXXXXXXXXXXXXXX extends AbstractMigration
+{
+    public function getDescription(): string
+    {
+        return 'Create the tables of SuluAbbreviationsBundle 2.0';
+    }
+
+    public function up(Schema $schema): void
+    {
+        $this->abortIf(
+            !$this->connection->getDatabasePlatform() instanceof \Doctrine\DBAL\Platforms\AbstractMySQLPlatform,
+            'This migration template only supports MySQL / MariaDB, generate a migration with doctrine:migrations:diff for other platforms.'
+        );
+
+        $this->addSql('CREATE TABLE abbr_abbreviations (id VARCHAR(36) NOT NULL, legacy_id INT DEFAULT NULL, UNIQUE INDEX UNIQ_DE3FDC96184998FC (legacy_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE abbr_abbreviation_dimension_contents (id INT AUTO_INCREMENT NOT NULL, author_id INT DEFAULT NULL, name VARCHAR(255) DEFAULT NULL, stage VARCHAR(16) NOT NULL, locale VARCHAR(7) DEFAULT NULL, ghostLocale VARCHAR(7) DEFAULT NULL, availableLocales LONGTEXT DEFAULT NULL COMMENT \'(DC2Type:json)\', templateKey VARCHAR(32) DEFAULT NULL, templateData LONGTEXT NOT NULL COMMENT \'(DC2Type:json)\', seoTitle VARCHAR(255) DEFAULT NULL, seoDescription LONGTEXT DEFAULT NULL, seoKeywords LONGTEXT DEFAULT NULL, seoCanonicalUrl LONGTEXT DEFAULT NULL, seoNoIndex TINYINT(1) NOT NULL, seoNoFollow TINYINT(1) NOT NULL, seoHideInSitemap TINYINT(1) NOT NULL, excerptTitle VARCHAR(255) DEFAULT NULL, excerptMore VARCHAR(64) DEFAULT NULL, excerptDescription LONGTEXT DEFAULT NULL, excerptImageId INT DEFAULT NULL, excerptIconId INT DEFAULT NULL, authored DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\', workflowPlace VARCHAR(32) DEFAULT NULL, workflowPublished DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\', abbreviationId VARCHAR(36) NOT NULL, INDEX IDX_22CEACFAD40AE21B (abbreviationId), INDEX IDX_22CEACFAF675F31B (author_id), INDEX idx_dimension (stage, locale), INDEX idx_locale (locale), INDEX idx_stage (stage), INDEX idx_template_key (templateKey), INDEX idx_workflow_place (workflowPlace), INDEX idx_workflow_published (workflowPublished), INDEX IDX_22CEACFA2F5A5F5D (excerptImageId), INDEX IDX_22CEACFA16996F78 (excerptIconId), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE abbr_abbreviation_dimension_content_excerpt_tags (abbreviation_dimension_content_id INT NOT NULL, tag_id INT NOT NULL, INDEX IDX_739C47AB8EA8DF33 (abbreviation_dimension_content_id), INDEX IDX_739C47ABBAD26311 (tag_id), PRIMARY KEY(abbreviation_dimension_content_id, tag_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE abbr_abbreviation_dimension_content_excerpt_categories (abbreviation_dimension_content_id INT NOT NULL, category_id INT NOT NULL, INDEX IDX_E386B1CD8EA8DF33 (abbreviation_dimension_content_id), INDEX IDX_E386B1CD12469DE2 (category_id), PRIMARY KEY(abbreviation_dimension_content_id, category_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE abbr_abbreviation_versions (id INT AUTO_INCREMENT NOT NULL, locale VARCHAR(7) NOT NULL, version INT NOT NULL, data LONGTEXT NOT NULL COMMENT \'(DC2Type:json)\', created DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', abbreviationId VARCHAR(36) NOT NULL, idUsersCreator INT DEFAULT NULL, INDEX IDX_3B7C9162D40AE21B (abbreviationId), INDEX IDX_3B7C9162DBF11E1D (idUsersCreator), INDEX idx_abbr_version_lookup (abbreviationId, locale, version), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('ALTER TABLE abbr_abbreviation_dimension_contents ADD CONSTRAINT FK_22CEACFAD40AE21B FOREIGN KEY (abbreviationId) REFERENCES abbr_abbreviations (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE abbr_abbreviation_dimension_contents ADD CONSTRAINT FK_22CEACFAF675F31B FOREIGN KEY (author_id) REFERENCES co_contacts (id) ON DELETE SET NULL');
+        $this->addSql('ALTER TABLE abbr_abbreviation_dimension_contents ADD CONSTRAINT FK_22CEACFA2F5A5F5D FOREIGN KEY (excerptImageId) REFERENCES me_media (id) ON DELETE SET NULL');
+        $this->addSql('ALTER TABLE abbr_abbreviation_dimension_contents ADD CONSTRAINT FK_22CEACFA16996F78 FOREIGN KEY (excerptIconId) REFERENCES me_media (id) ON DELETE SET NULL');
+        $this->addSql('ALTER TABLE abbr_abbreviation_dimension_content_excerpt_tags ADD CONSTRAINT FK_739C47AB8EA8DF33 FOREIGN KEY (abbreviation_dimension_content_id) REFERENCES abbr_abbreviation_dimension_contents (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE abbr_abbreviation_dimension_content_excerpt_tags ADD CONSTRAINT FK_739C47ABBAD26311 FOREIGN KEY (tag_id) REFERENCES ta_tags (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE abbr_abbreviation_dimension_content_excerpt_categories ADD CONSTRAINT FK_E386B1CD8EA8DF33 FOREIGN KEY (abbreviation_dimension_content_id) REFERENCES abbr_abbreviation_dimension_contents (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE abbr_abbreviation_dimension_content_excerpt_categories ADD CONSTRAINT FK_E386B1CD12469DE2 FOREIGN KEY (category_id) REFERENCES ca_categories (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE abbr_abbreviation_versions ADD CONSTRAINT FK_3B7C9162D40AE21B FOREIGN KEY (abbreviationId) REFERENCES abbr_abbreviations (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE abbr_abbreviation_versions ADD CONSTRAINT FK_3B7C9162DBF11E1D FOREIGN KEY (idUsersCreator) REFERENCES se_users (id) ON DELETE SET NULL');
+    }
+
+    public function down(Schema $schema): void
+    {
+        $this->addSql('DROP TABLE abbr_abbreviation_versions');
+        $this->addSql('DROP TABLE abbr_abbreviation_dimension_content_excerpt_categories');
+        $this->addSql('DROP TABLE abbr_abbreviation_dimension_content_excerpt_tags');
+        $this->addSql('DROP TABLE abbr_abbreviation_dimension_contents');
+        $this->addSql('DROP TABLE abbr_abbreviations');
+    }
+}

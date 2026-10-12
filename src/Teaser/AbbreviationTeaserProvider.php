@@ -57,4 +57,19 @@ class AbbreviationTeaserProvider extends ContentTeaserProvider
 
         return '' !== $description ? $description : parent::getDescription($dimensionContent, $data);
     }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    protected function getMediaId(DimensionContentInterface $dimensionContent, array $data): ?int
+    {
+        $mediaId = parent::getMediaId($dimensionContent, $data);
+        if (null !== $mediaId) {
+            return $mediaId;
+        }
+
+        $image = $data['image'] ?? null;
+
+        return \is_array($image) && isset($image['id']) ? (int) $image['id'] : null;
+    }
 }
