@@ -47,8 +47,7 @@
         "symfony/browser-kit": "^6.4 | ^7.0"
     },
     "suggest": {
-        "sulu/automation-bundle": "Allows to schedule publishing and unpublishing of abbreviations",
-        "sulu/http-cache-bundle": "Invalidates cached pages when abbreviations change"
+        "sulu/automation-bundle": "Allows to schedule publishing and unpublishing of abbreviations"
     },
     "autoload": {
         "psr-4": {
