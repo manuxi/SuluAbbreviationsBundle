@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Manuxi\SuluAbbreviationsBundle\Content\Type;
 
-use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use Doctrine\ORM\EntityManagerInterface;
+use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use Sulu\Component\Content\Compat\PropertyInterface;
 use Sulu\Component\Content\SimpleContentType;
 
@@ -31,10 +31,6 @@ class SingleAbbreviationSelection extends SimpleContentType
         return $this->entityManager->getRepository(Abbreviation::class)->find($id);
     }
 
-    /**
-     * @param PropertyInterface $property
-     * @return array
-     */
     public function getViewData(PropertyInterface $property): array
     {
         return [

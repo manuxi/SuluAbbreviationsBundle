@@ -35,12 +35,12 @@ abstract class AbstractEvent extends DomainEvent
 
     public function getResourceId(): string
     {
-        return (string)$this->entity->getId();
+        return (string) $this->entity->getId();
     }
 
     public function getResourceTitle(): ?string
     {
-        return "Abbreviations Settings";
+        return 'Abbreviations Settings';
     }
 
     public function getResourceSecurityContext(): ?string

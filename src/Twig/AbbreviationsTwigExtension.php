@@ -22,7 +22,7 @@ class AbbreviationsTwigExtension extends AbstractExtension
     {
         return [
             new TwigFunction('sulu_resolve_abbreviation', [$this, 'resolveAbbreviation']),
-            new TwigFunction('sulu_get_abbreviations', [$this, 'getAbbreviations'])
+            new TwigFunction('sulu_get_abbreviations', [$this, 'getAbbreviations']),
         ];
     }
 

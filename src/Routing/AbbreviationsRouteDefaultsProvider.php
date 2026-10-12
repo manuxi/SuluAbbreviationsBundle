@@ -26,7 +26,7 @@ class AbbreviationsRouteDefaultsProvider implements RouteDefaultsProviderInterfa
     public function getByEntity($entityClass, $id, $locale, $object = null)
     {
         return [
-            '_controller' => AbbreviationsController::class.'::indexAction',
+            '_controller'  => AbbreviationsController::class . '::indexAction',
             'abbreviation' => $this->repository->findById((int) $id, $locale),
         ];
     }

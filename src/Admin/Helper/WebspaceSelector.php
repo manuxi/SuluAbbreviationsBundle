@@ -8,7 +8,6 @@ use Sulu\Component\Webspace\Manager\WebspaceManagerInterface;
 
 class WebspaceSelector
 {
-
     private WebspaceManagerInterface $webspaceManager;
 
     public function __construct(WebspaceManagerInterface $webspaceManager)
@@ -21,7 +20,7 @@ class WebspaceSelector
         $values = [];
         foreach ($this->webspaceManager->getWebspaceCollection() as $webspace) {
             $values[] = [
-                'name' => $webspace->getKey(),
+                'name'  => $webspace->getKey(),
                 'title' => $webspace->getName(),
             ];
         }

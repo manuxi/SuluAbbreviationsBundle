@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Manuxi\SuluAbbreviationsBundle\Repository;
 
-use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationSeoTranslation;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationSeoTranslation;
 
 /**
  * @method AbbreviationSeoTranslation|null find($id, $lockMode = null, $lockVersion = null)

@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationRepository;
 use Manuxi\SuluSharedToolsBundle\Entity\Interfaces\AuditableTranslatableInterface;
 use Manuxi\SuluSharedToolsBundle\Entity\Interfaces\SearchableInterface;
 use Manuxi\SuluSharedToolsBundle\Entity\Traits\AuditableTranslatableTrait;
@@ -18,7 +19,6 @@ use Manuxi\SuluSharedToolsBundle\Entity\Traits\PublishedTranslatableTrait;
 use Manuxi\SuluSharedToolsBundle\Entity\Traits\RoutePathTranslatableTrait;
 use Manuxi\SuluSharedToolsBundle\Entity\Traits\ShowAuthorTranslatableTrait;
 use Manuxi\SuluSharedToolsBundle\Entity\Traits\ShowDateTranslatableTrait;
-use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationRepository;
 
 #[ORM\Entity(repositoryClass: AbbreviationRepository::class)]
 #[ORM\Table(name: 'app_abbreviation')]
@@ -32,9 +32,9 @@ class Abbreviation implements AuditableTranslatableInterface, SearchableInterfac
     use ShowAuthorTranslatableTrait;
     use ShowDateTranslatableTrait;
 
-    public const RESOURCE_KEY = 'abbreviations';
-    public const FORM_KEY = 'abbreviation_details';
-    public const LIST_KEY = 'abbreviations';
+    public const RESOURCE_KEY     = 'abbreviations';
+    public const FORM_KEY         = 'abbreviation_details';
+    public const LIST_KEY         = 'abbreviations';
     public const SECURITY_CONTEXT = 'sulu.abbreviations.abbreviations';
 
     #[ORM\Id]
@@ -185,7 +185,7 @@ class Abbreviation implements AuditableTranslatableInterface, SearchableInterfac
     #[Serializer\VirtualProperty(name: 'availableLocales')]
     public function getAvailableLocales(): array
     {
-        return \array_values($this->translations->getKeys());
+        return array_values($this->translations->getKeys());
     }
 
     /**

@@ -21,12 +21,11 @@ class AbbreviationsSelectionContentType extends SimpleContentType
     }
 
     /**
-     * @param PropertyInterface $property
      * @return Abbreviation[]
      */
     public function getContentData(PropertyInterface $property): array
     {
-        $ids = $property->getValue();
+        $ids    = $property->getValue();
         $locale = $property->getStructure()->getLanguageCode();
 
         $abbreviations = [];

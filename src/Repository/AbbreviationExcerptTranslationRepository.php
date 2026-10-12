@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Manuxi\SuluAbbreviationsBundle\Repository;
 
-use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationExcerptTranslation;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationExcerptTranslation;
 
 /**
  * @method AbbreviationExcerptTranslation|null find($id, $lockMode = null, $lockVersion = null)

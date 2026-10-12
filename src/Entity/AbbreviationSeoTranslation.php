@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Manuxi\SuluAbbreviationsBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationSeoTranslationRepository;
 use Manuxi\SuluSharedToolsBundle\Entity\Interfaces\SeoTranslationInterface;
 use Manuxi\SuluSharedToolsBundle\Entity\Traits\SeoTranslationTrait;
-use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationSeoTranslationRepository;
 
 #[ORM\Entity(repositoryClass: AbbreviationSeoTranslationRepository::class)]
 #[ORM\Table(name: 'app_abbreviation_seo_translation')]
@@ -29,5 +29,4 @@ class AbbreviationSeoTranslation implements SeoTranslationInterface
     {
         return $this->abbreviationSeo;
     }
-
 }

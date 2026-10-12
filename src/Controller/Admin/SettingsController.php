@@ -17,7 +17,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-
 /**
  * @RouteResource("abbreviations-settings")
  */
@@ -30,9 +29,9 @@ class SettingsController extends AbstractRestController implements ClassResource
         EntityManagerInterface $entityManager,
         ViewHandlerInterface $viewHandler,
         DomainEventCollectorInterface $domainEventCollector,
-        ?TokenStorageInterface $tokenStorage = null
+        ?TokenStorageInterface $tokenStorage = null,
     ) {
-        $this->entityManager = $entityManager;
+        $this->entityManager        = $entityManager;
         $this->domainEventCollector = $domainEventCollector;
 
         parent::__construct($viewHandler, $tokenStorage);
@@ -67,8 +66,8 @@ class SettingsController extends AbstractRestController implements ClassResource
     protected function getDataForEntity(AbbreviationsSettings $entity): array
     {
         return [
-            'toggleHeader' => $entity->getToggleHeader(),
-            'toggleHero' => $entity->getToggleHero(),
+            'toggleHeader'      => $entity->getToggleHeader(),
+            'toggleHero'        => $entity->getToggleHero(),
             'toggleBreadcrumbs' => $entity->getToggleBreadcrumbs(),
             'pageAbbreviations' => $entity->getPageAbbreviations(),
         ];

@@ -46,20 +46,20 @@ class AbbreviationsTrashItemHandler implements StoreTrashItemHandlerInterface, R
         $image = $entity->getImage();
 
         $data = [
-            'name' => $entity->getName(),
+            'name'        => $entity->getName(),
             'explanation' => $entity->getExplanation(),
             'description' => $entity->getDescription(),
-            'slug' => $entity->getRoutePath(),
-            'published' => $entity->isPublished(),
+            'slug'        => $entity->getRoutePath(),
+            'published'   => $entity->isPublished(),
             'publishedAt' => $entity->getPublishedAt(),
-            'ext' => $entity->getExt(),
-            'locale' => $entity->getLocale(),
-            'imageId' => $image?->getId(),
-            'link' => $entity->getLink(),
-            'showAuthor' => $entity->getShowAuthor(),
-            'showDate' => $entity->getShowDate(),
-            'authored' => $entity->getAuthored(),
-            'author' => $entity->getAuthor(),
+            'ext'         => $entity->getExt(),
+            'locale'      => $entity->getLocale(),
+            'imageId'     => $image?->getId(),
+            'link'        => $entity->getLink(),
+            'showAuthor'  => $entity->getShowAuthor(),
+            'showDate'    => $entity->getShowDate(),
+            'authored'    => $entity->getAuthored(),
+            'author'      => $entity->getAuthor(),
         ];
 
         $restoreType = isset($options['locale']) ? 'translation' : null;
@@ -84,7 +84,7 @@ class AbbreviationsTrashItemHandler implements StoreTrashItemHandlerInterface, R
         $data = $trashItem->getRestoreData();
 
         $abbreviationId = (int) $trashItem->getResourceId();
-        $abbreviation = new Abbreviation();
+        $abbreviation   = new Abbreviation();
         $abbreviation->setLocale($data['locale']);
         $abbreviation->setName($data['name']);
         $abbreviation->setExplanation($data['explanation']);
@@ -123,7 +123,7 @@ class AbbreviationsTrashItemHandler implements StoreTrashItemHandlerInterface, R
         return $abbreviation;
     }
 
-    private function createRoute(EntityManagerInterface $manager, int $id, string $locale, string $slug, string $class)
+    private function createRoute(EntityManagerInterface $manager, int $id, string $locale, string $slug, string $class): void
     {
         $route = new Route();
         $route->setPath($slug);

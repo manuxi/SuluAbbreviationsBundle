@@ -50,7 +50,7 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
 
     public function cgetAction(Request $request): Response
     {
-        $locale = $request->query->get('locale');
+        $locale             = $request->query->get('locale');
         $listRepresentation = $this->doctrineListRepresentationFactory->createDoctrineListRepresentation(
             Abbreviation::RESOURCE_KEY,
             [],
@@ -101,8 +101,8 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
                     $entity = $this->abbreviationModel->copy($id, $request);
                     break;
                 case 'copy-locale':
-                    $locale = $this->getRequestParameter($request, 'locale', true);
-                    $srcLocale = $this->getRequestParameter($request, 'src', false, $locale);
+                    $locale      = $this->getRequestParameter($request, 'locale', true);
+                    $srcLocale   = $this->getRequestParameter($request, 'src', false, $locale);
                     $destLocales = $this->getRequestParameter($request, 'dest', true);
                     $destLocales = explode(',', $destLocales);
 
@@ -116,7 +116,7 @@ class AbbreviationsController extends AbstractRestController implements ClassRes
                     $entity = $this->abbreviationModel->copyLanguage($id, $request, $srcLocale, $destLocales);
                     break;
                 default:
-                    throw new BadRequestHttpException(sprintf('Unknown action "%s".', $action));
+                    throw new BadRequestHttpException(\sprintf('Unknown action "%s".', $action));
             }
         } catch (RestException $exc) {
             $view = $this->view($exc->toArray(), 400);

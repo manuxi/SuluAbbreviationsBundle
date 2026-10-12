@@ -17,7 +17,8 @@ class AbbreviationsSitemapProvider implements SitemapProviderInterface
     public function __construct(
         private readonly AbbreviationRepository $repository,
         private readonly WebspaceManagerInterface $webspaceManager,
-    ) {}
+    ) {
+    }
 
     public function build($page, $scheme, $host)
     {
@@ -26,7 +27,7 @@ class AbbreviationsSitemapProvider implements SitemapProviderInterface
         $result = [];
         foreach ($this->findAbbreviations($locale, self::PAGE_SIZE, ($page - 1) * self::PAGE_SIZE) as $abbr) {
             $result[] = new SitemapUrl(
-                $scheme.'://'.$host.$abbr->getRoutePath(),
+                $scheme . '://' . $host . $abbr->getRoutePath(),
                 $abbr->getLocale(),
                 $abbr->getLocale(),
                 $abbr->getChanged()

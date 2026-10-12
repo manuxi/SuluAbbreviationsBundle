@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace Manuxi\SuluAbbreviationsBundle\Repository;
 
-use Doctrine\Common\Collections\Criteria;
-use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
-use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationTranslation;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\Persistence\ManagerRegistry;
+use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationTranslation;
 
 /**
  * @method AbbreviationTranslation|null find($id, $lockMode = null, $lockVersion = null)
@@ -37,7 +36,7 @@ class AbbreviationTranslationRepository extends ServiceEntityRepository
             ->select('IDENTITY(et.abbreviation) as abbreviation, et.locale, count(et.abbreviation) as abbreviationCount')
             ->getQuery()
         ;
-//        dump($query->getSQL());
+        //        dump($query->getSQL());
         return $query->getResult();
     }
 
@@ -45,7 +44,6 @@ class AbbreviationTranslationRepository extends ServiceEntityRepository
     {
         return Criteria::create()
             ->andWhere(Criteria::expr()->in('abbreviation', $ids))
-            ;
+        ;
     }
-
 }

@@ -19,7 +19,7 @@ class AbbreviationsObjectProvider implements PreviewObjectProviderInterface
 
     public function getObject($id, $locale)
     {
-        return $this->repository->findById((int)$id, $locale);
+        return $this->repository->findById((int) $id, $locale);
     }
 
     public function getId($object)
@@ -27,7 +27,7 @@ class AbbreviationsObjectProvider implements PreviewObjectProviderInterface
         return $object->getId();
     }
 
-    public function setValues($object, $locale, array $data)
+    public function setValues($object, $locale, array $data): void
     {
         // TODO: Implement setValues() method.
     }
@@ -50,7 +50,7 @@ class AbbreviationsObjectProvider implements PreviewObjectProviderInterface
     {
         return unserialize($serializedObject);
     }
-    
+
     public function getSecurityContext($id, $locale): ?string
     {
         $webspaceKey = $this->documentInspector->getWebspace($this->getObject($id, $locale));

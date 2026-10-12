@@ -20,16 +20,16 @@ class AbbreviationsAdmin extends Admin
 {
     public const NAV_ITEM = 'sulu_abbreviations.abbreviations';
 
-    public const LIST_VIEW = 'sulu_abbreviations.abbreviations.list';
-    public const ADD_FORM_VIEW = 'sulu_abbreviations.abbreviations.add_form';
-    public const ADD_FORM_DETAILS_VIEW = 'sulu_abbreviations.abbreviations.add_form.details';
-    public const EDIT_FORM_VIEW = 'sulu_abbreviations.abbreviations.edit_form';
+    public const LIST_VIEW              = 'sulu_abbreviations.abbreviations.list';
+    public const ADD_FORM_VIEW          = 'sulu_abbreviations.abbreviations.add_form';
+    public const ADD_FORM_DETAILS_VIEW  = 'sulu_abbreviations.abbreviations.add_form.details';
+    public const EDIT_FORM_VIEW         = 'sulu_abbreviations.abbreviations.edit_form';
     public const EDIT_FORM_DETAILS_VIEW = 'sulu_abbreviations.abbreviations.edit_form.details';
-    public const SECURITY_CONTEXT = 'sulu.modules.abbreviation';
+    public const SECURITY_CONTEXT       = 'sulu.modules.abbreviation';
 
     // seo,excerpt, etc
-    public const EDIT_FORM_VIEW_SEO = 'sulu_abbreviations.edit_form.seo';
-    public const EDIT_FORM_VIEW_EXCERPT = 'sulu_abbreviations.edit_form.excerpt';
+    public const EDIT_FORM_VIEW_SEO      = 'sulu_abbreviations.edit_form.seo';
+    public const EDIT_FORM_VIEW_EXCERPT  = 'sulu_abbreviations.edit_form.excerpt';
     public const EDIT_FORM_VIEW_SETTINGS = 'sulu_abbreviations.edit_form.settings';
 
     private ?array $types = null;
@@ -154,7 +154,7 @@ class AbbreviationsAdmin extends Admin
 
             // seo,excerpt, etc
             $formToolbarActionsWithoutType = [];
-            $previewCondition = 'nodeType == 1';
+            $previewCondition              = 'nodeType == 1';
 
             if ($this->securityChecker->hasPermission(Abbreviation::SECURITY_CONTEXT, PermissionTypes::ADD)) {
                 $listToolbarActions[] = new ToolbarAction('sulu_admin.add');

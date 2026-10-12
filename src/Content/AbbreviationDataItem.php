@@ -8,10 +8,9 @@ use JMS\Serializer\Annotation as Serializer;
 use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use Sulu\Component\SmartContent\ItemInterface;
 
-#[Serializer\ExclusionPolicy("all")]
+#[Serializer\ExclusionPolicy('all')]
 class AbbreviationDataItem implements ItemInterface
 {
-
     private Abbreviation $entity;
 
     public function __construct(Abbreviation $entity)

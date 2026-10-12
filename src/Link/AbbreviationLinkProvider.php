@@ -20,7 +20,7 @@ class AbbreviationLinkProvider implements LinkProviderInterface
     public function __construct(AbbreviationRepository $abbreviationRepository, TranslatorInterface $translator)
     {
         $this->abbreviationRepository = $abbreviationRepository;
-        $this->translator = $translator;
+        $this->translator             = $translator;
     }
 
     /**
@@ -29,12 +29,12 @@ class AbbreviationLinkProvider implements LinkProviderInterface
     public function getConfiguration(): LinkConfiguration
     {
         return LinkConfigurationBuilder::create()
-            ->setTitle($this->translator->trans('sulu_abbreviations.abbreviation',[],'admin'))
+            ->setTitle($this->translator->trans('sulu_abbreviations.abbreviation', [], 'admin'))
             ->setResourceKey(Abbreviation::RESOURCE_KEY) // the resourceKey of the entity that should be loaded
             ->setListAdapter('table')
             ->setDisplayProperties(['title'])
-            ->setOverlayTitle($this->translator->trans('sulu_abbreviations.abbreviation',[],'admin'))
-            ->setEmptyText($this->translator->trans('sulu_abbreviations.empty_abbreviationlist',[],'admin'))
+            ->setOverlayTitle($this->translator->trans('sulu_abbreviations.abbreviation', [], 'admin'))
+            ->setEmptyText($this->translator->trans('sulu_abbreviations.empty_abbreviationlist', [], 'admin'))
             ->setIcon('su-tag-pen')
             ->getLinkConfiguration();
     }
@@ -44,11 +44,11 @@ class AbbreviationLinkProvider implements LinkProviderInterface
      */
     public function preload(array $hrefs, $locale, $published = true): array
     {
-        if (0 === count($hrefs)) {
+        if (0 === \count($hrefs)) {
             return [];
         }
 
-        $result = [];
+        $result   = [];
         $elements = $this->abbreviationRepository->findBy(['id' => $hrefs]); // load items by id
         foreach ($elements as $element) {
             $element->setLocale($locale);

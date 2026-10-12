@@ -20,12 +20,12 @@ class SuluAbbreviationsExtension extends Extension implements PrependExtensionIn
     /**
      * @throws \Exception
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = new Configuration();
-        $config = $this->processConfiguration($configuration, $configs);
+        $config        = $this->processConfiguration($configuration, $configs);
 
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.xml');
         $loader->load('controller.xml');
 
@@ -41,7 +41,7 @@ class SuluAbbreviationsExtension extends Extension implements PrependExtensionIn
         $this->configurePersistence($config['objects'], $container);
     }
 
-    public function prepend(ContainerBuilder $container)
+    public function prepend(ContainerBuilder $container): void
     {
         if ($container->hasExtension('sulu_search')) {
             $container->prependExtensionConfig(
@@ -49,25 +49,25 @@ class SuluAbbreviationsExtension extends Extension implements PrependExtensionIn
                 [
                     'indexes' => [
                         'abbreviations' => [
-                            'name' => 'sulu_abbreviations.search.index.abbreviations',
-                            'icon' => 'su-tag-pen',
+                            'name'             => 'sulu_abbreviations.search.index.abbreviations',
+                            'icon'             => 'su-tag-pen',
                             'security_context' => Abbreviation::SECURITY_CONTEXT,
-                            'view' => [
-                                'name' => AbbreviationsAdmin::EDIT_FORM_VIEW,
+                            'view'             => [
+                                'name'           => AbbreviationsAdmin::EDIT_FORM_VIEW,
                                 'result_to_view' => [
-                                    'id' => 'id',
+                                    'id'     => 'id',
                                     'locale' => 'locale',
                                 ],
                             ],
                         ],
                         'abbreviations_published' => [
-                            'name' => 'sulu_abbreviations.search.index.abbreviations_published',
-                            'icon' => 'su-tag-pen',
+                            'name'             => 'sulu_abbreviations.search.index.abbreviations_published',
+                            'icon'             => 'su-tag-pen',
                             'security_context' => Abbreviation::SECURITY_CONTEXT,
-                            'view' => [
-                                'name' => AbbreviationsAdmin::EDIT_FORM_VIEW,
+                            'view'             => [
+                                'name'           => AbbreviationsAdmin::EDIT_FORM_VIEW,
                                 'result_to_view' => [
-                                    'id' => 'id',
+                                    'id'     => 'id',
                                     'locale' => 'locale',
                                 ],
                             ],
@@ -84,7 +84,7 @@ class SuluAbbreviationsExtension extends Extension implements PrependExtensionIn
                     'mappings' => [
                         Abbreviation::class => [
                             'generator' => 'schema',
-                            'options' => [
+                            'options'   => [
                                 // @TODO: works not yet as expected, does not translate correctly
                                 // see https://github.com/sulu/sulu/pull/5920
                                 'route_schema' => '/{translator.trans("sulu_abbreviations.abbreviations")}/{implode("-", object)}',
@@ -102,18 +102,18 @@ class SuluAbbreviationsExtension extends Extension implements PrependExtensionIn
                 [
                     'lists' => [
                         'directories' => [
-                            __DIR__.'/../Resources/config/lists',
+                            __DIR__ . '/../Resources/config/lists',
                         ],
                     ],
                     'forms' => [
                         'directories' => [
-                            __DIR__.'/../Resources/config/forms',
+                            __DIR__ . '/../Resources/config/forms',
                         ],
                     ],
                     'resources' => [
                         'abbreviations' => [
                             'routes' => [
-                                'list' => 'sulu_abbreviations.get_abbreviations',
+                                'list'   => 'sulu_abbreviations.get_abbreviations',
                                 'detail' => 'sulu_abbreviations.get_abbreviation',
                             ],
                         ],
@@ -128,21 +128,21 @@ class SuluAbbreviationsExtension extends Extension implements PrependExtensionIn
                             'abbreviation_selection' => [
                                 'default_type' => 'list_overlay',
                                 'resource_key' => Abbreviation::RESOURCE_KEY,
-                                'view' => [
-                                    'name' => AbbreviationsAdmin::EDIT_FORM_VIEW,
+                                'view'         => [
+                                    'name'           => AbbreviationsAdmin::EDIT_FORM_VIEW,
                                     'result_to_view' => [
                                         'id' => 'id',
                                     ],
                                 ],
                                 'types' => [
                                     'list_overlay' => [
-                                        'adapter' => 'table',
-                                        'list_key' => Abbreviation::LIST_KEY,
+                                        'adapter'            => 'table',
+                                        'list_key'           => Abbreviation::LIST_KEY,
                                         'display_properties' => [
                                             'name',
                                         ],
-                                        'icon' => 'su-tag-pen',
-                                        'label' => 'sulu_abbreviations.abbreviations_selection_label',
+                                        'icon'          => 'su-tag-pen',
+                                        'label'         => 'sulu_abbreviations.abbreviations_selection_label',
                                         'overlay_title' => 'sulu_abbreviations.select_abbreviation',
                                     ],
                                 ],
@@ -152,25 +152,25 @@ class SuluAbbreviationsExtension extends Extension implements PrependExtensionIn
                             'single_abbreviation_selection' => [
                                 'default_type' => 'list_overlay',
                                 'resource_key' => Abbreviation::RESOURCE_KEY,
-                                'view' => [
-                                    'name' => AbbreviationsAdmin::EDIT_FORM_VIEW,
+                                'view'         => [
+                                    'name'           => AbbreviationsAdmin::EDIT_FORM_VIEW,
                                     'result_to_view' => [
                                         'id' => 'id',
                                     ],
                                 ],
                                 'types' => [
                                     'list_overlay' => [
-                                        'adapter' => 'table',
-                                        'list_key' => Abbreviation::LIST_KEY,
+                                        'adapter'            => 'table',
+                                        'list_key'           => Abbreviation::LIST_KEY,
                                         'display_properties' => [
                                             'name',
                                         ],
-                                        'icon' => 'su-tag-pen',
-                                        'empty_text' => 'sulu_abbreviations.no_abbreviation_selected',
+                                        'icon'          => 'su-tag-pen',
+                                        'empty_text'    => 'sulu_abbreviations.no_abbreviation_selected',
                                         'overlay_title' => 'sulu_abbreviations.select_abbreviation',
                                     ],
                                     'auto_complete' => [
-                                        'display_property' => 'name',
+                                        'display_property'  => 'name',
                                         'search_properties' => [
                                             'name',
                                         ],
@@ -185,7 +185,7 @@ class SuluAbbreviationsExtension extends Extension implements PrependExtensionIn
 
         $container->loadFromExtension('framework', [
             'default_locale' => 'en',
-            'translator' => ['paths' => [__DIR__.'/../Resources/config/translations/']],
+            'translator'     => ['paths' => [__DIR__ . '/../Resources/config/translations/']],
         ]);
     }
 }

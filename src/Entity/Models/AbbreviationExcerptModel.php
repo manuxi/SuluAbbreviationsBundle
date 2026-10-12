@@ -30,9 +30,9 @@ class AbbreviationExcerptModel implements AbbreviationExcerptModelInterface
         MediaRepositoryInterface $mediaRepository,
     ) {
         $this->abbreviationExcerptRepository = $abbreviationExcerptRepository;
-        $this->categoryManager = $categoryManager;
-        $this->tagManager = $tagManager;
-        $this->mediaRepository = $mediaRepository;
+        $this->categoryManager               = $categoryManager;
+        $this->tagManager                    = $tagManager;
+        $this->mediaRepository               = $mediaRepository;
     }
 
     /**
@@ -71,7 +71,7 @@ class AbbreviationExcerptModel implements AbbreviationExcerptModelInterface
         }
 
         $categoryIds = $this->getProperty($data, 'categories');
-        if ($categoryIds && is_array($categoryIds)) {
+        if ($categoryIds && \is_array($categoryIds)) {
             $abbreviationExcerpt->removeCategories();
             $categories = $this->categoryManager->findByIds($categoryIds);
             foreach ($categories as $category) {
@@ -80,7 +80,7 @@ class AbbreviationExcerptModel implements AbbreviationExcerptModelInterface
         }
 
         $tags = $this->getProperty($data, 'tags');
-        if ($tags && is_array($tags)) {
+        if ($tags && \is_array($tags)) {
             $abbreviationExcerpt->removeTags();
             foreach ($tags as $tagName) {
                 $abbreviationExcerpt->addTag($this->tagManager->findOrCreateByName($tagName));
@@ -88,7 +88,7 @@ class AbbreviationExcerptModel implements AbbreviationExcerptModelInterface
         }
 
         $iconIds = $this->getPropertyMulti($data, ['icon', 'ids']);
-        if ($iconIds && is_array($iconIds)) {
+        if ($iconIds && \is_array($iconIds)) {
             $abbreviationExcerpt->removeIcons();
             foreach ($iconIds as $iconId) {
                 $icon = $this->mediaRepository->findMediaById((int) $iconId);
@@ -100,7 +100,7 @@ class AbbreviationExcerptModel implements AbbreviationExcerptModelInterface
         }
 
         $imageIds = $this->getPropertyMulti($data, ['images', 'ids']);
-        if ($imageIds && is_array($imageIds)) {
+        if ($imageIds && \is_array($imageIds)) {
             $abbreviationExcerpt->removeImages();
             foreach ($imageIds as $imageId) {
                 $image = $this->mediaRepository->findMediaById((int) $imageId);

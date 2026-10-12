@@ -133,8 +133,8 @@ class AbbreviationRepository extends ServiceEntityRepository implements DataProv
     ) {
         $entities = $this->getPublishedAbbreviations($filters, $locale, $page, $pageSize, $limit, $options);
 
-        return \array_map(
-            function (Abbreviation $entity) use ($locale) {
+        return array_map(
+            static function (Abbreviation $entity) use ($locale) {
                 return $entity->setLocale($locale);
             },
             $entities
@@ -153,7 +153,7 @@ class AbbreviationRepository extends ServiceEntityRepository implements DataProv
     protected function append(QueryBuilder $queryBuilder, string $alias, string $locale, $options = []): array
     {
         // $queryBuilder->andWhere($alias . '.translation.published = true');
-        $queryBuilder->innerJoin($alias.'.translations', 'translation', Join::WITH, 'translation.locale = :locale');
+        $queryBuilder->innerJoin($alias . '.translations', 'translation', Join::WITH, 'translation.locale = :locale');
         $queryBuilder->setParameter('locale', $locale);
         $queryBuilder->andWhere('translation.published = :published');
         $queryBuilder->setParameter('published', true);
@@ -163,19 +163,19 @@ class AbbreviationRepository extends ServiceEntityRepository implements DataProv
 
     public function appendCategoriesRelation(QueryBuilder $queryBuilder, $alias)
     {
-        return $alias.'.category';
+        return $alias . '.category';
         // $queryBuilder->addSelect($alias.'.category');
     }
 
     protected function appendSortByJoins(QueryBuilder $queryBuilder, string $alias, string $locale): void
     {
-        $queryBuilder->innerJoin($alias.'.translations', 'translation', Join::WITH, 'translation.locale = :locale');
+        $queryBuilder->innerJoin($alias . '.translations', 'translation', Join::WITH, 'translation.locale = :locale');
         $queryBuilder->setParameter('locale', $locale);
     }
 
     public function hasNextPage(array $filters, ?int $page, ?int $pageSize, ?int $limit, string $locale, array $options = []): bool
     {
-        $pageCurrent = (key_exists('page', $options)) ? (int) $options['page'] : 0;
+        $pageCurrent   = (\array_key_exists('page', $options)) ? (int) $options['page'] : 0;
         $totalArticles = $this->createQueryBuilder('n')
             ->select('count(n.id)')
             ->leftJoin('n.translations', 'translation')
@@ -188,14 +188,13 @@ class AbbreviationRepository extends ServiceEntityRepository implements DataProv
 
         if ((int) ($limit * $pageCurrent) + $limit < (int) $totalArticles) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
-    public function getPublishedAbbreviations(array $filters, string $locale, ?int $page, $pageSize, $limit = null, array $options): array
+    public function getPublishedAbbreviations(array $filters, string $locale, ?int $page, $pageSize, $limit, array $options): array
     {
-        $pageCurrent = (key_exists('page', $options)) ? (int) $options['page'] : 0;
+        $pageCurrent = (\array_key_exists('page', $options)) ? (int) $options['page'] : 0;
 
         $queryBuilder = $this->createQueryBuilder('abbreviation')
             ->leftJoin('abbreviation.translations', 'translation')
@@ -243,11 +242,11 @@ class AbbreviationRepository extends ServiceEntityRepository implements DataProv
         if ('and' === $operator) {
             // AND: Entity must have ALL tags (multiple JOINs necessary)
             foreach ($filters['tags'] as $i => $tag) {
-                $alias = 'tag'.$i;
+                $alias = 'tag' . $i;
                 $queryBuilder
                     ->innerJoin('excerpt_translation.tags', $alias)
-                    ->andWhere($queryBuilder->expr()->eq($alias.'.id', ':tag'.$i))
-                    ->setParameter('tag'.$i, $tag);
+                    ->andWhere($queryBuilder->expr()->eq($alias . '.id', ':tag' . $i))
+                    ->setParameter('tag' . $i, $tag);
             }
         } else {
             // OR: Entity must at least have one of the tags
@@ -271,11 +270,11 @@ class AbbreviationRepository extends ServiceEntityRepository implements DataProv
         if ('and' === $operator) {
             // AND: Entity must have ALL categories (multiple JOINs necessary)
             foreach ($filters['categories'] as $i => $category) {
-                $alias = 'category'.$i;
+                $alias = 'category' . $i;
                 $queryBuilder
                     ->leftJoin('excerpt_translation.categories', $alias)
-                    ->andWhere($alias.'.id = :category'.$i)
-                    ->setParameter('category'.$i, $category);
+                    ->andWhere($alias . '.id = :category' . $i)
+                    ->setParameter('category' . $i, $category);
             }
         } else {
             // OR: Entity must at least have one of the categories

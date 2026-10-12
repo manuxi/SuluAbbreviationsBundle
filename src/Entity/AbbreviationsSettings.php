@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Manuxi\SuluAbbreviationsBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
@@ -13,8 +15,8 @@ class AbbreviationsSettings implements AuditableInterface
 {
     use AuditableTrait;
 
-    public const RESOURCE_KEY = 'abbreviations_settings';
-    public const FORM_KEY = 'abbreviations_config';
+    public const RESOURCE_KEY     = 'abbreviations_settings';
+    public const FORM_KEY         = 'abbreviations_config';
     public const SECURITY_CONTEXT = 'sulu.abbreviations.settings';
 
     #[ORM\Id]
@@ -78,5 +80,4 @@ class AbbreviationsSettings implements AuditableInterface
     {
         $this->pageAbbreviations = $pageAbbreviations;
     }
-
 }

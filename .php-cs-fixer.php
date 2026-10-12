@@ -37,6 +37,9 @@ return (new PhpCsFixer\Config())
         'concat_space'                          => [
             'spacing' => 'one'
         ],
+        'declare_strict_types'                  => [
+            'strategy' => 'enforce',
+        ],
         'linebreak_after_opening_tag'           => true,
         'mb_str_functions'                      => true,
         'no_php4_constructor'                   => true,

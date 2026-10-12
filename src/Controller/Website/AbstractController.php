@@ -14,24 +14,18 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 abstract class AbstractController extends WebsiteController
 {
-
     protected ?Request $request;
     protected MediaManagerInterface $mediaManager;
 
     public function __construct(
         RequestStack $requestStack,
-        MediaManagerInterface $mediaManager
+        MediaManagerInterface $mediaManager,
     ) {
         $this->request      = $requestStack->getCurrentRequest();
         $this->mediaManager = $mediaManager;
     }
 
     /**
-     * @param string $viewTemplate
-     * @param array $parameters
-     * @param bool $preview
-     * @param bool $partial
-     * @return Response
      * @throws \Exception
      */
     protected function prepareResponse(string $viewTemplate, array $parameters, bool $preview, bool $partial): Response
@@ -62,7 +56,6 @@ abstract class AbstractController extends WebsiteController
                 );
             }
             return $response;
-
         } catch (\InvalidArgumentException $exception) {
             // template not found
             throw new HttpException(406, 'Error encountered while rendering content.', $exception);
@@ -71,7 +64,7 @@ abstract class AbstractController extends WebsiteController
 
     private function createResponse(Request $request): Response
     {
-        $response = new Response();
+        $response      = new Response();
         $cacheLifetime = $request->attributes->get('_cacheLifetime');
 
         if ($cacheLifetime) {
@@ -105,5 +98,4 @@ abstract class AbstractController extends WebsiteController
         }
         return $view . '.' . $requestFormat . '.twig';
     }
-
 }

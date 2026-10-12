@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Manuxi\SuluAbbreviationsBundle\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\OptimisticLockException;
-use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\ManagerRegistry;
 use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationExcerpt;
 
@@ -20,7 +18,6 @@ use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationExcerpt;
  */
 class AbbreviationExcerptRepository extends ServiceEntityRepository
 {
-
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, AbbreviationExcerpt::class);
@@ -64,5 +61,4 @@ class AbbreviationExcerptRepository extends ServiceEntityRepository
 
         return $abbreviationExcerpt;
     }
-
 }
