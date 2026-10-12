@@ -53,7 +53,7 @@ class AbbreviationTeaserProvider extends ContentTeaserProvider
         }
 
         $explanation = $data['explanation'] ?? null;
-        $description = \is_string($explanation) ? trim(strip_tags($explanation)) : '';
+        $description = \is_string($explanation) ? (string) preg_replace('/^\s+|\s+$/u', '', strip_tags($explanation)) : '';
 
         return '' !== $description ? $description : parent::getDescription($dimensionContent, $data);
     }

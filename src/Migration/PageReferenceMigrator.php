@@ -204,8 +204,7 @@ class PageReferenceMigrator
             return null;
         }
 
-        $trimmed = ltrim($value);
-        if ('' !== $trimmed && \in_array($trimmed[0], ['{', '['], true)) {
+        if (1 === preg_match('/^\s*[{\[]/', $value)) {
             $decoded = json_decode($value, true);
 
             if (\is_array($decoded)) {
