@@ -7,8 +7,10 @@ namespace Manuxi\SuluAbbreviationsBundle\Tests\Unit\DependencyInjection;
 use Manuxi\SuluAbbreviationsBundle\DependencyInjection\SuluAbbreviationsExtension;
 use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationRepository;
 use Manuxi\SuluAbbreviationsBundle\Routing\AbbreviationsRouteDefaultsProvider;
+use Manuxi\SuluAbbreviationsBundle\SuluAbbreviationsBundle;
 use PHPUnit\Framework\TestCase;
 use Sulu\Bundle\AutomationBundle\SuluAutomationBundle;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class SuluAbbreviationsExtensionTest extends TestCase
@@ -70,6 +72,25 @@ class SuluAbbreviationsExtensionTest extends TestCase
 
         sort($aliases);
         $this->assertSame(['abbreviation_selection', 'single_abbreviation_selection'], $aliases);
+    }
+
+    public function testPrependDoesNotConfigureFramework(): void
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new FrameworkExtension());
+
+        (new SuluAbbreviationsExtension())->prepend($container);
+
+        $this->assertSame([], $container->getExtensionConfig('framework'));
+    }
+
+    public function testTranslationsAreInAutoDiscoveredDirectory(): void
+    {
+        $directory = \dirname((string) (new \ReflectionClass(SuluAbbreviationsBundle::class))->getFileName()) . '/Resources/translations';
+
+        foreach (['admin.de.yaml', 'admin.en.yaml', 'messages.de.yaml', 'messages.en.yaml'] as $file) {
+            $this->assertFileExists($directory . '/' . $file);
+        }
     }
 
     public function testAutomationServicesAreOnlyLoadedWithAutomationBundle(): void

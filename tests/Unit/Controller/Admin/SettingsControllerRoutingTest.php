@@ -13,7 +13,6 @@ use Manuxi\SuluAbbreviationsBundle\DependencyInjection\SuluAbbreviationsExtensio
 use Manuxi\SuluAbbreviationsBundle\Entity\AbbreviationsSettings;
 use PHPUnit\Framework\TestCase;
 use Sulu\Bundle\AdminBundle\DependencyInjection\SuluAdminExtension;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class SettingsControllerRoutingTest extends TestCase
@@ -33,7 +32,6 @@ class SettingsControllerRoutingTest extends TestCase
 
         $container = new ContainerBuilder();
         $container->registerExtension(new SuluAdminExtension());
-        $container->registerExtension(new FrameworkExtension());
         (new SuluAbbreviationsExtension())->prepend($container);
 
         $adminConfig = array_merge_recursive(...$container->getExtensionConfig('sulu_admin'));

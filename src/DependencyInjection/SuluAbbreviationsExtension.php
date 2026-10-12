@@ -183,10 +183,5 @@ class SuluAbbreviationsExtension extends Extension implements PrependExtensionIn
                 ]
             );
         }
-
-        $container->loadFromExtension('framework', [
-            'default_locale' => 'en',
-            'translator'     => ['paths' => [__DIR__ . '/../Resources/config/translations/']],
-        ]);
     }
 }
