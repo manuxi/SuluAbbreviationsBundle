@@ -94,7 +94,7 @@ class AbbreviationRepository extends ServiceEntityRepository implements DataProv
         return $abbreviations;
     }
 
-    public function countForSitemap(string $locale)
+    public function countForSitemap(string $locale): int
     {
         $query = $this->createQueryBuilder('abbreviation')
             ->select('count(abbreviation)')
@@ -104,7 +104,7 @@ class AbbreviationRepository extends ServiceEntityRepository implements DataProv
             ->andWhere('translation.locale = :locale')
             ->setParameter('locale', $locale);
 
-        return $query->getQuery()->getSingleScalarResult();
+        return (int) $query->getQuery()->getSingleScalarResult();
     }
 
     /**
