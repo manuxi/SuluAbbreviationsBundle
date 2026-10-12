@@ -733,18 +733,6 @@ parameters:
 			path: src/Trash/AbbreviationsTrashItemHandler.php
 
 		-
-			message: '#^Method Manuxi\\SuluAbbreviationsBundle\\Twig\\AbbreviationsTwigExtension\:\:getAbbreviations\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/Twig/AbbreviationsTwigExtension.php
-
-		-
-			message: '#^Method Manuxi\\SuluAbbreviationsBundle\\Twig\\AbbreviationsTwigExtension\:\:getAbbreviations\(\) has parameter \$locale with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: src/Twig/AbbreviationsTwigExtension.php
-
-		-
 			message: '#^Property Manuxi\\SuluAbbreviationsBundle\\Tests\\Unit\\Entity\\AbbreviationTranslationTest\:\:\$abbreviation with generic class Prophecy\\Prophecy\\ObjectProphecy does not specify its types\: T$#'
 			identifier: missingType.generics
 			count: 1

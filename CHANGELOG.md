@@ -23,6 +23,7 @@ All notable changes to this project are documented in this file.
 - The settings payload passed to `Settings\ModifiedEvent` was silently dropped (the constructor accepted only the entity). `Settings\AbstractEvent` now accepts and returns the payload; missing keys in the PUT body no longer raise warnings.
 - Translations moved from `src/Resources/config/translations/` to `src/Resources/translations/`, where Symfony discovers them automatically. The extension no longer prepends `framework.translator.paths` and no longer overrides the host application's `framework.default_locale` with `en`.
 - Automation task handlers translated the non-existing keys `sulu_abbreviation.publish` / `sulu_abbreviation.unpublish`; they now use `sulu_abbreviations.publish` / `sulu_abbreviations.unpublish`. A unit test checks that every key passed to `trans()` exists in the de/en translation files.
+- Twig: `sulu_get_abbreviations()` requested page 0 and defaulted to the locale `en`; it now requests page 1 and uses the locale of the current request when no locale is passed. `sulu_resolve_abbreviation()` also uses the request locale by default and returns `null` for abbreviations that are not published in that locale.
 
 ### Removed
 - `Content\AbbreviationsSelectionContentType` (duplicate of `Content\Type\AbbreviationsSelection`). Templates must use the property type `abbreviation_selection`.

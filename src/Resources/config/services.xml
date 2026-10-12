@@ -144,6 +144,7 @@
         <!--Twig-->
         <service id="sulu_abbreviations.default.twig_extension" class="Manuxi\SuluAbbreviationsBundle\Twig\AbbreviationsTwigExtension">
             <argument type="service" id="sulu_abbreviations.repository.abbreviation"/>
+            <argument type="service" id="request_stack"/>
             <tag name="twig.extension"/>
         </service>
         <service id="sulu_abbreviations.settings.twig_extension" class="Manuxi\SuluAbbreviationsBundle\Twig\AbbreviationsSettingsTwigExtension">

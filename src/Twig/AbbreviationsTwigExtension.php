@@ -6,19 +6,21 @@ namespace Manuxi\SuluAbbreviationsBundle\Twig;
 
 use Manuxi\SuluAbbreviationsBundle\Entity\Abbreviation;
 use Manuxi\SuluAbbreviationsBundle\Repository\AbbreviationRepository;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 class AbbreviationsTwigExtension extends AbstractExtension
 {
-    private AbbreviationRepository $abbreviationRepository;
+    private const DEFAULT_LOCALE = 'en';
 
-    public function __construct(AbbreviationRepository $abbreviationRepository)
-    {
-        $this->abbreviationRepository = $abbreviationRepository;
+    public function __construct(
+        private readonly AbbreviationRepository $abbreviationRepository,
+        private readonly RequestStack $requestStack,
+    ) {
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('sulu_resolve_abbreviation', [$this, 'resolveAbbreviation']),
@@ -26,15 +28,32 @@ class AbbreviationsTwigExtension extends AbstractExtension
         ];
     }
 
-    public function resolveAbbreviation(int $id, string $locale = 'en'): ?Abbreviation
+    /**
+     * Returns the abbreviation if it is published in the given locale (default: locale of the current request).
+     */
+    public function resolveAbbreviation(int $id, ?string $locale = null): ?Abbreviation
     {
-        $abbreviation = $this->abbreviationRepository->findById($id, $locale);
+        $abbreviation = $this->abbreviationRepository->findById($id, $this->resolveLocale($locale));
 
-        return $abbreviation ?? null;
+        return true === $abbreviation?->isPublished() ? $abbreviation : null;
     }
 
-    public function getAbbreviations(int $limit = 100, $locale = 'en')
+    /**
+     * Returns the published abbreviations of the given locale (default: locale of the current request).
+     *
+     * @return Abbreviation[]
+     */
+    public function getAbbreviations(int $limit = 100, ?string $locale = null): array
     {
-        return $this->abbreviationRepository->findByFilters([], 0, $limit, $limit, $locale);
+        return $this->abbreviationRepository->findByFilters([], 1, $limit, $limit, $this->resolveLocale($locale));
+    }
+
+    private function resolveLocale(?string $locale): string
+    {
+        if (null !== $locale && '' !== $locale) {
+            return $locale;
+        }
+
+        return $this->requestStack->getCurrentRequest()?->getLocale() ?? self::DEFAULT_LOCALE;
     }
 }
